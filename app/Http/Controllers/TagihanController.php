@@ -41,20 +41,26 @@ class TagihanController extends Controller
 
     public function store(StoreTagihanRequest $request)
     {
-        $tagihan = Tagihan::create($request->validated());
+        $validated = $request->validated();
+        $pelanggan = Pelanggan::find($validated['id_pelanggan']);
+        $tagihanBaru = (float) $validated['total_tagihan'];
+        $warning = null;
 
-        $pelanggan = Pelanggan::find($request->id_pelanggan);
         if ($pelanggan && $pelanggan->batas_kredit > 0) {
-            $kredit = $pelanggan->cekBatasKredit((float) $tagihan->total_tagihan);
+            $kredit = $pelanggan->cekBatasKredit($tagihanBaru);
             if ($kredit['exceeded']) {
-                return redirect()->route('tagihan.index')
-                    ->with('success', 'Tagihan berhasil dibuat.')
-                    ->with('warning', 'Total piutang '.e($pelanggan->nama_pelanggan).' melebihi batas kredit sebesar Rp '.number_format($kredit['kelebihan'], 2).'. Sisa limit: Rp '.number_format($kredit['sisa_limit'], 2).'.');
+                $warning = 'Total piutang '.e($pelanggan->nama_pelanggan).' melebihi batas kredit sebesar Rp '.number_format($kredit['kelebihan'], 0, ',', '.').'. Sisa limit: Rp '.number_format($kredit['sisa_limit'], 0, ',', '.').'.';
             }
         }
 
-        return redirect()->route('tagihan.index')
-            ->with('success', 'Tagihan berhasil dibuat.');
+        Tagihan::create($validated);
+
+        $redirect = redirect()->route('tagihan.index')->with('success', 'Tagihan berhasil dibuat.');
+        if ($warning) {
+            $redirect->with('warning', $warning);
+        }
+
+        return $redirect;
     }
 
     public function show(Tagihan $tagihan)
