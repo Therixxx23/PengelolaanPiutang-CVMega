@@ -1,3 +1,68 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+    body {
+        @apply bg-paper text-ink font-sans antialiased;
+    }
+}
+
+@layer components {
+    .aging-rail-lancar {
+        @apply border-l-[3px] border-status-lancar;
+    }
+    .aging-rail-watch30 {
+        @apply border-l-[3px] border-status-watch30;
+    }
+    .aging-rail-watch60 {
+        @apply border-l-[3px] border-status-watch60;
+    }
+    .aging-rail-critical {
+        @apply border-l-[3px] border-status-critical;
+    }
+    .aging-rail-paid {
+        @apply border-l-[3px] border-status-paid;
+    }
+    .badge {
+        @apply inline-flex items-center px-2 py-0.5 text-xs font-medium rounded;
+    }
+    .badge-lancar {
+        @apply badge text-status-lancar;
+        background-color: rgba(107, 124, 163, 0.1);
+    }
+    .badge-watch30 {
+        @apply badge text-status-watch30;
+        background-color: rgba(200, 134, 42, 0.1);
+    }
+    .badge-watch60 {
+        @apply badge text-status-watch60;
+        background-color: rgba(184, 97, 42, 0.1);
+    }
+    .badge-critical {
+        @apply badge text-status-critical;
+        background-color: rgba(179, 58, 46, 0.1);
+    }
+    .badge-paid {
+        @apply badge text-status-paid;
+        background-color: rgba(62, 124, 88, 0.1);
+    }
+    .btn-primary {
+        @apply inline-flex items-center px-4 py-2 bg-action text-white text-sm font-medium rounded focus:outline-none focus:ring-2 focus:ring-action focus:ring-offset-2 transition hover:brightness-110;
+    }
+    .btn-secondary {
+        @apply inline-flex items-center px-4 py-2 border border-ink text-ink text-sm font-medium rounded focus:outline-none focus:ring-2 focus:ring-action focus:ring-off-2 transition hover:bg-ink hover:text-white;
+    }
+    .btn-destructive {
+        @apply inline-flex items-center px-4 py-2 border border-status-critical text-status-critical text-sm font-medium rounded focus:outline-none focus:ring-2 focus:ring-status-critical focus:ring-offset-2 transition hover:bg-status-critical hover:text-white;
+    }
+    .input-field {
+        @apply block w-full rounded border-line px-3 py-2 text-sm text-ink placeholder-ink-muted focus:border-action focus:ring-1 focus:ring-action;
+    }
+    .table-header {
+        @apply px-4 py-3 text-left text-xs font-medium text-ink-muted uppercase tracking-wider;
+    }
+    .table-cell {
+        @apply px-4 py-3 text-sm text-ink;
+    }
+}
