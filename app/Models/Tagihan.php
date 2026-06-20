@@ -60,9 +60,13 @@ class Tagihan extends Model
             return 0;
         }
 
-        $days = now()->startOfDay()->diffInDays($this->tanggal_jatuh_tempo->startOfDay(), false);
+        $due = $this->tanggal_jatuh_tempo->startOfDay();
 
-        return max(0, $days);
+        if ($due->gte(now()->startOfDay())) {
+            return 0;
+        }
+
+        return (int) $due->diffInDays(now()->startOfDay());
     }
 
     public function getAgingBucketAttribute(): string

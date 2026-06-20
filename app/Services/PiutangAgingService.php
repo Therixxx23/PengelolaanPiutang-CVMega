@@ -53,12 +53,13 @@ class PiutangAgingService
             return 0;
         }
 
-        $days = now()->startOfDay()->diffInDays(
-            $tagihan->tanggal_jatuh_tempo->startOfDay(),
-            false
-        );
+        $due = $tagihan->tanggal_jatuh_tempo->startOfDay();
 
-        return max(0, $days);
+        if ($due->gte(now()->startOfDay())) {
+            return 0;
+        }
+
+        return (int) $due->diffInDays(now()->startOfDay());
     }
 
     public function getBucketSummary(): array
