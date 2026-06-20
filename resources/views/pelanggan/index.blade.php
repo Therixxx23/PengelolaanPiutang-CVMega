@@ -11,7 +11,7 @@
             @endcan
         </div>
 
-        <div class="overflow-x-auto">
+        <div class="hidden sm:block overflow-x-auto">
             <table class="w-full">
                 <thead>
                     <tr class="border-b border-line">
@@ -64,7 +64,47 @@
             </table>
         </div>
 
-        <div class="px-4 py-3 border-t border-line">
+        <div class="sm:hidden divide-y divide-line">
+            @forelse ($pelanggan as $p)
+                <div class="p-4 space-y-2">
+                    <div class="flex items-center justify-between">
+                        <a href="{{ route('pelanggan.show', $p) }}" class="text-action hover:underline font-medium text-sm">
+                            {{ $p->nama_pelanggan }}
+                        </a>
+                        <span class="text-xs text-ink-muted">{{ $p->wilayah ?: '-' }}</span>
+                    </div>
+                    <div class="flex items-center justify-between text-sm">
+                        <span class="text-ink-muted">{{ $p->no_telepon ?: '-' }}</span>
+                        <span class="font-mono">Tagihan aktif: {{ $p->tagihan()->where('status', 'belum_lunas')->count() }}</span>
+                    </div>
+                    <div class="text-sm">
+                        <span class="text-ink-muted">Batas kredit:</span>
+                        <span class="font-mono ml-1">Rp {{ number_format($p->batas_kredit, 2) }}</span>
+                    </div>
+                    <div class="flex gap-2 pt-1">
+                        @can('update', $p)
+                            <a href="{{ route('pelanggan.edit', $p) }}" class="text-xs text-ink-muted hover:text-ink transition">Edit</a>
+                        @endcan
+                        @can('delete', $p)
+                            <form action="{{ route('pelanggan.destroy', $p) }}" method="POST" class="inline" onsubmit="return confirm('Hapus pelanggan ini?')">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="text-xs text-status-critical hover:text-status-critical transition">Hapus</button>
+                            </form>
+                        @endcan
+                    </div>
+                </div>
+            @empty
+                <div class="p-8 text-center text-ink-muted text-sm">
+                    Belum ada pelanggan.
+                    @can('create', App\Models\Pelanggan::class)
+                        <a href="{{ route('pelanggan.create') }}" class="text-action hover:underline">Tambah pelanggan baru</a>
+                    @endcan
+                </div>
+            @endforelse
+        </div>
+
+        <div class="px-4 py-3 border-t border-line hidden sm:block">
             {{ $pelanggan->links() }}
         </div>
     </div>

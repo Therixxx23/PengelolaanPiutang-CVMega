@@ -20,7 +20,7 @@
         <div class="px-4 py-3 border-b border-line">
             <h2 class="font-display text-lg font-semibold text-ink">Sisa Piutang per Pelanggan</h2>
         </div>
-        <div class="overflow-x-auto">
+        <div class="hidden sm:block overflow-x-auto">
             <table class="w-full">
                 <thead>
                     <tr class="border-b border-line">
@@ -33,7 +33,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach ($ringkasan as $r)
+                    @forelse ($ringkasan as $r)
                         @php
                             $badgeMap = [
                                 'lancar' => 'badge-lancar',
@@ -69,9 +69,61 @@
                                 @endif
                             </td>
                         </tr>
-                    @endforeach
+                    @empty
+                        <tr>
+                            <td colspan="6" class="px-4 py-8 text-center text-ink-muted text-sm">
+                                Belum ada data piutang untuk ditampilkan.
+                            </td>
+                        </tr>
+                    @endforelse
                 </tbody>
             </table>
+        </div>
+
+        <div class="sm:hidden divide-y divide-line">
+            @forelse ($ringkasan as $r)
+                @php
+                    $badgeMap = [
+                        'lancar' => 'badge-lancar',
+                        '0-30' => 'badge-watch30',
+                        '31-60' => 'badge-watch60',
+                        '>60' => 'badge-critical',
+                    ];
+                    $labelMap = [
+                        'lancar' => 'Lancar',
+                        '0-30' => '0-30 Hari',
+                        '31-60' => '31-60 Hari',
+                        '>60' => '>60 Hari',
+                    ];
+                    $worst = $r->bucket_terburuk;
+                @endphp
+                <div class="p-4 space-y-2">
+                    <div class="flex items-center justify-between">
+                        <a href="{{ route('pelanggan.show', $r->pelanggan) }}" class="text-action hover:underline font-medium text-sm">
+                            {{ $r->pelanggan->nama_pelanggan }}
+                        </a>
+                        @if ($worst)
+                            <span class="{{ $badgeMap[$worst] ?? 'badge-lancar' }}">{{ $labelMap[$worst] ?? $worst }}</span>
+                        @else
+                            <span class="badge-paid">Lunas</span>
+                        @endif
+                    </div>
+                    <div class="flex items-center justify-between text-sm">
+                        <span class="text-ink-muted">{{ $r->pelanggan->wilayah ?: '-' }}</span>
+                        <span class="font-mono {{ $r->sisa_piutang > 0 ? 'text-status-watch30' : 'text-status-paid' }}">
+                            Sisa: Rp {{ number_format($r->sisa_piutang, 2) }}
+                        </span>
+                    </div>
+                    <div class="flex items-center justify-between text-xs text-ink-muted">
+                        <span>Tagihan: Rp {{ number_format($r->total_tagihan, 2) }}</span>
+                        <span>Terbayar: Rp {{ number_format($r->total_terbayar, 2) }}</span>
+                    </div>
+                </div>
+            @empty
+                <div class="p-8 text-center text-ink-muted text-sm">
+                    Belum ada data piutang untuk ditampilkan.
+                </div>
+            @endforelse
         </div>
     </div>
 

@@ -34,7 +34,7 @@
             <p class="text-sm text-ink-muted">{{ $pembayaran->total() }} pembayaran ditemukan</p>
         </div>
 
-        <div class="overflow-x-auto">
+        <div class="hidden sm:block overflow-x-auto">
             <table class="w-full">
                 <thead>
                     <tr class="border-b border-line">
@@ -89,7 +89,42 @@
             </table>
         </div>
 
-        <div class="px-4 py-3 border-t border-line">
+        <div class="sm:hidden divide-y divide-line">
+            @forelse ($pembayaran as $p)
+                @php
+                    $totalBayar = $p->tagihan->pembayaran->sum('jumlah_bayar');
+                    $totalTagihan = $p->tagihan->total_tagihan;
+                    $sisa = $totalTagihan - $totalBayar;
+                @endphp
+                <div class="p-4 space-y-2">
+                    <div class="flex items-center justify-between text-sm">
+                        <span class="font-mono">{{ $p->tanggal_bayar->format('d/m/Y') }}</span>
+                        <span class="font-mono">Rp {{ number_format($p->jumlah_bayar, 2) }}</span>
+                    </div>
+                    <div class="flex items-center justify-between text-sm">
+                        <a href="{{ route('tagihan.show', $p->tagihan) }}" class="text-action hover:underline font-mono">
+                            {{ $p->tagihan->no_invoice }}
+                        </a>
+                        <span class="text-xs {{ $sisa > 0 ? 'text-status-watch30' : 'text-status-paid' }}">
+                            Sisa: Rp {{ number_format(max(0, $sisa), 2) }}
+                            ({{ $sisa > 0 ? 'sisa' : 'lunas' }})
+                        </span>
+                    </div>
+                    <div class="flex items-center justify-between text-xs text-ink-muted">
+                        <a href="{{ route('pelanggan.show', $p->tagihan->pelanggan) }}" class="text-action hover:underline">
+                            {{ $p->tagihan->pelanggan->nama_pelanggan }}
+                        </a>
+                        <span>{{ ucfirst($p->metode_bayar) }}{{ $p->keterangan ? ' — '.$p->keterangan : '' }}</span>
+                    </div>
+                </div>
+            @empty
+                <div class="p-8 text-center text-ink-muted text-sm">
+                    Belum ada pembayaran yang tercatat. Sesuaikan filter atau buat pembayaran baru dari halaman tagihan.
+                </div>
+            @endforelse
+        </div>
+
+        <div class="px-4 py-3 border-t border-line hidden sm:block">
             {{ $pembayaran->withQueryString()->links() }}
         </div>
     </div>

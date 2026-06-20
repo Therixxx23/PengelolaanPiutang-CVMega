@@ -25,7 +25,8 @@
             <div class="px-4 py-3 border-b border-line">
                 <h2 class="font-display text-lg font-semibold text-ink">Tagihan Terbaru</h2>
             </div>
-            <div class="overflow-x-auto">
+
+            <div class="hidden sm:block overflow-x-auto">
                 <table class="w-full">
                     <thead>
                         <tr class="border-b border-line">
@@ -77,6 +78,49 @@
                         @endforelse
                     </tbody>
                 </table>
+            </div>
+
+            <div class="sm:hidden divide-y divide-line">
+                @forelse ($tagihanTerbaru as $t)
+                    @php
+                        if ($t->status === 'lunas') {
+                            $rail = 'aging-rail-paid';
+                            $badge = 'badge-paid';
+                            $statusLabel = 'Lunas';
+                        } elseif ($t->is_overdue) {
+                            $bucket = $t->aging_bucket;
+                            $rail = $bucket === '0-30' ? 'aging-rail-watch30' : ($bucket === '31-60' ? 'aging-rail-watch60' : 'aging-rail-critical');
+                            $badge = $bucket === '0-30' ? 'badge-watch30' : ($bucket === '31-60' ? 'badge-watch60' : 'badge-critical');
+                            $statusLabel = $bucket === '0-30' ? '1-30 Hari' : ($bucket === '31-60' ? '31-60 Hari' : '>60 Hari');
+                        } else {
+                            $rail = 'aging-rail-lancar';
+                            $badge = 'badge-lancar';
+                            $statusLabel = 'Belum Lunas';
+                        }
+                    @endphp
+                    <div class="p-4 {{ $rail }} space-y-2">
+                        <div class="flex items-center justify-between">
+                            <a href="{{ route('tagihan.show', $t) }}" class="text-action hover:underline font-mono font-medium text-sm">
+                                {{ $t->no_invoice }}
+                            </a>
+                            <span class="{{ $badge }}">{{ $statusLabel }}</span>
+                        </div>
+                        <div class="flex items-center justify-between text-sm">
+                            <span>{{ $t->pelanggan->nama_pelanggan }}</span>
+                            <span class="font-mono">Rp {{ number_format($t->total_tagihan, 0) }}</span>
+                        </div>
+                        <div class="text-xs text-ink-muted">
+                            Jatuh tempo: {{ $t->tanggal_jatuh_tempo->format('d/m/Y') }}
+                        </div>
+                    </div>
+                @empty
+                    <div class="p-8 text-center text-ink-muted text-sm">
+                        Belum ada tagihan.
+                        @can('create', App\Models\Tagihan::class)
+                            <a href="{{ route('tagihan.create') }}" class="text-action hover:underline">Buat tagihan baru</a>
+                        @endcan
+                    </div>
+                @endforelse
             </div>
         </div>
     @else

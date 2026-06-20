@@ -11,7 +11,7 @@
             @endcan
         </div>
 
-        <div class="overflow-x-auto">
+        <div class="hidden sm:block overflow-x-auto">
             <table class="w-full">
                 <thead>
                     <tr class="border-b border-line">
@@ -86,7 +86,65 @@
             </table>
         </div>
 
-        <div class="px-4 py-3 border-t border-line">
+        <div class="sm:hidden divide-y divide-line">
+            @forelse ($tagihan as $t)
+                @php
+                    if ($t->status === 'lunas') {
+                        $rail = 'aging-rail-paid';
+                        $badge = 'badge-paid';
+                        $badgeText = 'Lunas';
+                    } elseif ($t->is_overdue) {
+                        $bucket = $t->aging_bucket;
+                        $rail = $bucket === '0-30' ? 'aging-rail-watch30' : ($bucket === '31-60' ? 'aging-rail-watch60' : 'aging-rail-critical');
+                        $badge = $bucket === '0-30' ? 'badge-watch30' : ($bucket === '31-60' ? 'badge-watch60' : 'badge-critical');
+                        $badgeText = $bucket === '0-30' ? '1-30 Hari' : ($bucket === '31-60' ? '31-60 Hari' : '>60 Hari');
+                    } else {
+                        $rail = 'aging-rail-lancar';
+                        $badge = 'badge-lancar';
+                        $badgeText = 'Belum Lunas';
+                    }
+                @endphp
+                <div class="p-4 {{ $rail }} space-y-2">
+                    <div class="flex items-center justify-between">
+                        <a href="{{ route('tagihan.show', $t) }}" class="text-action hover:underline font-mono font-medium text-sm">
+                            {{ $t->no_invoice }}
+                        </a>
+                        <span class="{{ $badge }}">{{ $badgeText }}</span>
+                    </div>
+                    <div class="flex items-center justify-between text-sm">
+                        <a href="{{ route('pelanggan.show', $t->pelanggan) }}" class="text-action hover:underline">
+                            {{ $t->pelanggan->nama_pelanggan }}
+                        </a>
+                        <span class="font-mono text-ink-muted">Rp {{ number_format($t->total_tagihan, 2) }}</span>
+                    </div>
+                    <div class="flex items-center justify-between text-xs text-ink-muted">
+                        <span>Tagihan: {{ $t->tanggal_tagihan->format('d/m/Y') }}</span>
+                        <span>Jatuh tempo: {{ $t->tanggal_jatuh_tempo->format('d/m/Y') }}</span>
+                    </div>
+                    <div class="flex gap-2 pt-1">
+                        @can('update', $t)
+                            <a href="{{ route('tagihan.edit', $t) }}" class="text-xs text-ink-muted hover:text-ink transition">Edit</a>
+                        @endcan
+                        @can('delete', $t)
+                            <form action="{{ route('tagihan.destroy', $t) }}" method="POST" class="inline" onsubmit="return confirm('Hapus tagihan ini?')">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="text-xs text-status-critical hover:text-status-critical transition">Hapus</button>
+                            </form>
+                        @endcan
+                    </div>
+                </div>
+            @empty
+                <div class="p-8 text-center text-ink-muted text-sm">
+                    Belum ada tagihan.
+                    @can('create', App\Models\Tagihan::class)
+                        <a href="{{ route('tagihan.create') }}" class="text-action hover:underline">Buat tagihan baru</a>
+                    @endcan
+                </div>
+            @endforelse
+        </div>
+
+        <div class="px-4 py-3 border-t border-line hidden sm:block">
             {{ $tagihan->links() }}
         </div>
     </div>

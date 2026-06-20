@@ -142,33 +142,51 @@
                         @endcan
                     </div>
                 @else
-                    <table class="w-full">
-                        <thead>
-                            <tr class="border-b border-line">
-                                <th class="table-header">Tanggal</th>
-                                <th class="table-header">Metode</th>
-                                <th class="table-header text-right">Jumlah</th>
-                                <th class="table-header">Keterangan</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($tagihan->pembayaran as $pem)
+                    <div class="hidden sm:block overflow-x-auto">
+                        <table class="w-full">
+                            <thead>
                                 <tr class="border-b border-line">
-                                    <td class="table-cell font-mono">{{ $pem->tanggal_bayar->format('d/m/Y') }}</td>
-                                    <td class="table-cell">{{ ucfirst($pem->metode_bayar) }}</td>
-                                    <td class="table-cell text-right font-mono">Rp {{ number_format($pem->jumlah_bayar, 2) }}</td>
-                                    <td class="table-cell text-ink-muted">{{ $pem->keterangan ?: '-' }}</td>
+                                    <th class="table-header">Tanggal</th>
+                                    <th class="table-header">Metode</th>
+                                    <th class="table-header text-right">Jumlah</th>
+                                    <th class="table-header">Keterangan</th>
                                 </tr>
-                            @endforeach
-                        </tbody>
-                        <tfoot>
-                            <tr class="border-t border-line font-medium">
-                                <td colspan="2" class="table-header text-right">Total</td>
-                                <td class="table-cell text-right font-mono">Rp {{ number_format($totalDibayar, 2) }}</td>
-                                <td></td>
-                            </tr>
-                        </tfoot>
-                    </table>
+                            </thead>
+                            <tbody>
+                                @foreach ($tagihan->pembayaran as $pem)
+                                    <tr class="border-b border-line">
+                                        <td class="table-cell font-mono">{{ $pem->tanggal_bayar->format('d/m/Y') }}</td>
+                                        <td class="table-cell">{{ ucfirst($pem->metode_bayar) }}</td>
+                                        <td class="table-cell text-right font-mono">Rp {{ number_format($pem->jumlah_bayar, 2) }}</td>
+                                        <td class="table-cell text-ink-muted">{{ $pem->keterangan ?: '-' }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                            <tfoot>
+                                <tr class="border-t border-line font-medium">
+                                    <td colspan="2" class="table-header text-right">Total</td>
+                                    <td class="table-cell text-right font-mono">Rp {{ number_format($totalDibayar, 2) }}</td>
+                                    <td></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+
+                    <div class="sm:hidden divide-y divide-line">
+                        @foreach ($tagihan->pembayaran as $pem)
+                            <div class="p-4 flex items-center justify-between">
+                                <div class="space-y-1">
+                                    <p class="text-sm font-mono">{{ $pem->tanggal_bayar->format('d/m/Y') }}</p>
+                                    <p class="text-xs text-ink-muted">{{ ucfirst($pem->metode_bayar) }}{{ $pem->keterangan ? ' — '.$pem->keterangan : '' }}</p>
+                                </div>
+                                <span class="font-mono text-sm">Rp {{ number_format($pem->jumlah_bayar, 2) }}</span>
+                            </div>
+                        @endforeach
+                        <div class="p-4 flex items-center justify-between font-medium border-t border-line">
+                            <span class="text-sm">Total</span>
+                            <span class="font-mono text-sm">Rp {{ number_format($totalDibayar, 2) }}</span>
+                        </div>
+                    </div>
                 @endif
             </div>
         </div>

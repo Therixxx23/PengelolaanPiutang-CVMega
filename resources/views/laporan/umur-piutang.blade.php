@@ -25,7 +25,7 @@
                         Tidak ada tagihan di bucket ini.
                     </div>
                 @else
-                    <div class="overflow-x-auto">
+                    <div class="hidden sm:block overflow-x-auto">
                         <table class="w-full">
                             <thead>
                                 <tr class="border-b border-line">
@@ -56,6 +56,28 @@
                                 @endforeach
                             </tbody>
                         </table>
+                    </div>
+
+                    <div class="sm:hidden divide-y divide-line">
+                        @foreach ($items as $t)
+                            <div class="p-4 space-y-2">
+                                <div class="flex items-center justify-between text-sm">
+                                    <a href="{{ route('tagihan.show', $t) }}" class="text-action hover:underline font-mono font-medium">
+                                        {{ $t->no_invoice }}
+                                    </a>
+                                    <span class="font-mono text-ink-muted">Rp {{ number_format($t->total_tagihan, 2) }}</span>
+                                </div>
+                                <div class="flex items-center justify-between text-sm">
+                                    <a href="{{ route('pelanggan.show', $t->pelanggan) }}" class="text-action hover:underline">
+                                        {{ $t->pelanggan->nama_pelanggan }}
+                                    </a>
+                                    <span class="text-ink-muted">{{ $t->days_overdue }} hari lewat</span>
+                                </div>
+                                <div class="text-xs text-ink-muted">
+                                    Jatuh tempo: {{ $t->tanggal_jatuh_tempo->format('d/m/Y') }}
+                                </div>
+                            </div>
+                        @endforeach
                     </div>
                 @endif
             </div>
