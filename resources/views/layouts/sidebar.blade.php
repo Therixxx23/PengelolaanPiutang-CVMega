@@ -11,28 +11,29 @@
             Dashboard
         </x-nav-link>
 
-        @can('viewAny', App\Models\Pelanggan::class)
-            <x-nav-link :href="route('pelanggan.index')" :active="request()->routeIs('pelanggan.*')">
-                Pelanggan
-            </x-nav-link>
-        @endcan
-
-        @can('viewAny', App\Models\Tagihan::class)
-            <x-nav-link :href="route('tagihan.index')" :active="request()->routeIs('tagihan.*')">
-                Tagihan
-            </x-nav-link>
-        @endcan
+        @auth
+            @if(Auth::user()->can('viewAny', 'App\Models\Pelanggan'))
+                <x-nav-link :href="route('pelanggan.index')" :active="request()->routeIs('pelanggan.*')">
+                    Pelanggan
+                </x-nav-link>
+            @endif
+            @if(Auth::user()->can('viewAny', 'App\Models\Tagihan'))
+                <x-nav-link :href="route('tagihan.index')" :active="request()->routeIs('tagihan.*')">
+                    Tagihan
+                </x-nav-link>
+            @endif
+        @endauth
 
         <div class="pt-4 mt-4 border-t border-line">
             <p class="px-3 text-xs font-medium text-ink-muted uppercase tracking-wider mb-2">Laporan</p>
 
-            <x-nav-link :href="#" :active="false">
+            <x-nav-link href="#" :active="false">
                 Umur Piutang
             </x-nav-link>
-            <x-nav-link :href="#" :active="false">
+            <x-nav-link href="#" :active="false">
                 Riwayat Pembayaran
             </x-nav-link>
-            <x-nav-link :href="#" :active="false">
+            <x-nav-link href="#" :active="false">
                 Rekapitulasi
             </x-nav-link>
         </div>

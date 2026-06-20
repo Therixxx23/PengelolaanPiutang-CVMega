@@ -3,11 +3,11 @@
 namespace App\Models;
 
 use Database\Factories\TagihanFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Builder;
 
 class Tagihan extends Model
 {
@@ -15,6 +15,7 @@ class Tagihan extends Model
     use HasFactory;
 
     protected $table = 'tagihan';
+
     protected $primaryKey = 'id_tagihan';
 
     protected $fillable = [

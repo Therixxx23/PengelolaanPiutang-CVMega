@@ -50,6 +50,7 @@ class PelangganController extends Controller
 
     public function destroy(Pelanggan $pelanggan)
     {
+        $this->authorize('delete', $pelanggan);
         $pelanggan->delete();
 
         return redirect()->route('pelanggan.index')

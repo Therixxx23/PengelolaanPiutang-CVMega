@@ -63,6 +63,7 @@ class TagihanController extends Controller
 
     public function destroy(Tagihan $tagihan)
     {
+        $this->authorize('delete', $tagihan);
         $tagihan->delete();
 
         return redirect()->route('tagihan.index')

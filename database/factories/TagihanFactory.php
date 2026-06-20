@@ -24,7 +24,7 @@ class TagihanFactory extends Factory
 
         return [
             'id_pelanggan' => Pelanggan::factory(),
-            'no_invoice' => 'INV/' . now()->format('Y/m/') . str_pad((string) static::$invoiceCounter, 6, '0', STR_PAD_LEFT),
+            'no_invoice' => 'INV/'.now()->format('Y/m/').str_pad((string) static::$invoiceCounter, 6, '0', STR_PAD_LEFT),
             'tanggal_tagihan' => $tanggalTagihan->format('Y-m-d'),
             'tanggal_jatuh_tempo' => $tanggalJatuhTempo->format('Y-m-d'),
             'total_tagihan' => fake()->randomFloat(2, 500_000, 50_000_000),

@@ -15,7 +15,7 @@ class PembayaranService
 
         if ($data['jumlah_bayar'] > $sisaTagihan) {
             throw ValidationException::withMessages([
-                'jumlah_bayar' => 'Jumlah bayar melebihi sisa tagihan (Rp ' . number_format($sisaTagihan, 2) . ').',
+                'jumlah_bayar' => 'Jumlah bayar melebihi sisa tagihan (Rp '.number_format($sisaTagihan, 2).').',
             ]);
         }
 

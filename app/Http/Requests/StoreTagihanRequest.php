@@ -17,8 +17,8 @@ class StoreTagihanRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'id_pelanggan' => ['required', 'exists:' . Pelanggan::class . ',id_pelanggan'],
-            'no_invoice' => ['required', 'string', 'max:30', 'unique:' . Tagihan::class . ',no_invoice'],
+            'id_pelanggan' => ['required', 'exists:'.Pelanggan::class.',id_pelanggan'],
+            'no_invoice' => ['required', 'string', 'max:30', 'unique:'.Tagihan::class.',no_invoice'],
             'tanggal_tagihan' => ['required', 'date'],
             'tanggal_jatuh_tempo' => ['required', 'date', 'after_or_equal:tanggal_tagihan'],
             'total_tagihan' => ['required', 'numeric', 'min:0'],
@@ -28,7 +28,7 @@ class StoreTagihanRequest extends FormRequest
 
     protected function prepareForValidation(): void
     {
-        if (!$this->has('no_invoice')) {
+        if (! $this->has('no_invoice')) {
             $this->merge([
                 'no_invoice' => app(InvoiceNumberService::class)->generate(),
             ]);

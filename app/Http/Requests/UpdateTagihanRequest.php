@@ -17,7 +17,7 @@ class UpdateTagihanRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'id_pelanggan' => ['required', 'exists:' . Pelanggan::class . ',id_pelanggan'],
+            'id_pelanggan' => ['required', 'exists:'.Pelanggan::class.',id_pelanggan'],
             'no_invoice' => ['required', 'string', 'max:30', Rule::unique(Tagihan::class)->ignore($this->route('tagihan'))],
             'tanggal_tagihan' => ['required', 'date'],
             'tanggal_jatuh_tempo' => ['required', 'date', 'after_or_equal:tanggal_tagihan'],

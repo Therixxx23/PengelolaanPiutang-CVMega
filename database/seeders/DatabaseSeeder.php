@@ -3,8 +3,8 @@
 namespace Database\Seeders;
 
 use App\Models\Pelanggan;
-use App\Models\Tagihan;
 use App\Models\Pembayaran;
+use App\Models\Tagihan;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 
@@ -58,7 +58,7 @@ class DatabaseSeeder extends Seeder
         foreach ($sequence as $bucket) {
             $tagihan = Tagihan::factory()->{$bucket}()->create([
                 'id_pelanggan' => $pelanggan->id_pelanggan,
-                'no_invoice' => 'INV/' . now()->format('Y/m/') . str_pad((string) random_int(1, 999999), 6, '0', STR_PAD_LEFT),
+                'no_invoice' => 'INV/'.now()->format('Y/m/').str_pad((string) random_int(1, 999999), 6, '0', STR_PAD_LEFT),
             ]);
 
             if ($bucket === 'lunas') {
