@@ -39,7 +39,7 @@
                 <thead>
                     <tr class="border-b border-line">
                         <th class="table-header">Tanggal</th>
-                        <th class="table-header">Invoice</th>
+                        <th class="table-header">No. Invoice</th>
                         <th class="table-header">Pelanggan</th>
                         <th class="table-header">Metode</th>
                         <th class="table-header text-right">Jumlah</th>
@@ -81,7 +81,7 @@
                     @empty
                         <tr>
                             <td colspan="7" class="px-4 py-8 text-center text-sm text-ink-muted">
-                                Tidak ada pembayaran ditemukan.
+                                Belum ada pembayaran yang tercatat. Sesuaikan filter atau buat pembayaran baru dari halaman tagihan.
                             </td>
                         </tr>
                     @endforelse

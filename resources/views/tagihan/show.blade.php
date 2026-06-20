@@ -135,6 +135,11 @@
                 @if ($tagihan->pembayaran->isEmpty())
                     <div class="px-4 py-8 text-center text-sm text-ink-muted">
                         Belum ada pembayaran untuk tagihan ini.
+                        @can('create', App\Models\Pembayaran::class)
+                            @if ($sisa > 0)
+                                <span class="block mt-1">Gunakan form di atas untuk mencatat pembayaran pertama.</span>
+                            @endif
+                        @endcan
                     </div>
                 @else
                     <table class="w-full">

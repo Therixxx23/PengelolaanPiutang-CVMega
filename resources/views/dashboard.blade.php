@@ -31,33 +31,50 @@
                         <tr class="border-b border-line">
                             <th class="table-header">Invoice</th>
                             <th class="table-header">Pelanggan</th>
-                            <th class="table-header">Total</th>
+                            <th class="table-header text-right">Total</th>
                             <th class="table-header">Status</th>
                             <th class="table-header">Jatuh Tempo</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach ($tagihanTerbaru as $t)
+                        @forelse ($tagihanTerbaru as $t)
                             @php
-                                $badge = $t->status === 'lunas'
-                                    ? 'badge-paid'
-                                    : ($t->days_overdue > 0 ? 'badge-critical' : ($t->days_overdue === 0 ? 'badge-lancar' : 'badge-lancar'));
-                                $statusLabel = $t->status === 'lunas'
-                                    ? 'Lunas'
-                                    : ($t->days_overdue > 0 ? 'Jatuh Tempo' : 'Belum Lunas');
+                                if ($t->status === 'lunas') {
+                                    $rail = 'paid';
+                                    $badge = 'badge-paid';
+                                    $statusLabel = 'Lunas';
+                                } elseif ($t->is_overdue) {
+                                    $bucket = $t->aging_bucket;
+                                    $rail = $bucket === '0-30' ? 'watch30' : ($bucket === '31-60' ? 'watch60' : 'critical');
+                                    $badge = $bucket === '0-30' ? 'badge-watch30' : ($bucket === '31-60' ? 'badge-watch60' : 'badge-critical');
+                                    $statusLabel = $bucket === '0-30' ? '1-30 Hari' : ($bucket === '31-60' ? '31-60 Hari' : '>60 Hari');
+                                } else {
+                                    $rail = 'lancar';
+                                    $badge = 'badge-lancar';
+                                    $statusLabel = 'Belum Lunas';
+                                }
                             @endphp
-                            <tr class="border-b border-line hover:bg-paper transition">
+                            <tr class="border-b border-line hover:bg-paper transition aging-rail-{{ $rail }}">
                                 <td class="table-cell">
                                     <a href="{{ route('tagihan.show', $t) }}" class="text-action hover:underline font-mono font-medium">
                                         {{ $t->no_invoice }}
                                     </a>
                                 </td>
                                 <td class="table-cell">{{ $t->pelanggan->nama_pelanggan }}</td>
-                                <td class="table-cell font-mono">Rp {{ number_format($t->total_tagihan, 0) }}</td>
+                                <td class="table-cell text-right font-mono">Rp {{ number_format($t->total_tagihan, 0) }}</td>
                                 <td class="table-cell"><span class="{{ $badge }}">{{ $statusLabel }}</span></td>
                                 <td class="table-cell font-mono">{{ $t->tanggal_jatuh_tempo->format('d/m/Y') }}</td>
                             </tr>
-                        @endforeach
+                        @empty
+                            <tr>
+                                <td colspan="5" class="px-4 py-8 text-center text-ink-muted text-sm">
+                                    Belum ada tagihan.
+                                    @can('create', App\Models\Tagihan::class)
+                                        <a href="{{ route('tagihan.create') }}" class="text-action hover:underline">Buat tagihan baru</a>
+                                    @endcan
+                                </td>
+                            </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>

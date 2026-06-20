@@ -56,6 +56,17 @@
                                 $rail = $t->aging_bucket === 'lunas' ? 'paid' : ($t->aging_bucket === 'lancar' ? 'lancar' : ($t->aging_bucket === '0-30' ? 'watch30' : ($t->aging_bucket === '31-60' ? 'watch60' : 'critical')));
                                 $sisa = $t->pembayaran->sum('jumlah_bayar');
                                 $sisaTagihan = $t->total_tagihan - $sisa;
+                                if ($t->status === 'lunas') {
+                                    $badgeClass = 'badge-paid';
+                                    $badgeText = 'Lunas';
+                                } elseif ($t->is_overdue) {
+                                    $bucket = $t->aging_bucket;
+                                    $badgeClass = $bucket === '0-30' ? 'badge-watch30' : ($bucket === '31-60' ? 'badge-watch60' : 'badge-critical');
+                                    $badgeText = $bucket === '0-30' ? 'Jatuh Tempo (1-30 hr)' : ($bucket === '31-60' ? 'Jatuh Tempo (31-60 hr)' : 'Jatuh Tempo (>60 hr)');
+                                } else {
+                                    $badgeClass = 'badge-lancar';
+                                    $badgeText = 'Belum Lunas';
+                                }
                             @endphp
                             <tr class="border-b border-line hover:bg-paper transition aging-rail-{{ $rail }}">
                                 <td class="table-cell font-mono">
@@ -68,22 +79,16 @@
                                 <td class="table-cell text-right font-mono">Rp {{ number_format($t->total_tagihan, 2) }}</td>
                                 <td class="table-cell text-right font-mono">Rp {{ number_format(max(0, $sisaTagihan), 2) }}</td>
                                 <td class="table-cell">
-                                    @if ($t->status === 'lunas')
-                                        <span class="badge-paid">Lunas</span>
-                                    @elseif ($t->is_overdue)
-                                        @php
-                                            $badge = $t->aging_bucket === '0-30' ? 'badge-watch30' : ($t->aging_bucket === '31-60' ? 'badge-watch60' : 'badge-critical');
-                                        @endphp
-                                        <span class="{{ $badge }}">Jatuh Tempo</span>
-                                    @else
-                                        <span class="badge-lancar">Belum Lunas</span>
-                                    @endif
+                                    <span class="{{ $badgeClass }}">{{ $badgeText }}</span>
                                 </td>
                             </tr>
                         @empty
                             <tr>
                                 <td colspan="6" class="px-4 py-8 text-center text-ink-muted text-sm">
                                     Belum ada tagihan untuk pelanggan ini.
+                                    @can('create', App\Models\Tagihan::class)
+                                        <a href="{{ route('tagihan.create') }}" class="text-action hover:underline">Buat tagihan baru</a>
+                                    @endcan
                                 </td>
                             </tr>
                         @endforelse
