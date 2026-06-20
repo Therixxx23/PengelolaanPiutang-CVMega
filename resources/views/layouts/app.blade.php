@@ -23,6 +23,24 @@
                     </h1>
                 @endisset
 
+                @if (session('success'))
+                    <div class="mb-6 px-4 py-3 bg-status-paid/10 border border-status-paid rounded text-sm text-status-paid font-medium" role="alert">
+                        {{ session('success') }}
+                    </div>
+                @endif
+
+                @if (session('warning'))
+                    <div class="mb-6 px-4 py-3 bg-status-watch30/10 border border-status-watch30 rounded text-sm text-status-watch30 font-medium" role="alert">
+                        {{ session('warning') }}
+                    </div>
+                @endif
+
+                @if (session('error'))
+                    <div class="mb-6 px-4 py-3 bg-status-critical/10 border border-status-critical rounded text-sm text-status-critical font-medium" role="alert">
+                        {{ session('error') }}
+                    </div>
+                @endif
+
                 {{ $slot }}
             </main>
         </div>

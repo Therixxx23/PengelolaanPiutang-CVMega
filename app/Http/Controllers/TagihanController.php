@@ -25,7 +25,15 @@ class TagihanController extends Controller
 
     public function create(InvoiceNumberService $invoiceService)
     {
-        $pelanggan = Pelanggan::orderBy('nama_pelanggan')->get();
+        $pelanggan = Pelanggan::orderBy('nama_pelanggan')->get()
+            ->map(fn ($p) => (object) [
+                'id_pelanggan' => $p->id_pelanggan,
+                'nama_pelanggan' => $p->nama_pelanggan,
+                'wilayah' => $p->wilayah,
+                'batas_kredit' => $p->batas_kredit,
+                'total_piutang_aktif' => $p->totalPiutangAktif(),
+                'sisa_limit' => max(0, (float) $p->batas_kredit - $p->totalPiutangAktif()),
+            ]);
         $noInvoice = $invoiceService->generate();
 
         return view('tagihan.create', compact('pelanggan', 'noInvoice'));
@@ -33,7 +41,17 @@ class TagihanController extends Controller
 
     public function store(StoreTagihanRequest $request)
     {
-        Tagihan::create($request->validated());
+        $tagihan = Tagihan::create($request->validated());
+
+        $pelanggan = Pelanggan::find($request->id_pelanggan);
+        if ($pelanggan && $pelanggan->batas_kredit > 0) {
+            $kredit = $pelanggan->cekBatasKredit((float) $tagihan->total_tagihan);
+            if ($kredit['exceeded']) {
+                return redirect()->route('tagihan.index')
+                    ->with('success', 'Tagihan berhasil dibuat.')
+                    ->with('warning', 'Total piutang '.e($pelanggan->nama_pelanggan).' melebihi batas kredit sebesar Rp '.number_format($kredit['kelebihan'], 2).'. Sisa limit: Rp '.number_format($kredit['sisa_limit'], 2).'.');
+            }
+        }
 
         return redirect()->route('tagihan.index')
             ->with('success', 'Tagihan berhasil dibuat.');

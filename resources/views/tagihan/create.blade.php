@@ -2,19 +2,50 @@
     <x-slot name="header">Buat Tagihan</x-slot>
 
     <div class="max-w-2xl">
-        <form action="{{ route('tagihan.store') }}" method="POST" class="bg-surface border border-line rounded p-6 space-y-4">
+        <form action="{{ route('tagihan.store') }}" method="POST" class="bg-surface border border-line rounded p-6 space-y-4" x-data="{}">
             @csrf
 
             <div>
                 <label for="id_pelanggan" class="block text-sm font-medium text-ink mb-1">Pelanggan</label>
-                <select id="id_pelanggan" name="id_pelanggan" class="input-field" required>
+                <select id="id_pelanggan" name="id_pelanggan" class="input-field" required
+                    x-init="
+                        $nextTick(() => {
+                            const sel = $el;
+                            if (sel.value) {
+                                sel.dispatchEvent(new Event('change', { bubbles: true }));
+                            }
+                        })
+                    "
+                    x-on:change="
+                        const opt = $event.target.selectedOptions[0];
+                        const info = document.getElementById('credit-info');
+                        if (opt && opt.dataset.limit !== undefined) {
+                            const limit = parseFloat(opt.dataset.limit);
+                            const aktif = parseFloat(opt.dataset.aktif);
+                            const sisa = Math.max(0, limit - aktif);
+                            if (limit > 0) {
+                                info.innerHTML = 'Piutang aktif: Rp ' + aktif.toLocaleString('id-ID') + ' &middot; Batas kredit: Rp ' + limit.toLocaleString('id-ID') + ' &middot; Sisa limit: Rp ' + sisa.toLocaleString('id-ID');
+                                info.classList.remove('hidden');
+                            } else {
+                                info.innerHTML = 'Piutang aktif: Rp ' + aktif.toLocaleString('id-ID') + ' &middot; Tanpa batas kredit';
+                                info.classList.remove('hidden');
+                            }
+                        } else {
+                            info.classList.add('hidden');
+                        }
+                    "
+                >
                     <option value="">Pilih pelanggan...</option>
                     @foreach ($pelanggan as $p)
-                        <option value="{{ $p->id_pelanggan }}" {{ old('id_pelanggan') == $p->id_pelanggan ? 'selected' : '' }}>
+                        <option value="{{ $p->id_pelanggan }}"
+                            data-limit="{{ $p->batas_kredit }}"
+                            data-aktif="{{ $p->total_piutang_aktif }}"
+                            {{ old('id_pelanggan') == $p->id_pelanggan ? 'selected' : '' }}>
                             {{ $p->nama_pelanggan }} ({{ $p->wilayah ?: '-' }})
                         </option>
                     @endforeach
                 </select>
+                <p id="credit-info" class="mt-1 text-xs text-ink-muted hidden"></p>
                 @error('id_pelanggan') <p class="mt-1 text-sm text-status-critical">{{ $message }}</p> @enderror
             </div>
 
