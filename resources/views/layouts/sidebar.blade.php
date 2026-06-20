@@ -17,7 +17,11 @@
             </x-nav-link>
         @endcan
 
-        {{-- Tagihan & Pembayaran routes will be added in next steps --}}
+        @can('viewAny', App\Models\Tagihan::class)
+            <x-nav-link :href="route('tagihan.index')" :active="request()->routeIs('tagihan.*')">
+                Tagihan
+            </x-nav-link>
+        @endcan
 
         <div class="pt-4 mt-4 border-t border-line">
             <p class="px-3 text-xs font-medium text-ink-muted uppercase tracking-wider mb-2">Laporan</p>

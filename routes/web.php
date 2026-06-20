@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\PelangganController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\TagihanController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -18,6 +19,10 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     Route::resource('pelanggan', PelangganController::class);
+    Route::resource('tagihan', TagihanController::class);
+
+    Route::post('/tagihan/{tagihan}/bayar', [TagihanController::class, 'bayar'])
+        ->name('tagihan.bayar');
 });
 
 require __DIR__.'/auth.php';
