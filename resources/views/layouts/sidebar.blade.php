@@ -27,13 +27,13 @@
         <div class="pt-4 mt-4 border-t border-line">
             <p class="px-3 text-xs font-medium text-ink-muted uppercase tracking-wider mb-2">Laporan</p>
 
-            <x-nav-link href="#" :active="false">
+            <x-nav-link :href="route('laporan.umur-piutang')" :active="request()->routeIs('laporan.umur-piutang')">
                 Umur Piutang
             </x-nav-link>
-            <x-nav-link href="#" :active="false">
+            <x-nav-link :href="route('riwayat-pembayaran')" :active="request()->routeIs('riwayat-pembayaran')">
                 Riwayat Pembayaran
             </x-nav-link>
-            <x-nav-link href="#" :active="false">
+            <x-nav-link :href="route('laporan.rekapitulasi')" :active="request()->routeIs('laporan.rekapitulasi')">
                 Rekapitulasi
             </x-nav-link>
         </div>
