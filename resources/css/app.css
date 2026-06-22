@@ -51,7 +51,7 @@
         @apply inline-flex items-center px-4 py-2 bg-action text-white text-sm font-medium rounded focus:outline-none focus:ring-2 focus:ring-action focus:ring-offset-2 transition hover:brightness-110;
     }
     .btn-secondary {
-        @apply inline-flex items-center px-4 py-2 border border-ink text-ink text-sm font-medium rounded focus:outline-none focus:ring-2 focus:ring-action focus:ring-off-2 transition hover:bg-ink hover:text-white;
+        @apply inline-flex items-center px-4 py-2 border border-ink text-ink text-sm font-medium rounded focus:outline-none focus:ring-2 focus:ring-action focus:ring-offset-2 transition hover:bg-ink hover:text-white;
     }
     .btn-destructive {
         @apply inline-flex items-center px-4 py-2 border border-status-critical text-status-critical text-sm font-medium rounded focus:outline-none focus:ring-2 focus:ring-status-critical focus:ring-offset-2 transition hover:bg-status-critical hover:text-white;

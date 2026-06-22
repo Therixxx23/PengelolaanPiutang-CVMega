@@ -1,4 +1,4 @@
-import defaultTheme from 'tailwindcss/defaultTheme';
+import defaultTheme from 'tailwindcss/defaultTheme.js';
 import forms from '@tailwindcss/forms';
 
 /** @type {import('tailwindcss').Config} */
@@ -29,7 +29,7 @@ export default {
             fontFamily: {
                 sans: ['Inter', ...defaultTheme.fontFamily.sans],
                 display: ['"IBM Plex Sans"', ...defaultTheme.fontFamily.sans],
-                mono: ['"IBM Plex Mono"', ...defaultTheme.fontFamily.monospace],
+                mono: ['"IBM Plex Mono"', ...defaultTheme.fontFamily.mono],
             },
             borderRadius: {
                 DEFAULT: '6px',
