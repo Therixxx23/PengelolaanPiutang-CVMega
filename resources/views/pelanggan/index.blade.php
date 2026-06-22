@@ -45,7 +45,7 @@
                                     <form action="{{ route('pelanggan.destroy', $p) }}" method="POST" class="inline" onsubmit="return confirm('Hapus pelanggan ini?')">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="ml-2 text-status-critical hover:text-status-critical text-sm transition">Hapus</button>
+                                        <button type="submit" class="btn-destructive !py-1 !px-2 text-xs">Hapus</button>
                                     </form>
                                 @endcan
                             </td>
@@ -89,7 +89,7 @@
                             <form action="{{ route('pelanggan.destroy', $p) }}" method="POST" class="inline" onsubmit="return confirm('Hapus pelanggan ini?')">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="text-xs text-status-critical hover:text-status-critical transition">Hapus</button>
+                                <button type="submit" class="btn-destructive !py-1 !px-2 text-xs">Hapus</button>
                             </form>
                         @endcan
                     </div>

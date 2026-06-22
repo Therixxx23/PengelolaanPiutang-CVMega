@@ -38,7 +38,7 @@
                             </thead>
                             <tbody>
                                 @foreach ($items as $t)
-                                    <tr class="border-b border-line hover:bg-paper transition">
+                                    <tr class="border-b border-line hover:bg-paper transition {{ $railClass }}">
                                         <td class="table-cell">
                                             <a href="{{ route('tagihan.show', $t) }}" class="text-action hover:underline font-mono font-medium">
                                                 {{ $t->no_invoice }}
@@ -60,7 +60,7 @@
 
                     <div class="sm:hidden divide-y divide-line">
                         @foreach ($items as $t)
-                            <div class="p-4 space-y-2">
+                            <div class="p-4 {{ $railClass }} space-y-2">
                                 <div class="flex items-center justify-between text-sm">
                                     <a href="{{ route('tagihan.show', $t) }}" class="text-action hover:underline font-mono font-medium">
                                         {{ $t->no_invoice }}
