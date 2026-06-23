@@ -129,7 +129,7 @@
 
     @if (count($chartLabels) > 0)
         <div class="bg-surface border border-line rounded p-6">
-            <h2 class="font-display text-lg font-semibold text-ink mb-4">Sisa Piutang per Pelanggan</h2>
+            <h2 class="font-display text-lg font-semibold text-ink mb-4">Grafik Sisa Piutang per Pelanggan</h2>
             <div class="relative" style="height: 300px;">
                 <canvas id="rekapChart"></canvas>
             </div>

@@ -172,4 +172,17 @@ class LaporanAccessTest extends TestCase
         $response->assertSee('0-30 Hari');
         $response->assertDontSee('Belum ada data piutang untuk ditampilkan');
     }
+
+    public function test_recap_report_table_and_chart_headings_are_distinct(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        Pelanggan::factory()->count(2)->has(Tagihan::factory()->lancar())->create();
+
+        $response = $this->actingAs($admin)->get(route('laporan.rekapitulasi'));
+        $html = $response->getContent();
+
+        $response->assertStatus(200);
+        $this->assertEquals(1, substr_count($html, '>Sisa Piutang per Pelanggan</h2>'), 'Tabel heading harus muncul tepat 1x');
+        $this->assertEquals(1, substr_count($html, '>Grafik Sisa Piutang per Pelanggan</h2>'), 'Chart heading harus muncul tepat 1x');
+    }
 }
