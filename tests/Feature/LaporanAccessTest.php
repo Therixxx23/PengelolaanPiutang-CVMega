@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Pelanggan;
 use App\Models\Tagihan;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -150,5 +151,25 @@ class LaporanAccessTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('Total Piutang');
         $response->assertSee('Total Pelanggan');
+    }
+
+    public function test_recap_report_lists_each_pelanggan_with_unpaid_tagihan(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+
+        $pelangganA = Pelanggan::factory()->create(['nama_pelanggan' => 'PT Maju Jaya']);
+        $pelangganB = Pelanggan::factory()->create(['nama_pelanggan' => 'CV Sukses Makmur']);
+
+        Tagihan::factory()->lancar()->create(['id_pelanggan' => $pelangganA->id_pelanggan]);
+        Tagihan::factory()->overdue30()->create(['id_pelanggan' => $pelangganB->id_pelanggan]);
+
+        $response = $this->actingAs($admin)->get(route('laporan.rekapitulasi'));
+
+        $response->assertStatus(200);
+        $response->assertSee('PT Maju Jaya');
+        $response->assertSee('CV Sukses Makmur');
+        $response->assertSee('Lancar');
+        $response->assertSee('0-30 Hari');
+        $response->assertDontSee('Belum ada data piutang untuk ditampilkan');
     }
 }
