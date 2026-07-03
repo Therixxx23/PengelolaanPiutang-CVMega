@@ -13,7 +13,7 @@ class PelangganControllerTest extends TestCase
 
     public function test_admin_can_view_index(): void
     {
-        $admin = User::factory()->create(['role' => 'admin']);
+        $admin = User::factory()->create(['role' => 'bagian_administrasi']);
         Pelanggan::factory(3)->create();
 
         $response = $this->actingAs($admin)->get(route('pelanggan.index'));
@@ -22,7 +22,7 @@ class PelangganControllerTest extends TestCase
 
     public function test_admin_can_create_pelanggan(): void
     {
-        $admin = User::factory()->create(['role' => 'admin']);
+        $admin = User::factory()->create(['role' => 'bagian_administrasi']);
 
         $response = $this->actingAs($admin)->post(route('pelanggan.store'), [
             'nama_pelanggan' => 'PT Maju Jaya',
@@ -38,7 +38,7 @@ class PelangganControllerTest extends TestCase
 
     public function test_admin_can_update_pelanggan(): void
     {
-        $admin = User::factory()->create(['role' => 'admin']);
+        $admin = User::factory()->create(['role' => 'bagian_administrasi']);
         $pelanggan = Pelanggan::factory()->create();
 
         $response = $this->actingAs($admin)->put(route('pelanggan.update', $pelanggan), [
@@ -55,7 +55,7 @@ class PelangganControllerTest extends TestCase
 
     public function test_admin_can_delete_pelanggan(): void
     {
-        $admin = User::factory()->create(['role' => 'admin']);
+        $admin = User::factory()->create(['role' => 'bagian_administrasi']);
         $pelanggan = Pelanggan::factory()->create();
 
         $response = $this->actingAs($admin)->delete(route('pelanggan.destroy', $pelanggan));
@@ -65,7 +65,7 @@ class PelangganControllerTest extends TestCase
 
     public function test_manajemen_can_view_index(): void
     {
-        $man = User::factory()->create(['role' => 'manajemen']);
+        $man = User::factory()->create(['role' => 'bagian_keuangan']);
 
         $response = $this->actingAs($man)->get(route('pelanggan.index'));
         $response->assertStatus(200);
@@ -73,7 +73,7 @@ class PelangganControllerTest extends TestCase
 
     public function test_manajemen_cannot_create_pelanggan(): void
     {
-        $man = User::factory()->create(['role' => 'manajemen']);
+        $man = User::factory()->create(['role' => 'bagian_keuangan']);
 
         $response = $this->actingAs($man)->post(route('pelanggan.store'), [
             'nama_pelanggan' => 'PT Nakal',
@@ -84,7 +84,7 @@ class PelangganControllerTest extends TestCase
 
     public function test_manajemen_cannot_update_pelanggan(): void
     {
-        $man = User::factory()->create(['role' => 'manajemen']);
+        $man = User::factory()->create(['role' => 'bagian_keuangan']);
         $pelanggan = Pelanggan::factory()->create();
 
         $response = $this->actingAs($man)->put(route('pelanggan.update', $pelanggan), [
@@ -96,7 +96,7 @@ class PelangganControllerTest extends TestCase
 
     public function test_manajemen_cannot_delete_pelanggan(): void
     {
-        $man = User::factory()->create(['role' => 'manajemen']);
+        $man = User::factory()->create(['role' => 'bagian_keuangan']);
         $pelanggan = Pelanggan::factory()->create();
 
         $response = $this->actingAs($man)->delete(route('pelanggan.destroy', $pelanggan));

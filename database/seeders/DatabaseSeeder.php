@@ -13,15 +13,15 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         User::factory()->create([
-            'name' => 'Admin',
+            'name' => 'Bagian Administrasi',
             'email' => 'admin@example.com',
-            'role' => 'admin',
+            'role' => 'bagian_administrasi',
         ]);
 
-        User::factory()->manajemen()->create([
-            'name' => 'Manajemen',
+        User::factory()->bagianKeuangan()->create([
+            'name' => 'Bagian Keuangan',
             'email' => 'manajemen@example.com',
-            'role' => 'manajemen',
+            'role' => 'bagian_keuangan',
         ]);
 
         $pelangganList = Pelanggan::factory(8)->create();

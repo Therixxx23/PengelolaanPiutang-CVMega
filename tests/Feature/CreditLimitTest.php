@@ -14,7 +14,7 @@ class CreditLimitTest extends TestCase
 
     public function test_pelanggan_below_limit_no_warning(): void
     {
-        $admin = User::factory()->create(['role' => 'admin']);
+        $admin = User::factory()->create(['role' => 'bagian_administrasi']);
         $pelanggan = Pelanggan::factory()->create(['batas_kredit' => 100_000_000]);
 
         $response = $this->actingAs($admin)->post(route('tagihan.store'), [
@@ -32,7 +32,7 @@ class CreditLimitTest extends TestCase
 
     public function test_pelanggan_exactly_at_limit_no_warning(): void
     {
-        $admin = User::factory()->create(['role' => 'admin']);
+        $admin = User::factory()->create(['role' => 'bagian_administrasi']);
         $pelanggan = Pelanggan::factory()->create(['batas_kredit' => 100_000_000]);
 
         Tagihan::factory()->create([
@@ -55,7 +55,7 @@ class CreditLimitTest extends TestCase
 
     public function test_new_tagihan_exceeding_credit_limit_shows_warning(): void
     {
-        $admin = User::factory()->create(['role' => 'admin']);
+        $admin = User::factory()->create(['role' => 'bagian_administrasi']);
         $pelanggan = Pelanggan::factory()->create(['batas_kredit' => 100_000_000]);
 
         Tagihan::factory()->create([
@@ -79,7 +79,7 @@ class CreditLimitTest extends TestCase
 
     public function test_credit_limit_warning_contains_amount_details(): void
     {
-        $admin = User::factory()->create(['role' => 'admin']);
+        $admin = User::factory()->create(['role' => 'bagian_administrasi']);
         $pelanggan = Pelanggan::factory()->create(['batas_kredit' => 100_000_000]);
 
         Tagihan::factory()->create([
@@ -104,7 +104,7 @@ class CreditLimitTest extends TestCase
 
     public function test_pelanggan_without_credit_limit_no_warning(): void
     {
-        $admin = User::factory()->create(['role' => 'admin']);
+        $admin = User::factory()->create(['role' => 'bagian_administrasi']);
         $pelanggan = Pelanggan::factory()->create(['batas_kredit' => 0]);
 
         Tagihan::factory()->create([

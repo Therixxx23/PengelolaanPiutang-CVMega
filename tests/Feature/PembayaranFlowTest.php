@@ -14,7 +14,7 @@ class PembayaranFlowTest extends TestCase
 
     public function test_admin_can_record_full_payment(): void
     {
-        $admin = User::factory()->create(['role' => 'admin']);
+        $admin = User::factory()->create(['role' => 'bagian_administrasi']);
         $tagihan = Tagihan::factory()->create(['total_tagihan' => 100000]);
 
         $response = $this->actingAs($admin)->post(route('tagihan.bayar', $tagihan), [
@@ -36,7 +36,7 @@ class PembayaranFlowTest extends TestCase
 
     public function test_admin_can_record_partial_payment(): void
     {
-        $admin = User::factory()->create(['role' => 'admin']);
+        $admin = User::factory()->create(['role' => 'bagian_administrasi']);
         $tagihan = Tagihan::factory()->create(['total_tagihan' => 100000]);
 
         $response = $this->actingAs($admin)->post(route('tagihan.bayar', $tagihan), [
@@ -55,7 +55,7 @@ class PembayaranFlowTest extends TestCase
 
     public function test_partial_payment_then_remaining_completes_invoice(): void
     {
-        $admin = User::factory()->create(['role' => 'admin']);
+        $admin = User::factory()->create(['role' => 'bagian_administrasi']);
         $tagihan = Tagihan::factory()->create(['total_tagihan' => 100000]);
 
         $this->actingAs($admin)->post(route('tagihan.bayar', $tagihan), [
@@ -79,7 +79,7 @@ class PembayaranFlowTest extends TestCase
 
     public function test_overpayment_is_rejected(): void
     {
-        $admin = User::factory()->create(['role' => 'admin']);
+        $admin = User::factory()->create(['role' => 'bagian_administrasi']);
         $tagihan = Tagihan::factory()->create(['total_tagihan' => 100000]);
 
         $response = $this->actingAs($admin)->post(route('tagihan.bayar', $tagihan), [
@@ -94,7 +94,7 @@ class PembayaranFlowTest extends TestCase
 
     public function test_manajemen_cannot_record_payment(): void
     {
-        $man = User::factory()->create(['role' => 'manajemen']);
+        $man = User::factory()->create(['role' => 'bagian_keuangan']);
         $tagihan = Tagihan::factory()->create();
 
         $response = $this->actingAs($man)->post(route('tagihan.bayar', $tagihan), [
@@ -108,7 +108,7 @@ class PembayaranFlowTest extends TestCase
 
     public function test_payment_history_visible_on_show_page(): void
     {
-        $admin = User::factory()->create(['role' => 'admin']);
+        $admin = User::factory()->create(['role' => 'bagian_administrasi']);
         $tagihan = Tagihan::factory()->create(['total_tagihan' => 200000]);
 
         Pembayaran::factory()->count(2)->create([

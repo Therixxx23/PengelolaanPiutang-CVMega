@@ -5,7 +5,7 @@
         $role = Auth::user()->role;
     @endphp
 
-    @if ($role === 'admin')
+    @if ($role === 'bagian_administrasi')
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-8">
             <div class="bg-surface border border-line rounded p-4">
                 <p class="text-xs text-ink-muted uppercase tracking-wider font-medium">Tagihan Belum Lunas</p>

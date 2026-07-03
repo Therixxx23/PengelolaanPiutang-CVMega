@@ -23,7 +23,7 @@ class TagihanControllerTest extends TestCase
 
     public function test_admin_can_view_index(): void
     {
-        $admin = User::factory()->create(['role' => 'admin']);
+        $admin = User::factory()->create(['role' => 'bagian_administrasi']);
 
         $response = $this->actingAs($admin)->get(route('tagihan.index'));
         $response->assertStatus(200);
@@ -31,7 +31,7 @@ class TagihanControllerTest extends TestCase
 
     public function test_admin_can_create_tagihan(): void
     {
-        $admin = User::factory()->create(['role' => 'admin']);
+        $admin = User::factory()->create(['role' => 'bagian_administrasi']);
         $noInvoice = app(InvoiceNumberService::class)->generate();
 
         $response = $this->actingAs($admin)->post(route('tagihan.store'), [
@@ -48,7 +48,7 @@ class TagihanControllerTest extends TestCase
 
     public function test_admin_can_update_tagihan(): void
     {
-        $admin = User::factory()->create(['role' => 'admin']);
+        $admin = User::factory()->create(['role' => 'bagian_administrasi']);
         $tagihan = Tagihan::factory()->create(['id_pelanggan' => $this->pelanggan->id_pelanggan]);
 
         $response = $this->actingAs($admin)->put(route('tagihan.update', $tagihan), [
@@ -68,7 +68,7 @@ class TagihanControllerTest extends TestCase
 
     public function test_admin_can_delete_tagihan(): void
     {
-        $admin = User::factory()->create(['role' => 'admin']);
+        $admin = User::factory()->create(['role' => 'bagian_administrasi']);
         $tagihan = Tagihan::factory()->create(['id_pelanggan' => $this->pelanggan->id_pelanggan]);
 
         $response = $this->actingAs($admin)->delete(route('tagihan.destroy', $tagihan));
@@ -78,7 +78,7 @@ class TagihanControllerTest extends TestCase
 
     public function test_manajemen_can_view_index(): void
     {
-        $man = User::factory()->create(['role' => 'manajemen']);
+        $man = User::factory()->create(['role' => 'bagian_keuangan']);
 
         $response = $this->actingAs($man)->get(route('tagihan.index'));
         $response->assertStatus(200);
@@ -86,7 +86,7 @@ class TagihanControllerTest extends TestCase
 
     public function test_manajemen_cannot_create_tagihan(): void
     {
-        $man = User::factory()->create(['role' => 'manajemen']);
+        $man = User::factory()->create(['role' => 'bagian_keuangan']);
 
         $response = $this->actingAs($man)->post(route('tagihan.store'), [
             'id_pelanggan' => $this->pelanggan->id_pelanggan,
@@ -97,7 +97,7 @@ class TagihanControllerTest extends TestCase
 
     public function test_manajemen_cannot_update_tagihan(): void
     {
-        $man = User::factory()->create(['role' => 'manajemen']);
+        $man = User::factory()->create(['role' => 'bagian_keuangan']);
         $tagihan = Tagihan::factory()->create(['id_pelanggan' => $this->pelanggan->id_pelanggan]);
 
         $response = $this->actingAs($man)->put(route('tagihan.update', $tagihan), [
@@ -109,7 +109,7 @@ class TagihanControllerTest extends TestCase
 
     public function test_manajemen_cannot_delete_tagihan(): void
     {
-        $man = User::factory()->create(['role' => 'manajemen']);
+        $man = User::factory()->create(['role' => 'bagian_keuangan']);
         $tagihan = Tagihan::factory()->create(['id_pelanggan' => $this->pelanggan->id_pelanggan]);
 
         $response = $this->actingAs($man)->delete(route('tagihan.destroy', $tagihan));

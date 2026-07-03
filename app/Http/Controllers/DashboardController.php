@@ -12,7 +12,7 @@ class DashboardController extends Controller
     {
         $user = Auth::user();
 
-        if ($user->role === 'admin') {
+        if ($user->role === 'bagian_administrasi') {
             $tagihanBelumLunas = Tagihan::where('status', 'belum_lunas')->count();
             $tagihanJatuhTempoMingguIni = Tagihan::where('status', 'belum_lunas')
                 ->whereBetween('tanggal_jatuh_tempo', [now()->startOfWeek(), now()->endOfWeek()])

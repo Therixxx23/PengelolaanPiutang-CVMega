@@ -19,16 +19,16 @@ class TagihanPolicy
 
     public function create(User $user): bool
     {
-        return $user->role === 'admin';
+        return $user->role === 'bagian_administrasi';
     }
 
     public function update(User $user, Tagihan $tagihan): bool
     {
-        return $user->role === 'admin';
+        return $user->role === 'bagian_administrasi';
     }
 
     public function delete(User $user, Tagihan $tagihan): bool
     {
-        return $user->role === 'admin';
+        return $user->role === 'bagian_administrasi';
     }
 }
