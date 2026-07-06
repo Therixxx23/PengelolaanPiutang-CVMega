@@ -57,14 +57,22 @@
                         <tr class="border-b border-line hover:bg-paper transition">
                             <td class="table-cell font-mono">{{ $p->tanggal_bayar->format('d/m/Y') }}</td>
                             <td class="table-cell">
-                                <a href="{{ route('tagihan.show', $p->tagihan) }}" class="text-action hover:underline font-mono">
-                                    {{ $p->tagihan->no_invoice }}
-                                </a>
+                                @if(Auth::user()->isAdministrasi())
+                                    <a href="{{ route('tagihan.show', $p->tagihan) }}" class="text-action hover:underline font-mono">
+                                        {{ $p->tagihan->no_invoice }}
+                                    </a>
+                                @else
+                                    <span class="font-mono text-ink">{{ $p->tagihan->no_invoice }}</span>
+                                @endif
                             </td>
                             <td class="table-cell">
-                                <a href="{{ route('pelanggan.show', $p->tagihan->pelanggan) }}" class="text-action hover:underline">
-                                    {{ $p->tagihan->pelanggan->nama_pelanggan }}
-                                </a>
+                                @if(Auth::user()->isAdministrasi())
+                                    <a href="{{ route('pelanggan.show', $p->tagihan->pelanggan) }}" class="text-action hover:underline">
+                                        {{ $p->tagihan->pelanggan->nama_pelanggan }}
+                                    </a>
+                                @else
+                                    <span class="text-ink">{{ $p->tagihan->pelanggan->nama_pelanggan }}</span>
+                                @endif
                             </td>
                             <td class="table-cell">{{ ucfirst($p->metode_bayar) }}</td>
                             <td class="table-cell text-right font-mono">Rp {{ number_format($p->jumlah_bayar, 2) }}</td>
@@ -102,18 +110,26 @@
                         <span class="font-mono">Rp {{ number_format($p->jumlah_bayar, 2) }}</span>
                     </div>
                     <div class="flex items-center justify-between text-sm">
-                        <a href="{{ route('tagihan.show', $p->tagihan) }}" class="text-action hover:underline font-mono">
-                            {{ $p->tagihan->no_invoice }}
-                        </a>
+                        @if(Auth::user()->isAdministrasi())
+                            <a href="{{ route('tagihan.show', $p->tagihan) }}" class="text-action hover:underline font-mono">
+                                {{ $p->tagihan->no_invoice }}
+                            </a>
+                        @else
+                            <span class="font-mono text-ink">{{ $p->tagihan->no_invoice }}</span>
+                        @endif
                         <span class="text-xs {{ $sisa > 0 ? 'text-status-watch30' : 'text-status-paid' }}">
                             Sisa: Rp {{ number_format(max(0, $sisa), 2) }}
                             ({{ $sisa > 0 ? 'sisa' : 'lunas' }})
                         </span>
                     </div>
                     <div class="flex items-center justify-between text-xs text-ink-muted">
-                        <a href="{{ route('pelanggan.show', $p->tagihan->pelanggan) }}" class="text-action hover:underline">
-                            {{ $p->tagihan->pelanggan->nama_pelanggan }}
-                        </a>
+                        @if(Auth::user()->isAdministrasi())
+                            <a href="{{ route('pelanggan.show', $p->tagihan->pelanggan) }}" class="text-action hover:underline">
+                                {{ $p->tagihan->pelanggan->nama_pelanggan }}
+                            </a>
+                        @else
+                            <span class="text-ink">{{ $p->tagihan->pelanggan->nama_pelanggan }}</span>
+                        @endif
                         <span>{{ ucfirst($p->metode_bayar) }}{{ $p->keterangan ? ' — '.$p->keterangan : '' }}</span>
                     </div>
                 </div>

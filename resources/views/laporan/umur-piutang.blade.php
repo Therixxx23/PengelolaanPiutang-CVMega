@@ -45,14 +45,22 @@
                                 @foreach ($items as $t)
                                     <tr class="border-b border-line hover:bg-paper transition {{ $railClass }}">
                                         <td class="table-cell">
-                                            <a href="{{ route('tagihan.show', $t) }}" class="text-action hover:underline font-mono font-medium">
-                                                {{ $t->no_invoice }}
-                                            </a>
+                                            @if(Auth::user()->isAdministrasi())
+                                                <a href="{{ route('tagihan.show', $t) }}" class="text-action hover:underline font-mono font-medium">
+                                                    {{ $t->no_invoice }}
+                                                </a>
+                                            @else
+                                                <span class="font-mono text-ink">{{ $t->no_invoice }}</span>
+                                            @endif
                                         </td>
                                         <td class="table-cell">
-                                            <a href="{{ route('pelanggan.show', $t->pelanggan) }}" class="text-action hover:underline">
-                                                {{ $t->pelanggan->nama_pelanggan }}
-                                            </a>
+                                            @if(Auth::user()->isAdministrasi())
+                                                <a href="{{ route('pelanggan.show', $t->pelanggan) }}" class="text-action hover:underline">
+                                                    {{ $t->pelanggan->nama_pelanggan }}
+                                                </a>
+                                            @else
+                                                <span class="text-ink">{{ $t->pelanggan->nama_pelanggan }}</span>
+                                            @endif
                                         </td>
                                         <td class="table-cell font-mono">{{ $t->tanggal_jatuh_tempo->format('d/m/Y') }}</td>
                                         <td class="table-cell text-right font-mono">{{ $t->days_overdue }}</td>
@@ -67,15 +75,23 @@
                         @foreach ($items as $t)
                             <div class="p-4 {{ $railClass }} space-y-2">
                                 <div class="flex items-center justify-between text-sm">
-                                    <a href="{{ route('tagihan.show', $t) }}" class="text-action hover:underline font-mono font-medium">
-                                        {{ $t->no_invoice }}
-                                    </a>
+                                    @if(Auth::user()->isAdministrasi())
+                                        <a href="{{ route('tagihan.show', $t) }}" class="text-action hover:underline font-mono font-medium">
+                                            {{ $t->no_invoice }}
+                                        </a>
+                                    @else
+                                        <span class="font-mono text-ink">{{ $t->no_invoice }}</span>
+                                    @endif
                                     <span class="font-mono text-ink-muted">Rp {{ number_format($t->total_tagihan, 2) }}</span>
                                 </div>
                                 <div class="flex items-center justify-between text-sm">
-                                    <a href="{{ route('pelanggan.show', $t->pelanggan) }}" class="text-action hover:underline">
-                                        {{ $t->pelanggan->nama_pelanggan }}
-                                    </a>
+                                    @if(Auth::user()->isAdministrasi())
+                                        <a href="{{ route('pelanggan.show', $t->pelanggan) }}" class="text-action hover:underline">
+                                            {{ $t->pelanggan->nama_pelanggan }}
+                                        </a>
+                                    @else
+                                        <span class="text-ink">{{ $t->pelanggan->nama_pelanggan }}</span>
+                                    @endif
                                     <span class="text-ink-muted">{{ $t->days_overdue }} hari lewat</span>
                                 </div>
                                 <div class="text-xs text-ink-muted">

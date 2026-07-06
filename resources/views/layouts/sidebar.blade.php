@@ -12,12 +12,10 @@
         </x-nav-link>
 
         @auth
-            @if(Auth::user()->can('viewAny', 'App\Models\Pelanggan'))
+            @if(Auth::user()->isAdministrasi())
                 <x-nav-link :href="route('pelanggan.index')" :active="request()->routeIs('pelanggan.*')">
                     Pelanggan
                 </x-nav-link>
-            @endif
-            @if(Auth::user()->can('viewAny', 'App\Models\Tagihan'))
                 <x-nav-link :href="route('tagihan.index')" :active="request()->routeIs('tagihan.*')">
                     Tagihan
                 </x-nav-link>

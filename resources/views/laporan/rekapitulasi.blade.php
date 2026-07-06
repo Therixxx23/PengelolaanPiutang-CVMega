@@ -51,9 +51,13 @@
                         @endphp
                         <tr class="border-b border-line hover:bg-paper transition">
                             <td class="table-cell">
-                                <a href="{{ route('pelanggan.show', $r->pelanggan) }}" class="text-action hover:underline font-medium">
-                                    {{ $r->pelanggan->nama_pelanggan }}
-                                </a>
+                                @if(Auth::user()->isAdministrasi())
+                                    <a href="{{ route('pelanggan.show', $r->pelanggan) }}" class="text-action hover:underline font-medium">
+                                        {{ $r->pelanggan->nama_pelanggan }}
+                                    </a>
+                                @else
+                                    <span class="font-medium text-ink">{{ $r->pelanggan->nama_pelanggan }}</span>
+                                @endif
                             </td>
                             <td class="table-cell">{{ $r->pelanggan->wilayah ?: '-' }}</td>
                             <td class="table-cell text-right font-mono">Rp {{ number_format($r->total_tagihan, 2) }}</td>
@@ -99,9 +103,13 @@
                 @endphp
                 <div class="p-4 space-y-2">
                     <div class="flex items-center justify-between">
-                        <a href="{{ route('pelanggan.show', $r->pelanggan) }}" class="text-action hover:underline font-medium text-sm">
-                            {{ $r->pelanggan->nama_pelanggan }}
-                        </a>
+                        @if(Auth::user()->isAdministrasi())
+                            <a href="{{ route('pelanggan.show', $r->pelanggan) }}" class="text-action hover:underline font-medium text-sm">
+                                {{ $r->pelanggan->nama_pelanggan }}
+                            </a>
+                        @else
+                            <span class="font-medium text-ink text-sm">{{ $r->pelanggan->nama_pelanggan }}</span>
+                        @endif
                         @if ($worst)
                             <span class="{{ $badgeMap[$worst] ?? 'badge-lancar' }}">{{ $labelMap[$worst] ?? $worst }}</span>
                         @else
