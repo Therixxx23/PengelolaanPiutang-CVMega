@@ -68,6 +68,9 @@
                         @can('update', $tagihan)
                             <a href="{{ route('tagihan.edit', $tagihan) }}" class="btn-secondary">Edit</a>
                         @endcan
+                        @can('update', $tagihan)
+                            <a href="{{ route('tagihan.pdf', $tagihan) }}" class="btn-secondary">Unduh Surat Tagihan</a>
+                        @endcan
                         @can('delete', $tagihan)
                             <form action="{{ route('tagihan.destroy', $tagihan) }}" method="POST" onsubmit="return confirm('Hapus tagihan ini?')">
                                 @csrf

@@ -185,4 +185,28 @@ class LaporanAccessTest extends TestCase
         $this->assertEquals(1, substr_count($html, '>Sisa Piutang per Pelanggan</h2>'), 'Tabel heading harus muncul tepat 1x');
         $this->assertEquals(1, substr_count($html, '>Grafik Sisa Piutang per Pelanggan</h2>'), 'Chart heading harus muncul tepat 1x');
     }
+
+    public function test_admin_can_download_excel_export(): void
+    {
+        $admin = User::factory()->create(['role' => 'bagian_administrasi']);
+        $pelanggan = Pelanggan::factory()->create();
+        Tagihan::factory()->lancar()->create(['id_pelanggan' => $pelanggan->id_pelanggan]);
+
+        $response = $this->actingAs($admin)->get(route('laporan.piutang.export'));
+
+        $response->assertStatus(200);
+        $response->assertHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    }
+
+    public function test_manajemen_can_download_excel_export(): void
+    {
+        $man = User::factory()->create(['role' => 'bagian_keuangan']);
+        $pelanggan = Pelanggan::factory()->create();
+        Tagihan::factory()->lancar()->create(['id_pelanggan' => $pelanggan->id_pelanggan]);
+
+        $response = $this->actingAs($man)->get(route('laporan.piutang.export'));
+
+        $response->assertStatus(200);
+        $response->assertHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    }
 }

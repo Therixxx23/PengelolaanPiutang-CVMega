@@ -115,4 +115,27 @@ class TagihanControllerTest extends TestCase
         $response = $this->actingAs($man)->delete(route('tagihan.destroy', $tagihan));
         $response->assertStatus(403);
     }
+
+    public function test_admin_can_download_pdf(): void
+    {
+        $admin = User::factory()->create(['role' => 'bagian_administrasi']);
+        $tagihan = Tagihan::factory()->create(['id_pelanggan' => $this->pelanggan->id_pelanggan]);
+        $tagihan->load('pelanggan');
+
+        $response = $this->actingAs($admin)->get(route('tagihan.pdf', $tagihan));
+
+        $response->assertStatus(200);
+        $response->assertHeader('Content-Type', 'application/pdf');
+        $response->assertHeader('Content-Disposition', 'attachment; filename=Surat-Tagihan-'.str_replace('/', '-', $tagihan->no_invoice).'.pdf');
+    }
+
+    public function test_manajemen_cannot_download_pdf(): void
+    {
+        $man = User::factory()->create(['role' => 'bagian_keuangan']);
+        $tagihan = Tagihan::factory()->create(['id_pelanggan' => $this->pelanggan->id_pelanggan]);
+
+        $response = $this->actingAs($man)->get(route('tagihan.pdf', $tagihan));
+
+        $response->assertStatus(403);
+    }
 }

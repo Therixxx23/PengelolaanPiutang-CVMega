@@ -27,8 +27,13 @@ Route::middleware('auth')->group(function () {
     Route::post('/tagihan/{tagihan}/bayar', [TagihanController::class, 'bayar'])
         ->name('tagihan.bayar');
 
+    Route::get('/tagihan/{tagihan}/pdf', [TagihanController::class, 'exportPdf'])
+        ->name('tagihan.pdf');
+
     Route::get('/laporan/umur-piutang', LaporanUmurPiutangController::class)
         ->name('laporan.umur-piutang');
+    Route::get('/laporan/piutang/export-excel', [LaporanUmurPiutangController::class, 'exportExcel'])
+        ->name('laporan.piutang.export');
     Route::get('/laporan/riwayat-pembayaran', RiwayatPembayaranController::class)
         ->name('riwayat-pembayaran');
     Route::get('/laporan/rekapitulasi', LaporanRekapitulasiController::class)

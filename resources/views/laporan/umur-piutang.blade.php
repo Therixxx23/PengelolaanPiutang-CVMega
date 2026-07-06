@@ -1,5 +1,10 @@
 <x-app-layout>
-    <x-slot name="header">Laporan Umur Piutang</x-slot>
+    <x-slot name="header">
+        <div class="flex items-center justify-between">
+            <span>Laporan Umur Piutang</span>
+            <a href="{{ route('laporan.piutang.export') }}" class="btn-secondary text-sm">Export Excel</a>
+        </div>
+    </x-slot>
 
     <div class="space-y-8">
         @foreach (['lancar' => 'Lancar (Belum Jatuh Tempo)', '0-30' => '0–30 Hari', '31-60' => '31–60 Hari', '>60' => '>60 Hari'] as $key => $label)

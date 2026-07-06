@@ -9,6 +9,7 @@ use App\Models\Pembayaran;
 use App\Models\Tagihan;
 use App\Services\InvoiceNumberService;
 use App\Services\PembayaranService;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 
@@ -113,5 +114,18 @@ class TagihanController extends Controller
 
         return redirect()->route('tagihan.show', $tagihan)
             ->with('success', 'Pembayaran berhasil dicatat.');
+    }
+
+    public function exportPdf(Tagihan $tagihan)
+    {
+        $this->authorize('update', $tagihan);
+
+        $tagihan->load(['pelanggan', 'pembayaran']);
+
+        $pdf = Pdf::loadView('pdf.surat_tagihan', compact('tagihan'));
+
+        $filename = 'Surat-Tagihan-'.str_replace('/', '-', $tagihan->no_invoice).'.pdf';
+
+        return $pdf->download($filename);
     }
 }
