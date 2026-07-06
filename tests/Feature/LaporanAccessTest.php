@@ -209,4 +209,56 @@ class LaporanAccessTest extends TestCase
         $response->assertStatus(200);
         $response->assertHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
     }
+
+    public function test_pimpinan_can_access_dashboard(): void
+    {
+        $pimpinan = User::factory()->pimpinan()->create();
+
+        $response = $this->actingAs($pimpinan)->get(route('dashboard'));
+
+        $response->assertStatus(200);
+        $response->assertSee('Total Piutang');
+    }
+
+    public function test_pimpinan_can_access_aging_report(): void
+    {
+        $pimpinan = User::factory()->pimpinan()->create();
+
+        $response = $this->actingAs($pimpinan)->get(route('laporan.umur-piutang'));
+
+        $response->assertStatus(200);
+        $response->assertSee('Laporan Umur Piutang');
+    }
+
+    public function test_pimpinan_can_access_payment_history(): void
+    {
+        $pimpinan = User::factory()->pimpinan()->create();
+
+        $response = $this->actingAs($pimpinan)->get(route('riwayat-pembayaran'));
+
+        $response->assertStatus(200);
+        $response->assertSee('Riwayat Pembayaran');
+    }
+
+    public function test_pimpinan_can_access_recap_report(): void
+    {
+        $pimpinan = User::factory()->pimpinan()->create();
+
+        $response = $this->actingAs($pimpinan)->get(route('laporan.rekapitulasi'));
+
+        $response->assertStatus(200);
+        $response->assertSee('Laporan Rekapitulasi');
+    }
+
+    public function test_pimpinan_can_download_excel_export(): void
+    {
+        $pimpinan = User::factory()->pimpinan()->create();
+        $pelanggan = Pelanggan::factory()->create();
+        Tagihan::factory()->lancar()->create(['id_pelanggan' => $pelanggan->id_pelanggan]);
+
+        $response = $this->actingAs($pimpinan)->get(route('laporan.piutang.export'));
+
+        $response->assertStatus(200);
+        $response->assertHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    }
 }

@@ -138,4 +138,54 @@ class TagihanControllerTest extends TestCase
 
         $response->assertStatus(403);
     }
+
+    public function test_pimpinan_can_view_index(): void
+    {
+        $pimpinan = User::factory()->pimpinan()->create();
+
+        $response = $this->actingAs($pimpinan)->get(route('tagihan.index'));
+        $response->assertStatus(200);
+    }
+
+    public function test_pimpinan_cannot_create_tagihan(): void
+    {
+        $pimpinan = User::factory()->pimpinan()->create();
+
+        $response = $this->actingAs($pimpinan)->post(route('tagihan.store'), [
+            'id_pelanggan' => $this->pelanggan->id_pelanggan,
+        ]);
+
+        $response->assertStatus(403);
+    }
+
+    public function test_pimpinan_cannot_update_tagihan(): void
+    {
+        $pimpinan = User::factory()->pimpinan()->create();
+        $tagihan = Tagihan::factory()->create(['id_pelanggan' => $this->pelanggan->id_pelanggan]);
+
+        $response = $this->actingAs($pimpinan)->put(route('tagihan.update', $tagihan), [
+            'id_pelanggan' => $this->pelanggan->id_pelanggan,
+        ]);
+
+        $response->assertStatus(403);
+    }
+
+    public function test_pimpinan_cannot_delete_tagihan(): void
+    {
+        $pimpinan = User::factory()->pimpinan()->create();
+        $tagihan = Tagihan::factory()->create(['id_pelanggan' => $this->pelanggan->id_pelanggan]);
+
+        $response = $this->actingAs($pimpinan)->delete(route('tagihan.destroy', $tagihan));
+        $response->assertStatus(403);
+    }
+
+    public function test_pimpinan_cannot_download_pdf(): void
+    {
+        $pimpinan = User::factory()->pimpinan()->create();
+        $tagihan = Tagihan::factory()->create(['id_pelanggan' => $this->pelanggan->id_pelanggan]);
+
+        $response = $this->actingAs($pimpinan)->get(route('tagihan.pdf', $tagihan));
+
+        $response->assertStatus(403);
+    }
 }

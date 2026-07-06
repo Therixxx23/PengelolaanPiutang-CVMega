@@ -102,4 +102,44 @@ class PelangganControllerTest extends TestCase
         $response = $this->actingAs($man)->delete(route('pelanggan.destroy', $pelanggan));
         $response->assertStatus(403);
     }
+
+    public function test_pimpinan_cannot_create_pelanggan(): void
+    {
+        $pimpinan = User::factory()->pimpinan()->create();
+
+        $response = $this->actingAs($pimpinan)->post(route('pelanggan.store'), [
+            'nama_pelanggan' => 'PT Nakal',
+        ]);
+
+        $response->assertStatus(403);
+    }
+
+    public function test_pimpinan_cannot_update_pelanggan(): void
+    {
+        $pimpinan = User::factory()->pimpinan()->create();
+        $pelanggan = Pelanggan::factory()->create();
+
+        $response = $this->actingAs($pimpinan)->put(route('pelanggan.update', $pelanggan), [
+            'nama_pelanggan' => 'PT Nakal',
+        ]);
+
+        $response->assertStatus(403);
+    }
+
+    public function test_pimpinan_cannot_delete_pelanggan(): void
+    {
+        $pimpinan = User::factory()->pimpinan()->create();
+        $pelanggan = Pelanggan::factory()->create();
+
+        $response = $this->actingAs($pimpinan)->delete(route('pelanggan.destroy', $pelanggan));
+        $response->assertStatus(403);
+    }
+
+    public function test_pimpinan_can_view_index(): void
+    {
+        $pimpinan = User::factory()->pimpinan()->create();
+
+        $response = $this->actingAs($pimpinan)->get(route('pelanggan.index'));
+        $response->assertStatus(200);
+    }
 }

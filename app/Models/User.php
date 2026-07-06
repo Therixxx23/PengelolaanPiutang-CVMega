@@ -40,6 +40,26 @@ class User extends Authenticatable
      *
      * @return array<string, string>
      */
+    public function isAdministrasi(): bool
+    {
+        return $this->role === 'bagian_administrasi';
+    }
+
+    public function isKeuangan(): bool
+    {
+        return $this->role === 'bagian_keuangan';
+    }
+
+    public function isPimpinan(): bool
+    {
+        return $this->role === 'pimpinan';
+    }
+
+    public function canViewReports(): bool
+    {
+        return in_array($this->role, ['bagian_keuangan', 'pimpinan']);
+    }
+
     protected function casts(): array
     {
         return [

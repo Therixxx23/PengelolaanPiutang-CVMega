@@ -19,16 +19,16 @@ class PembayaranPolicy
 
     public function create(User $user): bool
     {
-        return $user->role === 'bagian_administrasi';
+        return $user->isAdministrasi();
     }
 
     public function update(User $user, Pembayaran $pembayaran): bool
     {
-        return $user->role === 'bagian_administrasi';
+        return $user->isAdministrasi();
     }
 
     public function delete(User $user, Pembayaran $pembayaran): bool
     {
-        return $user->role === 'bagian_administrasi';
+        return $user->isAdministrasi();
     }
 }

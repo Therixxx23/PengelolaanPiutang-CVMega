@@ -41,6 +41,13 @@ class UserFactory extends Factory
         ]);
     }
 
+    public function pimpinan(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'role' => 'pimpinan',
+        ]);
+    }
+
     public function unverified(): static
     {
         return $this->state(fn (array $attributes) => [

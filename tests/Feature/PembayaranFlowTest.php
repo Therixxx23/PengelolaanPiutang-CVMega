@@ -106,6 +106,20 @@ class PembayaranFlowTest extends TestCase
         $response->assertStatus(403);
     }
 
+    public function test_pimpinan_cannot_record_payment(): void
+    {
+        $pimpinan = User::factory()->pimpinan()->create();
+        $tagihan = Tagihan::factory()->create();
+
+        $response = $this->actingAs($pimpinan)->post(route('tagihan.bayar', $tagihan), [
+            'tanggal_bayar' => now()->format('Y-m-d'),
+            'jumlah_bayar' => 50000,
+            'metode_bayar' => 'tunai',
+        ]);
+
+        $response->assertStatus(403);
+    }
+
     public function test_payment_history_visible_on_show_page(): void
     {
         $admin = User::factory()->create(['role' => 'bagian_administrasi']);
