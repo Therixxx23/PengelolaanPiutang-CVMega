@@ -10,6 +10,8 @@ class PelangganController extends Controller
 {
     public function index()
     {
+        $this->authorize('viewAny', Pelanggan::class);
+
         $pelanggan = Pelanggan::orderBy('nama_pelanggan')->paginate(15);
 
         return view('pelanggan.index', compact('pelanggan'));
@@ -17,6 +19,8 @@ class PelangganController extends Controller
 
     public function create()
     {
+        $this->authorize('create', Pelanggan::class);
+
         return view('pelanggan.create');
     }
 
@@ -30,6 +34,8 @@ class PelangganController extends Controller
 
     public function show(Pelanggan $pelanggan)
     {
+        $this->authorize('view', $pelanggan);
+
         $pelanggan->load('tagihan.pembayaran');
 
         return view('pelanggan.show', compact('pelanggan'));
@@ -37,6 +43,8 @@ class PelangganController extends Controller
 
     public function edit(Pelanggan $pelanggan)
     {
+        $this->authorize('update', $pelanggan);
+
         return view('pelanggan.edit', compact('pelanggan'));
     }
 

@@ -23,12 +23,12 @@ class PolicyTest extends TestCase
         $this->assertFalse($man->can('create', Pelanggan::class));
     }
 
-    public function test_manajemen_can_view_pelanggan(): void
+    public function test_manajemen_cannot_view_pelanggan(): void
     {
         $man = User::factory()->create(['role' => 'bagian_keuangan']);
         $pelanggan = Pelanggan::factory()->create();
-        $this->assertTrue($man->can('view', $pelanggan));
-        $this->assertTrue($man->can('viewAny', Pelanggan::class));
+        $this->assertFalse($man->can('view', $pelanggan));
+        $this->assertFalse($man->can('viewAny', Pelanggan::class));
     }
 
     public function test_pimpinan_cannot_create_pelanggan(): void
@@ -37,11 +37,11 @@ class PolicyTest extends TestCase
         $this->assertFalse($pimpinan->can('create', Pelanggan::class));
     }
 
-    public function test_pimpinan_can_view_pelanggan(): void
+    public function test_pimpinan_cannot_view_pelanggan(): void
     {
         $pimpinan = User::factory()->pimpinan()->create();
         $pelanggan = Pelanggan::factory()->create();
-        $this->assertTrue($pimpinan->can('view', $pelanggan));
-        $this->assertTrue($pimpinan->can('viewAny', Pelanggan::class));
+        $this->assertFalse($pimpinan->can('view', $pelanggan));
+        $this->assertFalse($pimpinan->can('viewAny', Pelanggan::class));
     }
 }

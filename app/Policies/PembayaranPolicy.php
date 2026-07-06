@@ -9,12 +9,12 @@ class PembayaranPolicy
 {
     public function viewAny(User $user): bool
     {
-        return true;
+        return $user->isAdministrasi();
     }
 
     public function view(User $user, Pembayaran $pembayaran): bool
     {
-        return true;
+        return $user->isAdministrasi();
     }
 
     public function create(User $user): bool

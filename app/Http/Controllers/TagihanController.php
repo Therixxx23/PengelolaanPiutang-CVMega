@@ -17,6 +17,8 @@ class TagihanController extends Controller
 {
     public function index()
     {
+        $this->authorize('viewAny', Tagihan::class);
+
         $tagihan = Tagihan::with('pelanggan')
             ->orderBy('created_at', 'desc')
             ->paginate(15);
@@ -26,6 +28,8 @@ class TagihanController extends Controller
 
     public function create(InvoiceNumberService $invoiceService)
     {
+        $this->authorize('create', Tagihan::class);
+
         $pelanggan = Pelanggan::orderBy('nama_pelanggan')->get()
             ->map(fn ($p) => (object) [
                 'id_pelanggan' => $p->id_pelanggan,
@@ -66,6 +70,8 @@ class TagihanController extends Controller
 
     public function show(Tagihan $tagihan)
     {
+        $this->authorize('view', $tagihan);
+
         $tagihan->load(['pelanggan', 'pembayaran']);
 
         return view('tagihan.show', compact('tagihan'));
@@ -73,6 +79,8 @@ class TagihanController extends Controller
 
     public function edit(Tagihan $tagihan)
     {
+        $this->authorize('update', $tagihan);
+
         $pelanggan = Pelanggan::orderBy('nama_pelanggan')->get();
 
         return view('tagihan.edit', compact('tagihan', 'pelanggan'));

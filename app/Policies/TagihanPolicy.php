@@ -9,12 +9,12 @@ class TagihanPolicy
 {
     public function viewAny(User $user): bool
     {
-        return true;
+        return $user->isAdministrasi();
     }
 
     public function view(User $user, Tagihan $tagihan): bool
     {
-        return true;
+        return $user->isAdministrasi();
     }
 
     public function create(User $user): bool

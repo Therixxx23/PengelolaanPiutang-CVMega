@@ -76,12 +76,12 @@ class TagihanControllerTest extends TestCase
         $this->assertDatabaseMissing('tagihan', ['id_tagihan' => $tagihan->id_tagihan]);
     }
 
-    public function test_manajemen_can_view_index(): void
+    public function test_manajemen_cannot_view_index(): void
     {
         $man = User::factory()->create(['role' => 'bagian_keuangan']);
 
         $response = $this->actingAs($man)->get(route('tagihan.index'));
-        $response->assertStatus(200);
+        $response->assertStatus(403);
     }
 
     public function test_manajemen_cannot_create_tagihan(): void
@@ -139,12 +139,12 @@ class TagihanControllerTest extends TestCase
         $response->assertStatus(403);
     }
 
-    public function test_pimpinan_can_view_index(): void
+    public function test_pimpinan_cannot_view_index(): void
     {
         $pimpinan = User::factory()->pimpinan()->create();
 
         $response = $this->actingAs($pimpinan)->get(route('tagihan.index'));
-        $response->assertStatus(200);
+        $response->assertStatus(403);
     }
 
     public function test_pimpinan_cannot_create_tagihan(): void

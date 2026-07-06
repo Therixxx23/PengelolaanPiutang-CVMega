@@ -63,12 +63,12 @@ class PelangganControllerTest extends TestCase
         $this->assertDatabaseMissing('pelanggan', ['id_pelanggan' => $pelanggan->id_pelanggan]);
     }
 
-    public function test_manajemen_can_view_index(): void
+    public function test_manajemen_cannot_view_index(): void
     {
         $man = User::factory()->create(['role' => 'bagian_keuangan']);
 
         $response = $this->actingAs($man)->get(route('pelanggan.index'));
-        $response->assertStatus(200);
+        $response->assertStatus(403);
     }
 
     public function test_manajemen_cannot_create_pelanggan(): void
@@ -135,11 +135,11 @@ class PelangganControllerTest extends TestCase
         $response->assertStatus(403);
     }
 
-    public function test_pimpinan_can_view_index(): void
+    public function test_pimpinan_cannot_view_index(): void
     {
         $pimpinan = User::factory()->pimpinan()->create();
 
         $response = $this->actingAs($pimpinan)->get(route('pelanggan.index'));
-        $response->assertStatus(200);
+        $response->assertStatus(403);
     }
 }
