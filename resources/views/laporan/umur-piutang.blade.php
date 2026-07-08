@@ -7,11 +7,45 @@
     </x-slot>
 
     <div class="space-y-8">
-        @foreach (['lancar' => 'Lancar (Belum Jatuh Tempo)', '0-30' => '0–30 Hari', '31-60' => '31–60 Hari', '>60' => '>60 Hari'] as $key => $label)
+        <div class="flex flex-wrap gap-x-4 gap-y-2">
+            @php $totalCount = array_sum(array_column($summary, 'count')); @endphp
+            @foreach (['semua' => 'Semua', 'lancar' => 'Lancar', '0-30' => '0–30 Hari', '31-60' => '31–60 Hari', '>60' => '>60 Hari'] as $key => $label)
+                @php
+                    $count = $key === 'semua' ? $totalCount : ($summary[$key]['count'] ?? 0);
+                    $isActive = $bucket === $key;
+                    if ($isActive) {
+                        $colorMap = [
+                            'semua' => 'bg-action text-white border-action',
+                            'lancar' => 'bg-status-lancar text-white border-status-lancar',
+                            '0-30' => 'bg-status-watch30 text-white border-status-watch30',
+                            '31-60' => 'bg-status-watch60 text-white border-status-watch60',
+                            '>60' => 'bg-status-critical text-white border-status-critical',
+                        ];
+                        $btnClass = 'inline-flex items-center px-3 py-1.5 text-sm font-medium rounded border-2 ' . ($colorMap[$key] ?? '');
+                        $url = route('laporan.umur-piutang');
+                    } else {
+                        $btnClass = 'inline-flex items-center px-3 py-1.5 text-sm font-medium rounded border border-line text-ink hover:bg-paper';
+                        $url = route('laporan.umur-piutang', $key === 'semua' ? [] : ['bucket' => $key]);
+                    }
+                @endphp
+                <a href="{{ $url }}" class="{{ $btnClass }}">
+                    {{ $label }} ({{ $count }})
+                </a>
+            @endforeach
+        </div>
+
+        @foreach ($bucketKeys as $key)
             @php
                 $items = $buckets[$key] ?? collect();
                 $totalBucket = $summary[$key]['total'] ?? 0;
                 $countBucket = $summary[$key]['count'] ?? 0;
+                $bucketLabels = [
+                    'lancar' => 'Lancar (Belum Jatuh Tempo)',
+                    '0-30' => '0–30 Hari',
+                    '31-60' => '31–60 Hari',
+                    '>60' => '>60 Hari',
+                ];
+                $label = $bucketLabels[$key] ?? $key;
                 $railClass = $key === 'lancar' ? 'aging-rail-lancar' : ($key === '0-30' ? 'aging-rail-watch30' : ($key === '31-60' ? 'aging-rail-watch60' : 'aging-rail-critical'));
                 $badgeClass = $key === 'lancar' ? 'badge-lancar' : ($key === '0-30' ? 'badge-watch30' : ($key === '31-60' ? 'badge-watch60' : 'badge-critical'));
             @endphp

@@ -224,4 +224,62 @@ class AksesRoleTest extends TestCase
         $response = $this->actingAs($this->pimpinan())->get(route('laporan.piutang.export'));
         $response->assertStatus(200);
     }
+
+    public function test_all_roles_get_umur_piutang_bucket_lancar(): void
+    {
+        $pelanggan = Pelanggan::factory()->create();
+        Tagihan::factory()->lancar()->create(['id_pelanggan' => $pelanggan->id_pelanggan]);
+
+        foreach (['bagian_administrasi', 'bagian_keuangan', 'pimpinan'] as $role) {
+            $user = match ($role) {
+                'bagian_administrasi' => $this->admin(),
+                'bagian_keuangan' => $this->keuangan(),
+                'pimpinan' => $this->pimpinan(),
+            };
+
+            $response = $this->actingAs($user)->get(route('laporan.umur-piutang', ['bucket' => 'lancar']));
+            $response->assertStatus(200);
+        }
+    }
+
+    public function test_all_roles_get_umur_piutang_bucket_0_30(): void
+    {
+        foreach (['bagian_administrasi', 'bagian_keuangan', 'pimpinan'] as $role) {
+            $user = match ($role) {
+                'bagian_administrasi' => $this->admin(),
+                'bagian_keuangan' => $this->keuangan(),
+                'pimpinan' => $this->pimpinan(),
+            };
+
+            $response = $this->actingAs($user)->get(route('laporan.umur-piutang', ['bucket' => '0-30']));
+            $response->assertStatus(200);
+        }
+    }
+
+    public function test_all_roles_get_umur_piutang_bucket_invalid_fallback(): void
+    {
+        foreach (['bagian_administrasi', 'bagian_keuangan', 'pimpinan'] as $role) {
+            $user = match ($role) {
+                'bagian_administrasi' => $this->admin(),
+                'bagian_keuangan' => $this->keuangan(),
+                'pimpinan' => $this->pimpinan(),
+            };
+
+            $response = $this->actingAs($user)->get(route('laporan.umur-piutang', ['bucket' => 'invalid']));
+            $response->assertStatus(200);
+        }
+    }
+
+    public function test_umur_piutang_bucket_lancar_shows_only_lancar_tags(): void
+    {
+        $pelanggan = Pelanggan::factory()->create();
+        Tagihan::factory()->overdue30()->create(['id_pelanggan' => $pelanggan->id_pelanggan]);
+        Tagihan::factory()->lancar()->create(['id_pelanggan' => $pelanggan->id_pelanggan]);
+
+        $response = $this->actingAs($this->admin())
+            ->get(route('laporan.umur-piutang', ['bucket' => 'lancar']));
+
+        $response->assertStatus(200);
+        $response->assertSee('Lancar (Belum Jatuh Tempo)');
+    }
 }
