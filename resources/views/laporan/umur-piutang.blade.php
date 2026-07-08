@@ -13,22 +13,23 @@
                 @php
                     $count = $key === 'semua' ? $totalCount : ($summary[$key]['count'] ?? 0);
                     $isActive = $bucket === $key;
+                    $colorMap = [
+                        'semua' => '#1B2027',
+                        'lancar' => '#6B7CA3',
+                        '0-30' => '#C8862A',
+                        '31-60' => '#B8612A',
+                        '>60' => '#B33A2E',
+                    ];
+                    $color = $colorMap[$key] ?? '#1B2027';
                     if ($isActive) {
-                        $colorMap = [
-                            'semua' => 'bg-action text-white border-action',
-                            'lancar' => 'bg-status-lancar text-white border-status-lancar',
-                            '0-30' => 'bg-status-watch30 text-white border-status-watch30',
-                            '31-60' => 'bg-status-watch60 text-white border-status-watch60',
-                            '>60' => 'bg-status-critical text-white border-status-critical',
-                        ];
-                        $btnClass = 'inline-flex items-center px-3 py-1.5 text-sm font-medium rounded border-2 ' . ($colorMap[$key] ?? '');
+                        $btnStyle = "background-color:{$color}; color:#ffffff; border:2px solid {$color}";
                         $url = route('laporan.umur-piutang');
                     } else {
-                        $btnClass = 'inline-flex items-center px-3 py-1.5 text-sm font-medium rounded border border-line text-ink hover:bg-paper';
+                        $btnStyle = "background-color:#ffffff; color:{$color}; border:1px solid {$color}";
                         $url = route('laporan.umur-piutang', $key === 'semua' ? [] : ['bucket' => $key]);
                     }
                 @endphp
-                <a href="{{ $url }}" class="{{ $btnClass }}">
+                <a href="{{ $url }}" style="{{ $btnStyle }}" class="inline-flex items-center px-3 py-1.5 text-sm font-medium rounded">
                     {{ $label }} ({{ $count }})
                 </a>
             @endforeach
