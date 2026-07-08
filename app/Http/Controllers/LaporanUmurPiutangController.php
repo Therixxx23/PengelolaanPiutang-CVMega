@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Exports\TagihanBelumLunasExport;
+use App\Models\Tagihan;
 use App\Services\PiutangAgingService;
 use OpenSpout\Writer\XLSX\Writer;
 
@@ -19,6 +20,7 @@ class LaporanUmurPiutangController extends Controller
             $bucket = 'semua';
         }
 
+        // Summary counts selalu dari FULL data (tidak kena paginate)
         $buckets = $agingService->getBucketedTagihan();
 
         $summary = [];
@@ -29,11 +31,36 @@ class LaporanUmurPiutangController extends Controller
             ];
         }
 
+        // Query paginated untuk bucket spesifik
+        $paginatedTagihan = null;
+
+        if ($bucket !== 'semua') {
+            $query = Tagihan::with('pelanggan')->where('status', 'belum_lunas');
+
+            $today = now()->startOfDay();
+
+            match ($bucket) {
+                'lancar' => $query->whereDate('tanggal_jatuh_tempo', '>=', $today),
+                '0-30' => $query
+                    ->whereDate('tanggal_jatuh_tempo', '>=', $today->copy()->subDays(30))
+                    ->whereDate('tanggal_jatuh_tempo', '<=', $today->copy()->subDays(1)),
+                '31-60' => $query
+                    ->whereDate('tanggal_jatuh_tempo', '>=', $today->copy()->subDays(60))
+                    ->whereDate('tanggal_jatuh_tempo', '<=', $today->copy()->subDays(31)),
+                '>60' => $query->whereDate('tanggal_jatuh_tempo', '<=', $today->copy()->subDays(61)),
+            };
+
+            $paginatedTagihan = $query->paginate(10);
+            $paginatedTagihan->appends(['bucket' => $bucket]);
+        }
+
         $bucketKeys = $bucket === 'semua'
             ? array_keys($buckets)
             : [$bucket];
 
-        return view('laporan.umur-piutang', compact('buckets', 'summary', 'bucket', 'bucketKeys'));
+        return view('laporan.umur-piutang', compact(
+            'buckets', 'summary', 'bucket', 'bucketKeys', 'paginatedTagihan',
+        ));
     }
 
     public function exportExcel()

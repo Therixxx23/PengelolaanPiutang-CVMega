@@ -37,7 +37,7 @@
 
         @foreach ($bucketKeys as $key)
             @php
-                $items = $buckets[$key] ?? collect();
+                $items = $paginatedTagihan ?? ($buckets[$key] ?? collect());
                 $totalBucket = $summary[$key]['total'] ?? 0;
                 $countBucket = $summary[$key]['count'] ?? 0;
                 $bucketLabels = [
@@ -138,6 +138,12 @@
                 @endif
             </div>
         @endforeach
+
+        @if ($paginatedTagihan)
+            <div class="mt-4">
+                {{ $paginatedTagihan->links() }}
+            </div>
+        @endif
 
         <div class="bg-surface border border-line rounded p-4">
             <div class="flex items-center justify-between text-sm">
