@@ -12,7 +12,7 @@
         </div>
         <div class="bg-surface border border-line rounded p-4">
             <p class="text-xs text-ink-muted uppercase tracking-wider font-medium">Total Pelanggan</p>
-            <p class="text-xl font-mono font-semibold text-ink mt-1">{{ $ringkasan->count() }}</p>
+            <p class="text-xl font-mono font-semibold text-ink mt-1">{{ $totalPelanggan }}</p>
         </div>
     </div>
 
@@ -79,12 +79,18 @@
                                 Belum ada data piutang untuk ditampilkan.
                             </td>
                         </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
+            @endforelse
+        </tbody>
+    </table>
+</div>
 
-        <div class="sm:hidden divide-y divide-line">
+@if ($ringkasan->hasPages())
+    <div class="px-4 py-3 border-t border-line">
+        {{ $ringkasan->links() }}
+    </div>
+@endif
+
+<div class="sm:hidden divide-y divide-line">
             @forelse ($ringkasan as $r)
                 @php
                     $badgeMap = [
