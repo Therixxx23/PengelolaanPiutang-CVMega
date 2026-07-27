@@ -9,27 +9,21 @@
 
     <form method="GET" action="{{ route('laporan.rekapitulasi') }}">
         <div style="display:flex; gap:8px; align-items:center; margin-bottom:16px">
-            <div style="flex:1; position:relative">
-                <input
-                    type="text"
-                    name="search"
-                    value="{{ $search }}"
-                    placeholder="Cari nama pelanggan..."
-                    autocomplete="off"
-                    style="width:100%; padding:8px 12px; border:1px solid #DCE2E0; border-radius:6px; font-family:Inter,sans-serif; font-size:14px; color:#1B2027; outline-color:#0E6E66; box-sizing:border-box">
+            <input
+                type="text"
+                name="search"
+                value="{{ $search }}"
+                placeholder="Cari nama pelanggan..."
+                autocomplete="off"
+                style="flex:1; padding:8px 12px; border:1px solid #DCE2E0; border-radius:6px; font-family:Inter,sans-serif; font-size:14px; color:#1B2027; outline-color:#0E6E66; box-sizing:border-box">
 
-            </div>
-
-            <div style="display:flex; flex-direction:column; gap:4px">
-                <label style="font-size:11px; color:#5B6470; font-weight:500">WILAYAH</label>
-                <select name="wilayah"
-                        style="width:180px; padding:8px 12px; border:1px solid #DCE2E0; border-radius:6px; font-family:Inter,sans-serif; font-size:14px; color:#1B2027; outline-color:#0E6E66">
-                    <option value="semua" {{ $wilayah === 'semua' ? 'selected' : '' }}>Semua Wilayah</option>
-                    @foreach($daftarWilayah as $w)
-                        <option value="{{ $w }}" {{ $wilayah === $w ? 'selected' : '' }}>{{ $w }}</option>
-                    @endforeach
-                </select>
-            </div>
+            <select name="wilayah"
+                    style="width:180px; padding:8px 12px; border:1px solid #DCE2E0; border-radius:6px; font-family:Inter,sans-serif; font-size:14px; color:#1B2027; outline-color:#0E6E66">
+                <option value="semua" {{ $wilayah === 'semua' ? 'selected' : '' }}>Semua Wilayah</option>
+                @foreach($daftarWilayah as $w)
+                    <option value="{{ $w }}" {{ $wilayah === $w ? 'selected' : '' }}>{{ $w }}</option>
+                @endforeach
+            </select>
 
             <button type="submit"
                     style="padding:8px 20px; background:#0E6E66; color:white; border:none; border-radius:6px; font-size:14px; cursor:pointer; font-family:'IBM Plex Sans',sans-serif; font-weight:500">
