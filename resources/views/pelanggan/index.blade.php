@@ -38,16 +38,18 @@
                                 {{ $p->tagihan()->where('status', 'belum_lunas')->count() }}
                             </td>
                             <td class="table-cell text-right whitespace-nowrap">
-                                @can('update', $p)
-                                    <a href="{{ route('pelanggan.edit', $p) }}" class="text-ink-muted hover:text-ink text-sm transition">Edit</a>
-                                @endcan
-                                @can('delete', $p)
-                                    <form action="{{ route('pelanggan.destroy', $p) }}" method="POST" class="inline" onsubmit="return confirm('Hapus pelanggan ini?')">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn-destructive !py-1 !px-2 text-xs">Hapus</button>
-                                    </form>
-                                @endcan
+                                <div class="flex items-center justify-end gap-2">
+                                    @can('update', $p)
+                                        <a href="{{ route('pelanggan.edit', $p) }}" class="btn-edit !py-1 !px-2 text-xs">Edit</a>
+                                    @endcan
+                                    @can('delete', $p)
+                                        <form action="{{ route('pelanggan.destroy', $p) }}" method="POST" onsubmit="return confirm('Hapus pelanggan ini?')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn-destructive !py-1 !px-2 text-xs">Hapus</button>
+                                        </form>
+                                    @endcan
+                                </div>
                             </td>
                         </tr>
                     @empty
@@ -83,10 +85,10 @@
                     </div>
                     <div class="flex gap-2 pt-1">
                         @can('update', $p)
-                            <a href="{{ route('pelanggan.edit', $p) }}" class="text-xs text-ink-muted hover:text-ink transition">Edit</a>
+                            <a href="{{ route('pelanggan.edit', $p) }}" class="btn-edit !py-1 !px-2 text-xs">Edit</a>
                         @endcan
                         @can('delete', $p)
-                            <form action="{{ route('pelanggan.destroy', $p) }}" method="POST" class="inline" onsubmit="return confirm('Hapus pelanggan ini?')">
+                            <form action="{{ route('pelanggan.destroy', $p) }}" method="POST" onsubmit="return confirm('Hapus pelanggan ini?')">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="btn-destructive !py-1 !px-2 text-xs">Hapus</button>

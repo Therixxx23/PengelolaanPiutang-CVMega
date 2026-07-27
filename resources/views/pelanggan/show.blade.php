@@ -20,9 +20,9 @@
                     <p class="text-xs text-ink-muted uppercase tracking-wider font-medium">Batas Kredit</p>
                     <p class="text-sm text-ink font-mono mt-1">Rp {{ number_format($pelanggan->batas_kredit, 2) }}</p>
                 </div>
-                <div class="pt-3 border-t border-line flex gap-2">
+                    <div class="pt-3 border-t border-line flex gap-2">
                     @can('update', $pelanggan)
-                        <a href="{{ route('pelanggan.edit', $pelanggan) }}" class="btn-secondary">Edit</a>
+                        <a href="{{ route('pelanggan.edit', $pelanggan) }}" class="btn-edit">Edit</a>
                     @endcan
                     @can('delete', $pelanggan)
                         <form action="{{ route('pelanggan.destroy', $pelanggan) }}" method="POST" onsubmit="return confirm('Hapus pelanggan ini? Semua tagihan terkait juga akan dihapus.')">

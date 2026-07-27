@@ -66,7 +66,7 @@
 
                     <div class="pt-3 border-t border-line flex gap-2">
                         @can('update', $tagihan)
-                            <a href="{{ route('tagihan.edit', $tagihan) }}" class="btn-secondary">Edit</a>
+                            <a href="{{ route('tagihan.edit', $tagihan) }}" class="btn-edit">Edit</a>
                         @endcan
                         @can('update', $tagihan)
                             <a href="{{ route('tagihan.pdf', $tagihan) }}" class="btn-secondary">Unduh Surat Tagihan</a>

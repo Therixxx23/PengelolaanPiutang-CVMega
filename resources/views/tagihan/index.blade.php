@@ -60,16 +60,18 @@
                                 <span class="{{ $badge }}">{{ $badgeText }}</span>
                             </td>
                             <td class="table-cell text-right whitespace-nowrap">
-                                @can('update', $t)
-                                    <a href="{{ route('tagihan.edit', $t) }}" class="text-ink-muted hover:text-ink text-sm transition">Edit</a>
-                                @endcan
-                                @can('delete', $t)
-                                    <form action="{{ route('tagihan.destroy', $t) }}" method="POST" class="inline" onsubmit="return confirm('Hapus tagihan ini?')">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn-destructive !py-1 !px-2 text-xs">Hapus</button>
-                                    </form>
-                                @endcan
+                                <div class="flex items-center justify-end gap-2">
+                                    @can('update', $t)
+                                        <a href="{{ route('tagihan.edit', $t) }}" class="btn-edit !py-1 !px-2 text-xs">Edit</a>
+                                    @endcan
+                                    @can('delete', $t)
+                                        <form action="{{ route('tagihan.destroy', $t) }}" method="POST" onsubmit="return confirm('Hapus tagihan ini?')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn-destructive !py-1 !px-2 text-xs">Hapus</button>
+                                        </form>
+                                    @endcan
+                                </div>
                             </td>
                         </tr>
                     @empty
@@ -123,10 +125,10 @@
                     </div>
                     <div class="flex gap-2 pt-1">
                         @can('update', $t)
-                            <a href="{{ route('tagihan.edit', $t) }}" class="text-xs text-ink-muted hover:text-ink transition">Edit</a>
+                            <a href="{{ route('tagihan.edit', $t) }}" class="btn-edit !py-1 !px-2 text-xs">Edit</a>
                         @endcan
                         @can('delete', $t)
-                            <form action="{{ route('tagihan.destroy', $t) }}" method="POST" class="inline" onsubmit="return confirm('Hapus tagihan ini?')">
+                            <form action="{{ route('tagihan.destroy', $t) }}" method="POST" onsubmit="return confirm('Hapus tagihan ini?')">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="btn-destructive !py-1 !px-2 text-xs">Hapus</button>
