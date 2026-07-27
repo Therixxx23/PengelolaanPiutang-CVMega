@@ -19,11 +19,26 @@ class TagihanController extends Controller
     {
         $this->authorize('viewAny', Tagihan::class);
 
-        $tagihan = Tagihan::with('pelanggan')
-            ->orderBy('created_at', 'desc')
-            ->paginate(15);
+        $search = request('search', '');
+        $status = request('status', 'semua');
+        $totalSemua = Tagihan::count();
 
-        return view('tagihan.index', compact('tagihan'));
+        $tagihan = Tagihan::with('pelanggan')
+            ->when($search, function ($q) use ($search) {
+                $q->where('no_invoice', 'like', "%{$search}%")
+                    ->orWhereHas('pelanggan', function ($q) use ($search) {
+                        $q->where('nama_pelanggan', 'like', "%{$search}%");
+                    });
+            })
+            ->when($status !== 'semua', function ($q) use ($status) {
+                $q->where('status', $status);
+            })
+            ->latest('tanggal_tagihan')
+            ->paginate(10);
+
+        $tagihan->appends(['search' => $search, 'status' => $status]);
+
+        return view('tagihan.index', compact('tagihan', 'search', 'status', 'totalSemua'));
     }
 
     public function create(InvoiceNumberService $invoiceService)

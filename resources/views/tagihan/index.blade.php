@@ -2,8 +2,37 @@
     <x-slot name="header">Tagihan</x-slot>
 
     <div class="bg-surface border border-line rounded overflow-hidden">
+        <div class="px-4 py-3 border-b border-line">
+            <form method="GET" action="{{ route('tagihan.index') }}" class="flex flex-col sm:flex-row gap-2 sm:items-center">
+                <input type="text" name="search"
+                       value="{{ $search }}"
+                       placeholder="Cari no. invoice atau nama pelanggan..."
+                       class="flex-1 px-3 py-2 border border-line rounded text-sm font-sans text-ink outline-focus">
+                <select name="status"
+                        class="px-3 py-2 border border-line rounded text-sm font-sans text-ink outline-focus sm:min-w-[150px]">
+                    <option value="semua" {{ $status === 'semua' ? 'selected' : '' }}>Semua Status</option>
+                    <option value="belum_lunas" {{ $status === 'belum_lunas' ? 'selected' : '' }}>Belum Lunas</option>
+                    <option value="lunas" {{ $status === 'lunas' ? 'selected' : '' }}>Lunas</option>
+                </select>
+                <button type="submit" class="btn-primary !py-2">Cari</button>
+                @if($search || $status !== 'semua')
+                    <a href="{{ route('tagihan.index') }}" class="px-4 py-2 border border-line rounded text-sm text-ink-muted font-sans hover:bg-paper transition text-center">
+                        Reset
+                    </a>
+                @endif
+            </form>
+        </div>
+
         <div class="px-4 py-3 border-b border-line flex items-center justify-between">
-            <p class="text-sm text-ink-muted">{{ $tagihan->total() }} tagihan</p>
+            <p class="text-sm text-ink-muted">
+                @if($search || $status !== 'semua')
+                    Menampilkan {{ $tagihan->total() }} dari {{ $totalSemua }} tagihan
+                    @if($search) untuk "{{ $search }}"@endif
+                    @if($status !== 'semua') · {{ $status === 'belum_lunas' ? 'Belum Lunas' : 'Lunas' }}@endif
+                @else
+                    {{ $totalSemua }} tagihan
+                @endif
+            </p>
             @can('create', App\Models\Tagihan::class)
                 <a href="{{ route('tagihan.create') }}" class="btn-primary">
                     + Buat Tagihan
@@ -77,10 +106,15 @@
                     @empty
                         <tr>
                             <td colspan="7" class="px-4 py-8 text-center text-ink-muted text-sm">
-                                Belum ada tagihan.
-                                @can('create', App\Models\Tagihan::class)
-                                    <a href="{{ route('tagihan.create') }}" class="text-action hover:underline">Buat tagihan baru</a>
-                                @endcan
+                                @if($search || $status !== 'semua')
+                                    Tidak ada tagihan yang cocok dengan pencarian ini.
+                                    <a href="{{ route('tagihan.index') }}" class="text-action hover:underline">Reset pencarian</a>
+                                @else
+                                    Belum ada tagihan.
+                                    @can('create', App\Models\Tagihan::class)
+                                        <a href="{{ route('tagihan.create') }}" class="text-action hover:underline">Buat tagihan baru</a>
+                                    @endcan
+                                @endif
                             </td>
                         </tr>
                     @endforelse
@@ -138,10 +172,15 @@
                 </div>
             @empty
                 <div class="p-8 text-center text-ink-muted text-sm">
-                    Belum ada tagihan.
-                    @can('create', App\Models\Tagihan::class)
-                        <a href="{{ route('tagihan.create') }}" class="text-action hover:underline">Buat tagihan baru</a>
-                    @endcan
+                    @if($search || $status !== 'semua')
+                        Tidak ada tagihan yang cocok dengan pencarian ini.
+                        <a href="{{ route('tagihan.index') }}" class="text-action hover:underline">Reset pencarian</a>
+                    @else
+                        Belum ada tagihan.
+                        @can('create', App\Models\Tagihan::class)
+                            <a href="{{ route('tagihan.create') }}" class="text-action hover:underline">Buat tagihan baru</a>
+                        @endcan
+                    @endif
                 </div>
             @endforelse
         </div>
