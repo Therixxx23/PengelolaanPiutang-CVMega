@@ -96,20 +96,19 @@
                 <thead>
                     <tr class="border-b border-line">
                         <th style="width:4%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">No</th>
-                        <th style="width:20%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Pelanggan</th>
-                        <th style="width:14%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Wilayah</th>
+                        <th style="width:22%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Pelanggan</th>
+                        <th style="width:12%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Wilayah</th>
                         <th style="width:16%; padding:12px 16px; text-align:right; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Total Tagihan</th>
                         <th style="width:16%; padding:12px 16px; text-align:right; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Total Terbayar</th>
-                        <th style="width:16%; padding:12px 16px; text-align:right; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Sisa Piutang</th>
-                        <th style="width:14%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Status</th>
+                        <th style="width:17%; padding:12px 16px; text-align:right; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Sisa Piutang</th>
+                        <th style="width:13%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Status</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse ($paginated as $r)
                         @php
                             $sisaLunas = $r->sisa_piutang <= 0;
-                            $badgeColor = $sisaLunas ? '#3E7C58' : '#B33A2E';
-                            $badgeLabel = $sisaLunas ? 'Lunas' : 'Sisa';
+                            $sisaColor = $sisaLunas ? '#3E7C58' : '#B33A2E';
 
                             $bucketMap = [
                                 'lancar' => ['Lancar', '#6B7CA3'],
@@ -134,7 +133,7 @@
                                     <span style="font-weight:500; color:#1B2027">{{ $r->pelanggan->nama_pelanggan }}</span>
                                 @endif
                             </td>
-                            <td style="padding:12px 16px; font-size:14px">{{ $r->pelanggan->wilayah ?: '-' }}</td>
+                            <td style="padding:12px 16px; font-size:14px; white-space:nowrap">{{ $r->pelanggan->wilayah ?: '-' }}</td>
                             <td style="padding:12px 16px; font-size:14px; white-space:nowrap; text-align:right; font-family:'IBM Plex Mono',monospace">
                                 Rp {{ number_format($r->total_tagihan, 2, ',', '.') }}
                             </td>
@@ -142,12 +141,12 @@
                                 Rp {{ number_format($r->total_terbayar, 2, ',', '.') }}
                             </td>
                             <td style="padding:12px 16px; text-align:right; white-space:nowrap">
-                                <div style="font-family:'IBM Plex Mono',monospace; font-size:13px; color:{{ $badgeColor }}">
+                                <div style="font-family:'IBM Plex Mono',monospace; font-size:14px; color:{{ $sisaColor }}">
                                     Rp {{ number_format($r->sisa_piutang, 2, ',', '.') }}
                                 </div>
-                                <span style="font-size:10px; padding:1px 6px; border-radius:3px; background:{{ $badgeColor }}20; color:{{ $badgeColor }}; border:1px solid {{ $badgeColor }}">
-                                    {{ $badgeLabel }}
-                                </span>
+                                @if($sisaLunas)
+                                    <span style="font-size:10px; padding:1px 6px; border-radius:3px; background:#3E7C5820; color:#3E7C58; border:1px solid #3E7C58">Lunas</span>
+                                @endif
                             </td>
                             <td style="padding:12px 16px; white-space:nowrap">
                                 @if ($worst)
@@ -182,8 +181,7 @@
             @forelse ($paginated as $r)
                 @php
                     $sisaLunas = $r->sisa_piutang <= 0;
-                    $badgeColor = $sisaLunas ? '#3E7C58' : '#B33A2E';
-                    $badgeLabel = $sisaLunas ? 'Lunas' : 'Sisa';
+                    $sisaColor = $sisaLunas ? '#3E7C58' : '#B33A2E';
 
                     $bucketMap = [
                         'lancar' => ['Lancar', '#6B7CA3'],
@@ -216,10 +214,11 @@
                     </div>
                     <div class="flex items-center justify-between text-sm">
                         <span style="color:#5B6470">{{ $r->pelanggan->wilayah ?: '-' }}</span>
-                        <span style="font-family:'IBM Plex Mono',monospace; font-weight:500">
-                            <span style="font-size:10px; padding:1px 6px; border-radius:3px; background:{{ $badgeColor }}20; color:{{ $badgeColor }}; border:1px solid {{ $badgeColor }}">
-                                {{ $badgeLabel }} · Rp {{ number_format($r->sisa_piutang, 2, ',', '.') }}
-                            </span>
+                        <span style="font-family:'IBM Plex Mono',monospace; font-weight:500; color:{{ $sisaColor }}">
+                            Rp {{ number_format($r->sisa_piutang, 2, ',', '.') }}
+                            @if($sisaLunas)
+                                <span style="font-size:10px; padding:1px 6px; border-radius:3px; background:#3E7C5820; color:#3E7C58; border:1px solid #3E7C58">Lunas</span>
+                            @endif
                         </span>
                     </div>
                     <div class="flex items-center justify-between text-xs" style="color:#5B6470">
