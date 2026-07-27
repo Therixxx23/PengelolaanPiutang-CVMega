@@ -21,6 +21,8 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
+    Route::get('pelanggan/suggest', [PelangganController::class, 'suggest'])
+        ->name('pelanggan.suggest');
     Route::resource('pelanggan', PelangganController::class);
 
     Route::get('tagihan/suggest', [TagihanController::class, 'suggest'])
