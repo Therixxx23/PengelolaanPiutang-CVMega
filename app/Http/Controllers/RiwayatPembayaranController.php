@@ -10,7 +10,8 @@ class RiwayatPembayaranController extends Controller
 {
     public function __invoke(Request $request)
     {
-        $query = Pembayaran::with(['tagihan.pelanggan'])->orderBy('tanggal_bayar', 'desc');
+        $query = Pembayaran::with(['tagihan.pelanggan', 'tagihan.pembayaran'])
+            ->orderBy('tanggal_bayar', 'desc');
 
         if ($request->filled('id_pelanggan')) {
             $query->whereHas('tagihan', function ($q) use ($request) {
@@ -26,9 +27,18 @@ class RiwayatPembayaranController extends Controller
             $query->whereDate('tanggal_bayar', '<=', $request->sampai);
         }
 
-        $pembayaran = $query->paginate(20);
+        $summaryQuery = clone $query;
+        $summary = [
+            'total' => $summaryQuery->sum('jumlah_bayar'),
+            'rata_rata' => $summaryQuery->avg('jumlah_bayar'),
+            'jumlah' => $summaryQuery->count(),
+        ];
+
+        $pembayaran = $query->paginate(15);
+        $pembayaran->appends(request()->only(['id_pelanggan', 'dari', 'sampai']));
+
         $pelanggan = Pelanggan::orderBy('nama_pelanggan')->get();
 
-        return view('laporan.riwayat-pembayaran', compact('pembayaran', 'pelanggan'));
+        return view('laporan.riwayat-pembayaran', compact('pembayaran', 'pelanggan', 'summary'));
     }
 }
