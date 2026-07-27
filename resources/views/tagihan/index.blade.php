@@ -49,13 +49,13 @@
             <table style="width:100%; table-layout:fixed">
                 <thead>
                     <tr class="border-b border-line">
-                        <th style="width:22%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">No. Invoice</th>
-                        <th style="width:22%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Pelanggan</th>
-                        <th style="width:11%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Tanggal</th>
-                        <th style="width:11%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Jatuh Tempo</th>
-                        <th style="width:18%; padding:12px 16px; text-align:right; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Total</th>
-                        <th style="width:10%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Status</th>
-                        <th style="width:6%; padding:12px 16px; text-align:right; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em"></th>
+                        <th style="width:18%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">No. Invoice</th>
+                        <th style="width:18%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Pelanggan</th>
+                        <th style="width:10%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Tanggal</th>
+                        <th style="width:10%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Jatuh Tempo</th>
+                        <th style="width:16%; padding:12px 16px; text-align:right; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Total</th>
+                        <th style="width:14%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Status</th>
+                        <th style="width:14%; padding:12px 16px; text-align:right; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em"></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -79,13 +79,15 @@
                             $bg = $color . '20';
                         @endphp
                         <tr class="border-b border-line hover:bg-paper transition aging-rail-{{ $rail }}">
-                            <td style="padding:12px 16px; font-size:14px; overflow:hidden; text-overflow:ellipsis">
+                            <td style="padding:12px 16px; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:0"
+                                title="{{ $t->no_invoice }}">
                                 <a href="{{ route('tagihan.show', $t) }}"
                                    style="color:#0E6E66; text-decoration:none; font-family:'IBM Plex Mono',monospace; font-weight:500">
                                     {{ $t->no_invoice }}
                                 </a>
                             </td>
-                            <td style="padding:12px 16px; font-size:14px; overflow:hidden; text-overflow:ellipsis">
+                            <td style="padding:12px 16px; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:0"
+                                title="{{ $t->pelanggan->nama_pelanggan }}">
                                 <a href="{{ route('pelanggan.show', $t->pelanggan) }}"
                                    style="color:#0E6E66; text-decoration:none">
                                     {{ $t->pelanggan->nama_pelanggan }}
@@ -96,7 +98,7 @@
                             <td style="padding:12px 16px; font-size:14px; white-space:nowrap; text-align:right; font-family:'IBM Plex Mono',monospace">
                                 Rp {{ number_format($t->total_tagihan, 2, ',', '.') }}
                             </td>
-                            <td style="padding:12px 16px">
+                            <td style="padding:12px 16px; white-space:nowrap">
                                 <span style="font-size:11px; padding:2px 8px; border-radius:4px; white-space:nowrap; background:{{ $bg }}; color:{{ $color }}; border:1px solid {{ $color }}">
                                     {{ $label }}
                                 </span>
@@ -105,7 +107,7 @@
                                 <div style="display:flex; align-items:center; justify-content:flex-end; gap:6px">
                                     @can('update', $t)
                                         <a href="{{ route('tagihan.edit', $t) }}"
-                                           style="padding:4px 12px; border:1px solid #0E6E66; color:#0E6E66; background:white; border-radius:4px; font-size:12px; text-decoration:none; font-family:Inter,sans-serif; font-weight:500">
+                                           style="padding:2px 8px; border:1px solid #0E6E66; color:#0E6E66; background:white; border-radius:4px; font-size:11px; text-decoration:none; font-family:Inter,sans-serif; font-weight:500">
                                             Edit
                                         </a>
                                     @endcan
@@ -114,7 +116,7 @@
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit"
-                                                    style="padding:4px 12px; border:1px solid #B33A2E; color:#B33A2E; background:white; border-radius:4px; font-size:12px; cursor:pointer; font-family:Inter,sans-serif; font-weight:500">
+                                                    style="padding:2px 8px; border:1px solid #B33A2E; color:#B33A2E; background:white; border-radius:4px; font-size:11px; cursor:pointer; font-family:Inter,sans-serif; font-weight:500">
                                                 Hapus
                                             </button>
                                         </form>
