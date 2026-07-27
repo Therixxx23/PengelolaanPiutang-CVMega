@@ -1,8 +1,14 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex items-center justify-between">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
             <span>Laporan Umur Piutang</span>
-            <a href="{{ route('laporan.piutang.export') }}" class="btn-secondary text-sm">Export Excel</a>
+            <div class="flex items-center gap-2">
+                <span class="text-xs text-ink-muted">{{ $exportDescription }}</span>
+                <a href="{{ route('laporan.piutang.export', array_merge(
+                    $bucket !== 'semua' ? ['bucket' => $bucket] : [],
+                    $periode !== 'semua' ? ['periode' => $periode] : []
+                )) }}" class="btn-secondary text-sm">Export Excel</a>
+            </div>
         </div>
     </x-slot>
 
@@ -21,16 +27,38 @@
                         '>60' => '#B33A2E',
                     ];
                     $color = $colorMap[$key] ?? '#1B2027';
+                    $periodeParam = $periode !== 'semua' ? ['periode' => $periode] : [];
                     if ($isActive) {
                         $btnStyle = "background-color:{$color}; color:#ffffff; border:2px solid {$color}";
-                        $url = route('laporan.umur-piutang');
+                        $url = route('laporan.umur-piutang', $periodeParam);
                     } else {
                         $btnStyle = "background-color:#ffffff; color:{$color}; border:1px solid {$color}";
-                        $url = route('laporan.umur-piutang', $key === 'semua' ? [] : ['bucket' => $key]);
+                        $url = route('laporan.umur-piutang', array_merge($key === 'semua' ? [] : ['bucket' => $key], $periodeParam));
                     }
                 @endphp
                 <a href="{{ $url }}" style="{{ $btnStyle }}" class="inline-flex items-center px-3 py-1.5 text-sm font-medium rounded">
                     {{ $label }} ({{ $count }})
+                </a>
+            @endforeach
+        </div>
+
+        <div class="flex flex-wrap items-center gap-x-4 gap-y-2">
+            <span class="text-xs text-ink-muted font-medium">Periode:</span>
+            @foreach (['semua' => 'Semua', 'minggu-ini' => 'Minggu Ini', 'bulan-ini' => 'Bulan Ini', 'tahun-ini' => 'Tahun Ini'] as $key => $label)
+                @php
+                    $pIsActive = $periode === $key;
+                    $pColor = '#0E6E66';
+                    $bucketParam = $bucket !== 'semua' ? ['bucket' => $bucket] : [];
+                    if ($pIsActive) {
+                        $pBtnStyle = "background-color:{$pColor}; color:#ffffff; border:2px solid {$pColor}";
+                        $pUrl = route('laporan.umur-piutang', $bucketParam);
+                    } else {
+                        $pBtnStyle = "background-color:#ffffff; color:{$pColor}; border:1px solid {$pColor}";
+                        $pUrl = route('laporan.umur-piutang', array_merge($key === 'semua' ? [] : ['periode' => $key], $bucketParam));
+                    }
+                @endphp
+                <a href="{{ $pUrl }}" style="{{ $pBtnStyle }}" class="inline-flex items-center px-3 py-1.5 text-sm font-medium rounded">
+                    {{ $label }}
                 </a>
             @endforeach
         </div>

@@ -282,4 +282,41 @@ class AksesRoleTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('Lancar (Belum Jatuh Tempo)');
     }
+
+    public function test_umur_piutang_bucket_and_periode_combined(): void
+    {
+        $response = $this->actingAs($this->admin())->get(
+            route('laporan.umur-piutang', ['bucket' => '0-30', 'periode' => 'bulan-ini'])
+        );
+        $response->assertStatus(200);
+    }
+
+    public function test_umur_piutang_invalid_periode_fallback(): void
+    {
+        $response = $this->actingAs($this->admin())->get(
+            route('laporan.umur-piutang', ['periode' => 'kemarin'])
+        );
+        $response->assertStatus(200);
+    }
+
+    public function test_export_with_combined_filters(): void
+    {
+        $pelanggan = Pelanggan::factory()->create();
+        Tagihan::factory()->lancar()->create(['id_pelanggan' => $pelanggan->id_pelanggan]);
+
+        $response = $this->actingAs($this->admin())->get(
+            route('laporan.piutang.export', ['bucket' => 'lancar', 'periode' => 'bulan-ini'])
+        );
+        $response->assertStatus(200);
+        $response->assertHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    }
+
+    public function test_export_with_zero_results(): void
+    {
+        $response = $this->actingAs($this->admin())->get(
+            route('laporan.piutang.export', ['bucket' => '>60', 'periode' => 'minggu-ini'])
+        );
+        $response->assertStatus(200);
+        $response->assertHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    }
 }

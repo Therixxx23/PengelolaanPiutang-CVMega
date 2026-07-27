@@ -3,12 +3,23 @@
 namespace App\Exports;
 
 use App\Models\Tagihan;
+use App\Services\TagihanFilterService;
 use OpenSpout\Common\Entity\Row;
 use OpenSpout\Common\Entity\Style\Style;
 use OpenSpout\Writer\AbstractWriter;
 
 class TagihanBelumLunasExport
 {
+    private string $bucket;
+
+    private string $periode;
+
+    public function __construct(string $bucket = 'semua', string $periode = 'semua')
+    {
+        $this->bucket = $bucket;
+        $this->periode = $periode;
+    }
+
     public function write(AbstractWriter $writer): void
     {
         $headerStyle = new Style(fontBold: true);
@@ -22,25 +33,29 @@ class TagihanBelumLunasExport
 
         $writer->addRow(Row::fromValuesWithStyle($headers, $headerStyle));
 
-        $tagihan = Tagihan::with('pelanggan', 'pembayaran')
-            ->where('status', 'belum_lunas')
-            ->get()
+        $query = Tagihan::with('pelanggan', 'pembayaran')
+            ->where('status', 'belum_lunas');
+
+        TagihanFilterService::applyPeriodeFilter($query, $this->periode);
+        TagihanFilterService::applyBucketFilter($query, $this->bucket);
+
+        $tagihan = $query->get()
             ->sortByDesc(function ($t) {
                 $order = ['>60' => 3, '31-60' => 2, '0-30' => 1, 'lancar' => 0];
 
                 return $order[$t->aging_bucket] ?? -1;
             });
 
+        $bucketLabels = [
+            'lancar' => 'Lancar',
+            '0-30' => '0-30 Hari',
+            '31-60' => '31-60 Hari',
+            '>60' => '>60 Hari',
+        ];
+
         foreach ($tagihan as $t) {
             $totalDibayar = $t->pembayaran->sum('jumlah_bayar');
             $sisa = $t->total_tagihan - $totalDibayar;
-
-            $bucketLabels = [
-                'lancar' => 'Lancar',
-                '0-30' => '0-30 Hari',
-                '31-60' => '31-60 Hari',
-                '>60' => '>60 Hari',
-            ];
 
             $writer->addRow(Row::fromValues([
                 $t->no_invoice,
