@@ -171,4 +171,62 @@ class TagihanSearchFilterTest extends TestCase
         $response->assertOk();
         $response->assertSee('Barrows Inc');
     }
+
+    public function test_suggest_returns_matching_invoices_and_pelanggan(): void
+    {
+        $pelanggan = Pelanggan::factory()->create(['nama_pelanggan' => 'Barrows Inc']);
+        Tagihan::factory()->create([
+            'id_pelanggan' => $pelanggan->id_pelanggan,
+            'no_invoice' => 'INV/2026/07/000042',
+        ]);
+
+        $response = $this->actingAs($this->admin)->get(route('tagihan.suggest', ['q' => 'INV']));
+
+        $response->assertOk();
+        $response->assertJsonFragment(['type' => 'invoice', 'label' => 'INV/2026/07/000042']);
+
+        $response2 = $this->actingAs($this->admin)->get(route('tagihan.suggest', ['q' => 'Bar']));
+        $response2->assertOk();
+        $response2->assertJsonFragment(['type' => 'pelanggan', 'label' => 'Barrows Inc']);
+    }
+
+    public function test_suggest_returns_empty_for_short_query(): void
+    {
+        $response = $this->actingAs($this->admin)->get(route('tagihan.suggest', ['q' => 'a']));
+
+        $response->assertOk();
+        $response->assertJson([]);
+    }
+
+    public function test_suggest_returns_empty_for_no_match(): void
+    {
+        $response = $this->actingAs($this->admin)->get(route('tagihan.suggest', ['q' => 'ZZZZZ']));
+
+        $response->assertOk();
+        $response->assertJson([]);
+    }
+
+    public function test_suggest_requires_login(): void
+    {
+        $response = $this->get(route('tagihan.suggest', ['q' => 'INV']));
+
+        $response->assertRedirect();
+    }
+
+    public function test_suggest_returns_max_8_items(): void
+    {
+        $pelanggan = Pelanggan::factory()->create();
+
+        for ($i = 1; $i <= 10; $i++) {
+            Tagihan::factory()->create([
+                'id_pelanggan' => $pelanggan->id_pelanggan,
+                'no_invoice' => 'INV/2026/07/0000'.str_pad((string) $i, 2, '0', STR_PAD_LEFT),
+            ]);
+        }
+
+        $response = $this->actingAs($this->admin)->get(route('tagihan.suggest', ['q' => 'INV']));
+
+        $response->assertOk();
+        $this->assertLessThanOrEqual(8, count($response->json()));
+    }
 }

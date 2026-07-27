@@ -41,6 +41,29 @@ class TagihanController extends Controller
         return view('tagihan.index', compact('tagihan', 'search', 'status', 'totalSemua'));
     }
 
+    public function suggest(Request $request)
+    {
+        $q = $request->get('q', '');
+
+        if (strlen($q) < 2) {
+            return response()->json([]);
+        }
+
+        $invoices = Tagihan::where('no_invoice', 'like', "%{$q}%")
+            ->limit(5)
+            ->pluck('no_invoice')
+            ->map(fn ($v) => ['type' => 'invoice', 'label' => $v]);
+
+        $pelanggan = Pelanggan::where('nama_pelanggan', 'like', "%{$q}%")
+            ->limit(5)
+            ->pluck('nama_pelanggan')
+            ->map(fn ($v) => ['type' => 'pelanggan', 'label' => $v]);
+
+        return response()->json(
+            $invoices->merge($pelanggan)->values()->take(8)
+        );
+    }
+
     public function create(InvoiceNumberService $invoiceService)
     {
         $this->authorize('create', Tagihan::class);

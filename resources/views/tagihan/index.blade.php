@@ -11,10 +11,45 @@
 
     <form method="GET" action="{{ route('tagihan.index') }}">
         <div style="display:flex; gap:8px; align-items:center; margin-bottom:16px">
-            <input type="text" name="search"
-                   value="{{ $search }}"
-                   placeholder="Cari invoice / pelanggan..."
-                   style="flex:1; padding:8px 12px; border:1px solid #DCE2E0; border-radius:6px; font-family:Inter,sans-serif; font-size:14px; color:#1B2027; outline-color:#0E6E66">
+            <div x-data="suggestSearch()" style="flex:1; position:relative">
+                <input
+                    type="text"
+                    name="search"
+                    x-model="query"
+                    x-on:input.debounce.300ms="fetchSuggest()"
+                    x-on:keydown.escape="closeSuggest()"
+                    x-on:keydown.arrow-down.prevent="highlightNext()"
+                    x-on:keydown.arrow-up.prevent="highlightPrev()"
+                    x-on:keydown.enter.prevent="selectHighlighted()"
+                    x-on:click.outside="closeSuggest()"
+                    value="{{ $search }}"
+                    placeholder="Cari no. invoice atau nama pelanggan..."
+                    autocomplete="off"
+                    style="width:100%; padding:8px 12px; border:1px solid #DCE2E0; border-radius:6px; font-family:Inter,sans-serif; font-size:14px; color:#1B2027; outline-color:#0E6E66; box-sizing:border-box">
+
+                <div x-show="open && results.length > 0"
+                     x-transition
+                     style="position:absolute; top:100%; left:0; right:0; background:white; border:1px solid #DCE2E0; border-radius:6px; box-shadow:0 4px 12px rgba(0,0,0,0.08); z-index:50; margin-top:4px; overflow:hidden">
+
+                    <template x-for="(item, index) in results" :key="index">
+                        <div
+                            x-on:click="selectItem(item)"
+                            x-on:mouseenter="highlighted = index"
+                            :style="highlighted === index
+                                ? 'background:#F0FAF9; cursor:pointer; padding:8px 12px'
+                                : 'cursor:pointer; padding:8px 12px'"
+                            style="border-bottom:1px solid #DCE2E0; display:flex; align-items:center; gap:8px">
+                            <span :style="item.type === 'invoice'
+                                    ? 'font-size:10px; padding:2px 6px; border-radius:4px; background:#0E6E6620; color:#0E6E66; white-space:nowrap'
+                                    : 'font-size:10px; padding:2px 6px; border-radius:4px; background:#6B7CA320; color:#6B7CA3; white-space:nowrap'"
+                                  x-text="item.type === 'invoice' ? 'Invoice' : 'Pelanggan'">
+                            </span>
+                            <span style="font-size:14px; color:#1B2027" x-text="item.label"></span>
+                        </div>
+                    </template>
+                </div>
+            </div>
+
             <select name="status"
                     style="width:160px; padding:8px 12px; border:1px solid #DCE2E0; border-radius:6px; font-family:Inter,sans-serif; font-size:14px; color:#1B2027; outline-color:#0E6E66">
                 <option value="semua" {{ $status === 'semua' ? 'selected' : '' }}>Semua Status</option>
@@ -33,6 +68,66 @@
             @endif
         </div>
     </form>
+
+    @push('scripts')
+    <script>
+    function suggestSearch() {
+        return {
+            query: '{{ $search }}',
+            results: [],
+            open: false,
+            highlighted: -1,
+
+            async fetchSuggest() {
+                if (this.query.length < 2) {
+                    this.results = [];
+                    this.open = false;
+                    return;
+                }
+                try {
+                    const res = await fetch(
+                        `{{ route('tagihan.suggest') }}?q=${encodeURIComponent(this.query)}`
+                    );
+                    this.results = await res.json();
+                    this.open = this.results.length > 0;
+                    this.highlighted = -1;
+                } catch (e) {
+                    this.results = [];
+                    this.open = false;
+                }
+            },
+
+            selectItem(item) {
+                this.query = item.label;
+                this.open = false;
+                this.$nextTick(() => {
+                    this.$el.closest('form').submit();
+                });
+            },
+
+            highlightNext() {
+                if (this.highlighted < this.results.length - 1)
+                    this.highlighted++;
+            },
+
+            highlightPrev() {
+                if (this.highlighted > 0) this.highlighted--;
+            },
+
+            selectHighlighted() {
+                if (this.highlighted >= 0 && this.results[this.highlighted]) {
+                    this.selectItem(this.results[this.highlighted]);
+                }
+            },
+
+            closeSuggest() {
+                this.open = false;
+                this.highlighted = -1;
+            }
+        }
+    }
+    </script>
+    @endpush
 
     <p style="font-size:13px; color:#5B6470; margin-bottom:8px">
         @if($search || $status !== 'semua')

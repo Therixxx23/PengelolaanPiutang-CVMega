@@ -22,6 +22,9 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     Route::resource('pelanggan', PelangganController::class);
+
+    Route::get('tagihan/suggest', [TagihanController::class, 'suggest'])
+        ->name('tagihan.suggest');
     Route::resource('tagihan', TagihanController::class);
 
     Route::post('/tagihan/{tagihan}/bayar', [TagihanController::class, 'bayar'])
