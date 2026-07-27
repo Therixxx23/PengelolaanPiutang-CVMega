@@ -1,80 +1,117 @@
 <x-app-layout>
-    <x-slot name="header">
-        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
-            <span>Laporan Umur Piutang</span>
-            <div class="flex items-center gap-2">
-                <span class="text-xs text-ink-muted">{{ $exportDescription }}</span>
-                <a href="{{ route('laporan.piutang.export', array_merge(
-                    $bucket !== 'semua' ? ['bucket' => $bucket] : [],
-                    $periode !== 'semua' ? ['periode' => $periode] : []
-                )) }}" class="btn-secondary text-sm">Export Excel</a>
+    <div class="space-y-4">
+        {{-- Header --}}
+        <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+            <div>
+                <h1 class="font-display text-2xl font-semibold text-ink">Laporan Umur Piutang</h1>
+                <p class="text-sm text-ink-muted mt-0.5">CV. Mega Setia Abadi</p>
+            </div>
+            <a href="{{ route('laporan.piutang.export', array_merge(
+                $bucket !== 'semua' ? ['bucket' => $bucket] : [],
+                $periode !== 'semua' ? ['periode' => $periode] : []
+            )) }}" class="btn-secondary text-sm whitespace-nowrap self-start">Export Excel</a>
+        </div>
+        {{-- Filter Umur Piutang --}}
+        <div>
+            <p class="text-xs text-ink-muted font-medium mb-2">Filter Umur Piutang:</p>
+            <div class="flex flex-wrap gap-2">
+                @php $totalCount = array_sum(array_column($summary, 'count')); @endphp
+                @foreach (['semua' => 'Semua', 'lancar' => 'Lancar', '0-30' => '0–30 Hari', '31-60' => '31–60 Hari', '>60' => '>60 Hari'] as $key => $label)
+                    @php
+                        $count = $key === 'semua' ? $totalCount : ($summary[$key]['count'] ?? 0);
+                        $isActive = $bucket === $key;
+                        $colorMap = [
+                            'semua' => '#1B2027',
+                            'lancar' => '#6B7CA3',
+                            '0-30' => '#C8862A',
+                            '31-60' => '#B8612A',
+                            '>60' => '#B33A2E',
+                        ];
+                        $color = $colorMap[$key] ?? '#1B2027';
+                        $periodeParam = $periode !== 'semua' ? ['periode' => $periode] : [];
+                        if ($isActive) {
+                            $btnStyle = "background-color:{$color}; color:#ffffff; border:2px solid {$color}";
+                            $url = route('laporan.umur-piutang', $periodeParam);
+                        } else {
+                            $btnStyle = "background-color:#ffffff; color:{$color}; border:1px solid {$color}";
+                            $url = route('laporan.umur-piutang', array_merge($key === 'semua' ? [] : ['bucket' => $key], $periodeParam));
+                        }
+                    @endphp
+                    <a href="{{ $url }}" style="{{ $btnStyle }}" class="inline-flex items-center px-4 py-2 text-sm font-medium rounded">
+                        {{ $label }} ({{ $count }})
+                    </a>
+                @endforeach
             </div>
         </div>
-    </x-slot>
 
-    <div class="space-y-8">
-        <div class="flex flex-wrap gap-x-4 gap-y-2">
-            @php $totalCount = array_sum(array_column($summary, 'count')); @endphp
-            @foreach (['semua' => 'Semua', 'lancar' => 'Lancar', '0-30' => '0–30 Hari', '31-60' => '31–60 Hari', '>60' => '>60 Hari'] as $key => $label)
-                @php
-                    $count = $key === 'semua' ? $totalCount : ($summary[$key]['count'] ?? 0);
-                    $isActive = $bucket === $key;
-                    $colorMap = [
-                        'semua' => '#1B2027',
-                        'lancar' => '#6B7CA3',
-                        '0-30' => '#C8862A',
-                        '31-60' => '#B8612A',
-                        '>60' => '#B33A2E',
-                    ];
-                    $color = $colorMap[$key] ?? '#1B2027';
-                    $periodeParam = $periode !== 'semua' ? ['periode' => $periode] : [];
-                    if ($isActive) {
-                        $btnStyle = "background-color:{$color}; color:#ffffff; border:2px solid {$color}";
-                        $url = route('laporan.umur-piutang', $periodeParam);
-                    } else {
-                        $btnStyle = "background-color:#ffffff; color:{$color}; border:1px solid {$color}";
-                        $url = route('laporan.umur-piutang', array_merge($key === 'semua' ? [] : ['bucket' => $key], $periodeParam));
-                    }
-                @endphp
-                <a href="{{ $url }}" style="{{ $btnStyle }}" class="inline-flex items-center px-3 py-1.5 text-sm font-medium rounded">
-                    {{ $label }} ({{ $count }})
-                </a>
-            @endforeach
+        {{-- Filter Periode --}}
+        <div>
+            <p class="text-xs text-ink-muted font-medium mb-2">Periode:</p>
+            <div class="flex flex-wrap gap-2">
+                @foreach (['semua' => 'Semua', 'minggu-ini' => 'Minggu Ini', 'bulan-ini' => 'Bulan Ini', 'tahun-ini' => 'Tahun Ini'] as $key => $label)
+                    @php
+                        $pIsActive = $periode === $key;
+                        $pColor = '#0E6E66';
+                        $bucketParam = $bucket !== 'semua' ? ['bucket' => $bucket] : [];
+                        if ($pIsActive) {
+                            $pBtnStyle = "background-color:{$pColor}; color:#ffffff; border:2px solid {$pColor}";
+                            $pUrl = route('laporan.umur-piutang', $bucketParam);
+                        } else {
+                            $pBtnStyle = "background-color:#ffffff; color:{$pColor}; border:1px solid {$pColor}";
+                            $pUrl = route('laporan.umur-piutang', array_merge($key === 'semua' ? [] : ['periode' => $key], $bucketParam));
+                        }
+                    @endphp
+                    <a href="{{ $pUrl }}" style="{{ $pBtnStyle }}" class="inline-flex items-center px-4 py-2 text-sm font-medium rounded">
+                        {{ $label }}
+                    </a>
+                @endforeach
+            </div>
         </div>
 
-        <div class="flex flex-wrap items-center gap-x-4 gap-y-2">
-            <span class="text-xs text-ink-muted font-medium">Periode:</span>
-            @foreach (['semua' => 'Semua', 'minggu-ini' => 'Minggu Ini', 'bulan-ini' => 'Bulan Ini', 'tahun-ini' => 'Tahun Ini'] as $key => $label)
-                @php
-                    $pIsActive = $periode === $key;
-                    $pColor = '#0E6E66';
-                    $bucketParam = $bucket !== 'semua' ? ['bucket' => $bucket] : [];
-                    if ($pIsActive) {
-                        $pBtnStyle = "background-color:{$pColor}; color:#ffffff; border:2px solid {$pColor}";
-                        $pUrl = route('laporan.umur-piutang', $bucketParam);
-                    } else {
-                        $pBtnStyle = "background-color:#ffffff; color:{$pColor}; border:1px solid {$pColor}";
-                        $pUrl = route('laporan.umur-piutang', array_merge($key === 'semua' ? [] : ['periode' => $key], $bucketParam));
-                    }
-                @endphp
-                <a href="{{ $pUrl }}" style="{{ $pBtnStyle }}" class="inline-flex items-center px-3 py-1.5 text-sm font-medium rounded">
-                    {{ $label }}
-                </a>
-            @endforeach
+        {{-- Info Hasil Filter --}}
+        @php
+            $bucketLabelMap = [
+                'lancar' => 'Lancar',
+                '0-30' => '0–30 Hari',
+                '31-60' => '31–60 Hari',
+                '>60' => '>60 Hari',
+            ];
+            $periodeLabelMap = [
+                'minggu-ini' => 'Minggu Ini',
+                'bulan-ini' => 'Bulan Ini',
+                'tahun-ini' => 'Tahun Ini',
+            ];
+            $infoParts = ['Menampilkan', $totalCount, 'tagihan'];
+            if ($bucket !== 'semua') {
+                $infoParts[] = $bucketLabelMap[$bucket] ?? $bucket;
+            }
+            $infoPeriode = $periodeLabelMap[$periode] ?? null;
+        @endphp
+        <div style="background-color:#F6F7F6; border:1px solid #DCE2E0" class="rounded-lg px-4 py-3 flex items-start gap-2">
+            <svg class="w-4 h-4 text-ink-muted mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10" /><line x1="12" y1="16" x2="12" y2="12" /><line x1="12" y1="8" x2="12.01" y2="8" />
+            </svg>
+            <p class="text-sm text-ink-muted">
+                {{ implode(' ', $infoParts) }}
+                @if ($infoPeriode)
+                    &middot; {{ $infoPeriode }}
+                @endif
+            </p>
         </div>
 
+        {{-- Data Sections --}}
         @foreach ($bucketKeys as $key)
             @php
                 $items = $paginatedTagihan ?? ($buckets[$key] ?? collect());
                 $totalBucket = $summary[$key]['total'] ?? 0;
                 $countBucket = $summary[$key]['count'] ?? 0;
-                $bucketLabels = [
+                $sectionLabels = [
                     'lancar' => 'Lancar (Belum Jatuh Tempo)',
                     '0-30' => '0–30 Hari',
                     '31-60' => '31–60 Hari',
                     '>60' => '>60 Hari',
                 ];
-                $label = $bucketLabels[$key] ?? $key;
+                $label = $sectionLabels[$key] ?? $key;
                 $railClass = $key === 'lancar' ? 'aging-rail-lancar' : ($key === '0-30' ? 'aging-rail-watch30' : ($key === '31-60' ? 'aging-rail-watch60' : 'aging-rail-critical'));
                 $badgeClass = $key === 'lancar' ? 'badge-lancar' : ($key === '0-30' ? 'badge-watch30' : ($key === '31-60' ? 'badge-watch60' : 'badge-critical'));
             @endphp
