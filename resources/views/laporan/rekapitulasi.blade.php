@@ -1,149 +1,252 @@
 <x-app-layout>
-    <x-slot name="header">Laporan Rekapitulasi</x-slot>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px">
+        <h1 class="font-display text-2xl font-semibold text-ink">Laporan Rekapitulasi</h1>
+        <a href="{{ route('laporan.rekapitulasi.export', request()->only('search', 'wilayah')) }}"
+           style="background:#0E6E66; color:white; padding:8px 16px; border-radius:6px; font-size:14px; text-decoration:none; font-family:'IBM Plex Sans',sans-serif; font-weight:500">
+            Export Excel
+        </a>
+    </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-8">
-        <div class="bg-surface border border-line rounded p-4">
-            <p class="text-xs text-ink-muted uppercase tracking-wider font-medium">Total Piutang</p>
-            <p class="text-xl rupiah font-semibold text-ink mt-1">Rp {{ number_format($totalPiutang, 2, ',', '.') }}</p>
+    <form method="GET" action="{{ route('laporan.rekapitulasi') }}">
+        <div style="display:flex; gap:8px; align-items:center; margin-bottom:16px">
+            <div style="flex:1; position:relative">
+                <input
+                    type="text"
+                    name="search"
+                    value="{{ $search }}"
+                    placeholder="Cari nama pelanggan..."
+                    autocomplete="off"
+                    style="width:100%; padding:8px 12px; border:1px solid #DCE2E0; border-radius:6px; font-family:Inter,sans-serif; font-size:14px; color:#1B2027; outline-color:#0E6E66; box-sizing:border-box">
+
+            </div>
+
+            <div style="display:flex; flex-direction:column; gap:4px">
+                <label style="font-size:11px; color:#5B6470; font-weight:500">WILAYAH</label>
+                <select name="wilayah"
+                        style="width:180px; padding:8px 12px; border:1px solid #DCE2E0; border-radius:6px; font-family:Inter,sans-serif; font-size:14px; color:#1B2027; outline-color:#0E6E66">
+                    <option value="semua" {{ $wilayah === 'semua' ? 'selected' : '' }}>Semua Wilayah</option>
+                    @foreach($daftarWilayah as $w)
+                        <option value="{{ $w }}" {{ $wilayah === $w ? 'selected' : '' }}>{{ $w }}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            <button type="submit"
+                    style="padding:8px 20px; background:#0E6E66; color:white; border:none; border-radius:6px; font-size:14px; cursor:pointer; font-family:'IBM Plex Sans',sans-serif; font-weight:500">
+                Filter
+            </button>
+
+            @if($search || $wilayah !== 'semua')
+                <a href="{{ route('laporan.rekapitulasi') }}"
+                   style="padding:8px 16px; border:1px solid #DCE2E0; border-radius:6px; font-size:14px; color:#5B6470; font-family:Inter,sans-serif; text-decoration:none">
+                    Reset
+                </a>
+            @endif
         </div>
-        <div class="bg-surface border border-line rounded p-4">
-            <p class="text-xs text-ink-muted uppercase tracking-wider font-medium">Total Tertagih</p>
-            <p class="text-xl rupiah font-semibold text-status-paid mt-1">Rp {{ number_format($totalTertagih, 2, ',', '.') }}</p>
+    </form>
+
+    <p style="font-size:13px; color:#5B6470; margin-bottom:8px">
+        @if($search || $wilayah !== 'semua')
+            Menampilkan {{ $paginated->total() }} dari {{ $totalSemua }} pelanggan
+            @if($search) untuk "{{ $search }}"@endif
+            @if($wilayah !== 'semua') · Wilayah: {{ $wilayah }}@endif
+        @else
+            {{ $totalSemua }} pelanggan
+        @endif
+    </p>
+
+    <div style="display:flex; gap:16px; margin-bottom:16px; flex-wrap:wrap">
+        <div style="flex:1; border:1px solid #DCE2E0; border-radius:8px; padding:16px">
+            <div style="font-size:11px; color:#5B6470; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; margin-bottom:4px">
+                Total Piutang
+            </div>
+            <div style="font-family:'IBM Plex Mono',monospace; font-size:20px; color:#B33A2E; font-weight:600">
+                Rp {{ number_format($totalPiutang, 0, ',', '.') }}
+            </div>
         </div>
-        <div class="bg-surface border border-line rounded p-4">
-            <p class="text-xs text-ink-muted uppercase tracking-wider font-medium">Total Pelanggan</p>
-            <p class="text-xl font-mono font-semibold text-ink mt-1">{{ $totalPelanggan }}</p>
+        <div style="flex:1; border:1px solid #DCE2E0; border-radius:8px; padding:16px">
+            <div style="font-size:11px; color:#5B6470; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; margin-bottom:4px">
+                Total Tertagih
+            </div>
+            <div style="font-family:'IBM Plex Mono',monospace; font-size:20px; color:#3E7C58; font-weight:600">
+                Rp {{ number_format($totalTertagih, 0, ',', '.') }}
+            </div>
+        </div>
+        <div style="flex:1; border:1px solid #DCE2E0; border-radius:8px; padding:16px">
+            <div style="font-size:11px; color:#5B6470; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; margin-bottom:4px">
+                Sisa Piutang
+            </div>
+            <div style="font-family:'IBM Plex Mono',monospace; font-size:20px; color:#B33A2E; font-weight:600">
+                Rp {{ number_format($totalSisa, 0, ',', '.') }}
+            </div>
+        </div>
+        <div style="flex:1; border:1px solid #DCE2E0; border-radius:8px; padding:16px">
+            <div style="font-size:11px; color:#5B6470; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; margin-bottom:4px">
+                Total Pelanggan
+            </div>
+            <div style="font-family:'IBM Plex Mono',monospace; font-size:20px; color:#1B2027; font-weight:600">
+                {{ $totalPelanggan }}
+            </div>
         </div>
     </div>
 
-    <div class="bg-surface border border-line rounded overflow-hidden mb-8">
-        <div class="px-4 py-3 border-b border-line">
-            <h2 class="font-display text-lg font-semibold text-ink">Sisa Piutang per Pelanggan</h2>
-        </div>
+    <div class="bg-surface border border-line rounded overflow-hidden">
         <div class="hidden sm:block overflow-x-auto">
-            <table class="w-full">
+            <table style="width:100%; table-layout:fixed">
                 <thead>
                     <tr class="border-b border-line">
-                        <th class="table-header">Pelanggan</th>
-                        <th class="table-header">Wilayah</th>
-                        <th class="table-header text-right">Total Tagihan</th>
-                        <th class="table-header text-right">Total Terbayar</th>
-                        <th class="table-header text-right">Sisa Piutang</th>
-                        <th class="table-header">Status Terburuk</th>
+                        <th style="width:4%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">No</th>
+                        <th style="width:20%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Pelanggan</th>
+                        <th style="width:14%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Wilayah</th>
+                        <th style="width:16%; padding:12px 16px; text-align:right; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Total Tagihan</th>
+                        <th style="width:16%; padding:12px 16px; text-align:right; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Total Terbayar</th>
+                        <th style="width:16%; padding:12px 16px; text-align:right; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Sisa Piutang</th>
+                        <th style="width:14%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Status</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse ($ringkasan as $r)
+                    @forelse ($paginated as $r)
                         @php
-                            $badgeMap = [
-                                'lancar' => 'badge-lancar',
-                                '0-30' => 'badge-watch30',
-                                '31-60' => 'badge-watch60',
-                                '>60' => 'badge-critical',
-                            ];
-                            $labelMap = [
-                                'lancar' => 'Lancar',
-                                '0-30' => '0-30 Hari',
-                                '31-60' => '31-60 Hari',
-                                '>60' => '>60 Hari',
+                            $sisaLunas = $r->sisa_piutang <= 0;
+                            $badgeColor = $sisaLunas ? '#3E7C58' : '#B33A2E';
+                            $badgeLabel = $sisaLunas ? 'Lunas' : 'Sisa';
+
+                            $bucketMap = [
+                                'lancar' => ['Lancar', '#6B7CA3'],
+                                '0-30' => ['0-30 Hari', '#C8862A'],
+                                '31-60' => ['31-60 Hari', '#B8612A'],
+                                '>60' => ['>60 Hari', '#B33A2E'],
                             ];
                             $worst = $r->bucket_terburuk;
                         @endphp
                         <tr class="border-b border-line hover:bg-paper transition">
-                            <td class="table-cell">
+                            <td style="padding:12px 16px; font-size:14px; font-family:'IBM Plex Mono',monospace">
+                                {{ ($paginated->currentPage() - 1) * $paginated->perPage() + $loop->iteration }}
+                            </td>
+                            <td style="padding:12px 16px; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:0"
+                                title="{{ $r->pelanggan->nama_pelanggan }}">
                                 @if(Auth::user()->isAdministrasi())
-                                    <a href="{{ route('pelanggan.show', $r->pelanggan) }}" class="text-action hover:underline font-medium">
+                                    <a href="{{ route('pelanggan.show', $r->pelanggan) }}"
+                                       style="color:#0E6E66; text-decoration:none; font-weight:500">
                                         {{ $r->pelanggan->nama_pelanggan }}
                                     </a>
                                 @else
-                                    <span class="font-medium text-ink">{{ $r->pelanggan->nama_pelanggan }}</span>
+                                    <span style="font-weight:500; color:#1B2027">{{ $r->pelanggan->nama_pelanggan }}</span>
                                 @endif
                             </td>
-                            <td class="table-cell">{{ $r->pelanggan->wilayah ?: '-' }}</td>
-                            <td class="table-cell rupiah">Rp {{ number_format($r->total_tagihan, 2, ',', '.') }}</td>
-                            <td class="table-cell rupiah">Rp {{ number_format($r->total_terbayar, 2, ',', '.') }}</td>
-                            <td class="table-cell rupiah font-medium {{ $r->sisa_piutang > 0 ? 'text-status-watch30' : 'text-status-paid' }}">
-                                Rp {{ number_format($r->sisa_piutang, 2, ',', '.') }}
+                            <td style="padding:12px 16px; font-size:14px">{{ $r->pelanggan->wilayah ?: '-' }}</td>
+                            <td style="padding:12px 16px; font-size:14px; white-space:nowrap; text-align:right; font-family:'IBM Plex Mono',monospace">
+                                Rp {{ number_format($r->total_tagihan, 2, ',', '.') }}
                             </td>
-                            <td class="table-cell">
+                            <td style="padding:12px 16px; font-size:14px; white-space:nowrap; text-align:right; font-family:'IBM Plex Mono',monospace">
+                                Rp {{ number_format($r->total_terbayar, 2, ',', '.') }}
+                            </td>
+                            <td style="padding:12px 16px; text-align:right; white-space:nowrap">
+                                <div style="font-family:'IBM Plex Mono',monospace; font-size:13px; color:{{ $badgeColor }}">
+                                    Rp {{ number_format($r->sisa_piutang, 2, ',', '.') }}
+                                </div>
+                                <span style="font-size:10px; padding:1px 6px; border-radius:3px; background:{{ $badgeColor }}20; color:{{ $badgeColor }}; border:1px solid {{ $badgeColor }}">
+                                    {{ $badgeLabel }}
+                                </span>
+                            </td>
+                            <td style="padding:12px 16px; white-space:nowrap">
                                 @if ($worst)
-                                    <span class="{{ $badgeMap[$worst] ?? 'badge-lancar' }}">{{ $labelMap[$worst] ?? $worst }}</span>
+                                    @php [$bLabel, $bColor] = $bucketMap[$worst] ?? ['-', '#5B6470']; @endphp
+                                    <span style="font-size:11px; padding:2px 8px; border-radius:4px; white-space:nowrap; background:{{ $bColor }}20; color:{{ $bColor }}; border:1px solid {{ $bColor }}">
+                                        {{ $bLabel }}
+                                    </span>
                                 @else
-                                    <span class="badge-paid">Lunas</span>
+                                    <span style="font-size:11px; padding:2px 8px; border-radius:4px; white-space:nowrap; background:#3E7C5820; color:#3E7C58; border:1px solid #3E7C58">
+                                        Lunas
+                                    </span>
                                 @endif
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="px-4 py-8 text-center text-ink-muted text-sm">
-                                Belum ada data piutang untuk ditampilkan.
+                            <td colspan="7" style="padding:32px; text-align:center; color:#5B6470; font-size:14px">
+                                @if($search || $wilayah !== 'semua')
+                                    Tidak ada pelanggan yang cocok dengan filter ini.
+                                    <a href="{{ route('laporan.rekapitulasi') }}" style="color:#0E6E66; text-decoration:none">Reset filter</a>
+                                @else
+                                    Belum ada data piutang untuk ditampilkan.
+                                @endif
                             </td>
                         </tr>
-            @endforelse
-        </tbody>
-    </table>
-</div>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
 
-@if ($ringkasan->hasPages())
-    <div class="px-4 py-3 border-t border-line">
-        {{ $ringkasan->links() }}
-    </div>
-@endif
-
-<div class="sm:hidden divide-y divide-line">
-            @forelse ($ringkasan as $r)
+        <div class="sm:hidden divide-y divide-line">
+            @forelse ($paginated as $r)
                 @php
-                    $badgeMap = [
-                        'lancar' => 'badge-lancar',
-                        '0-30' => 'badge-watch30',
-                        '31-60' => 'badge-watch60',
-                        '>60' => 'badge-critical',
-                    ];
-                    $labelMap = [
-                        'lancar' => 'Lancar',
-                        '0-30' => '0-30 Hari',
-                        '31-60' => '31-60 Hari',
-                        '>60' => '>60 Hari',
+                    $sisaLunas = $r->sisa_piutang <= 0;
+                    $badgeColor = $sisaLunas ? '#3E7C58' : '#B33A2E';
+                    $badgeLabel = $sisaLunas ? 'Lunas' : 'Sisa';
+
+                    $bucketMap = [
+                        'lancar' => ['Lancar', '#6B7CA3'],
+                        '0-30' => ['0-30 Hari', '#C8862A'],
+                        '31-60' => ['31-60 Hari', '#B8612A'],
+                        '>60' => ['>60 Hari', '#B33A2E'],
                     ];
                     $worst = $r->bucket_terburuk;
                 @endphp
                 <div class="p-4 space-y-2">
                     <div class="flex items-center justify-between">
                         @if(Auth::user()->isAdministrasi())
-                            <a href="{{ route('pelanggan.show', $r->pelanggan) }}" class="text-action hover:underline font-medium text-sm">
+                            <a href="{{ route('pelanggan.show', $r->pelanggan) }}"
+                               style="color:#0E6E66; text-decoration:none; font-weight:500; font-size:14px">
                                 {{ $r->pelanggan->nama_pelanggan }}
                             </a>
                         @else
-                            <span class="font-medium text-ink text-sm">{{ $r->pelanggan->nama_pelanggan }}</span>
+                            <span style="font-weight:500; color:#1B2027; font-size:14px">{{ $r->pelanggan->nama_pelanggan }}</span>
                         @endif
                         @if ($worst)
-                            <span class="{{ $badgeMap[$worst] ?? 'badge-lancar' }}">{{ $labelMap[$worst] ?? $worst }}</span>
+                            @php [$bLabel, $bColor] = $bucketMap[$worst] ?? ['-', '#5B6470']; @endphp
+                            <span style="font-size:11px; padding:2px 8px; border-radius:4px; white-space:nowrap; background:{{ $bColor }}20; color:{{ $bColor }}; border:1px solid {{ $bColor }}">
+                                {{ $bLabel }}
+                            </span>
                         @else
-                            <span class="badge-paid">Lunas</span>
+                            <span style="font-size:11px; padding:2px 8px; border-radius:4px; white-space:nowrap; background:#3E7C5820; color:#3E7C58; border:1px solid #3E7C58">
+                                Lunas
+                            </span>
                         @endif
                     </div>
                     <div class="flex items-center justify-between text-sm">
-                        <span class="text-ink-muted">{{ $r->pelanggan->wilayah ?: '-' }}</span>
-                        <span class="rupiah {{ $r->sisa_piutang > 0 ? 'text-status-watch30' : 'text-status-paid' }}">
-                            Sisa: Rp {{ number_format($r->sisa_piutang, 2, ',', '.') }}
+                        <span style="color:#5B6470">{{ $r->pelanggan->wilayah ?: '-' }}</span>
+                        <span style="font-family:'IBM Plex Mono',monospace; font-weight:500">
+                            <span style="font-size:10px; padding:1px 6px; border-radius:3px; background:{{ $badgeColor }}20; color:{{ $badgeColor }}; border:1px solid {{ $badgeColor }}">
+                                {{ $badgeLabel }} · Rp {{ number_format($r->sisa_piutang, 2, ',', '.') }}
+                            </span>
                         </span>
                     </div>
-                    <div class="flex items-center justify-between text-xs text-ink-muted">
+                    <div class="flex items-center justify-between text-xs" style="color:#5B6470">
                         <span>Tagihan: Rp {{ number_format($r->total_tagihan, 2, ',', '.') }}</span>
                         <span>Terbayar: Rp {{ number_format($r->total_terbayar, 2, ',', '.') }}</span>
                     </div>
                 </div>
             @empty
-                <div class="p-8 text-center text-ink-muted text-sm">
-                    Belum ada data piutang untuk ditampilkan.
+                <div class="p-8 text-center" style="color:#5B6470; font-size:14px">
+                    @if($search || $wilayah !== 'semua')
+                        Tidak ada pelanggan yang cocok dengan filter ini.
+                        <a href="{{ route('laporan.rekapitulasi') }}" style="color:#0E6E66; text-decoration:none">Reset filter</a>
+                    @else
+                        Belum ada data piutang untuk ditampilkan.
+                    @endif
                 </div>
             @endforelse
+        </div>
+
+        <div class="px-4 py-3 border-t border-line hidden sm:block">
+            {{ $paginated->links() }}
         </div>
     </div>
 
     @if (count($chartLabels) > 0)
-        <div class="bg-surface border border-line rounded p-6">
-            <h2 class="font-display text-lg font-semibold text-ink mb-4">Grafik Sisa Piutang per Pelanggan</h2>
+        <div class="bg-surface border border-line rounded p-6" style="margin-top:16px">
+            <h2 class="font-display text-lg font-semibold text-ink mb-4">Grafik Sisa Piutang per Pelanggan (Top 10)</h2>
             <div class="relative" style="height: 300px;">
                 <canvas id="rekapChart"></canvas>
             </div>

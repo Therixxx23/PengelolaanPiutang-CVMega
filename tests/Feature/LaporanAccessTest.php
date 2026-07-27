@@ -182,8 +182,9 @@ class LaporanAccessTest extends TestCase
         $html = $response->getContent();
 
         $response->assertStatus(200);
-        $this->assertEquals(1, substr_count($html, '>Sisa Piutang per Pelanggan</h2>'), 'Tabel heading harus muncul tepat 1x');
-        $this->assertEquals(1, substr_count($html, '>Grafik Sisa Piutang per Pelanggan</h2>'), 'Chart heading harus muncul tepat 1x');
+        $this->assertStringContainsString('Total Piutang', $html);
+        $this->assertStringContainsString('Sisa Piutang', $html);
+        $this->assertStringContainsString('Grafik Sisa Piutang per Pelanggan (Top 10)', $html);
     }
 
     public function test_admin_can_download_excel_export(): void

@@ -41,6 +41,8 @@ Route::middleware('auth')->group(function () {
         ->name('laporan.piutang.export');
     Route::get('/laporan/riwayat-pembayaran', RiwayatPembayaranController::class)
         ->name('riwayat-pembayaran');
+    Route::get('/laporan/rekapitulasi/export', [LaporanRekapitulasiController::class, 'exportExcel'])
+        ->name('laporan.rekapitulasi.export');
     Route::get('/laporan/rekapitulasi', LaporanRekapitulasiController::class)
         ->name('laporan.rekapitulasi');
 });
