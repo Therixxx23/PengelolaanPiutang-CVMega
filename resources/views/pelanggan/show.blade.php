@@ -18,7 +18,7 @@
                 </div>
                 <div>
                     <p class="text-xs text-ink-muted uppercase tracking-wider font-medium">Batas Kredit</p>
-                    <p class="text-sm text-ink font-mono mt-1">Rp {{ number_format($pelanggan->batas_kredit, 2) }}</p>
+                    <p class="text-sm text-ink rupiah mt-1">Rp {{ number_format($pelanggan->batas_kredit, 2, ',', '.') }}</p>
                 </div>
                     <div class="pt-3 border-t border-line flex gap-2">
                     @can('update', $pelanggan)
@@ -77,8 +77,8 @@
                                     </td>
                                     <td class="table-cell font-mono">{{ $t->tanggal_tagihan->format('d/m/Y') }}</td>
                                     <td class="table-cell font-mono">{{ $t->tanggal_jatuh_tempo->format('d/m/Y') }}</td>
-                                    <td class="table-cell text-right font-mono">Rp {{ number_format($t->total_tagihan, 2) }}</td>
-                                    <td class="table-cell text-right font-mono">Rp {{ number_format(max(0, $sisaTagihan), 2) }}</td>
+                                    <td class="table-cell rupiah">Rp {{ number_format($t->total_tagihan, 2, ',', '.') }}</td>
+                                    <td class="table-cell rupiah">Rp {{ number_format(max(0, $sisaTagihan), 2, ',', '.') }}</td>
                                     <td class="table-cell">
                                         <span class="{{ $badgeClass }}">{{ $badgeText }}</span>
                                     </td>
@@ -123,8 +123,8 @@
                                 <span class="{{ $badgeClass }}">{{ $badgeText }}</span>
                             </div>
                             <div class="flex items-center justify-between text-sm">
-                                <span class="text-ink-muted">Total: <span class="font-mono text-ink">Rp {{ number_format($t->total_tagihan, 2) }}</span></span>
-                                <span class="font-mono">Sisa: Rp {{ number_format(max(0, $sisaTagihan), 2) }}</span>
+                                <span class="text-ink-muted">Total: <span class="rupiah text-ink">Rp {{ number_format($t->total_tagihan, 2, ',', '.') }}</span></span>
+                                <span class="rupiah">Sisa: Rp {{ number_format(max(0, $sisaTagihan), 2, ',', '.') }}</span>
                             </div>
                             <div class="flex items-center justify-between text-xs text-ink-muted">
                                 <span>Tagihan: {{ $t->tanggal_tagihan->format('d/m/Y') }}</span>

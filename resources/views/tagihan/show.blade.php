@@ -49,7 +49,7 @@
                     </div>
                     <div>
                         <p class="text-xs text-ink-muted uppercase tracking-wider font-medium">Total Tagihan</p>
-                        <p class="text-lg text-ink font-mono mt-1">Rp {{ number_format($tagihan->total_tagihan, 2) }}</p>
+                        <p class="text-lg text-ink rupiah mt-1">Rp {{ number_format($tagihan->total_tagihan, 2, ',', '.') }}</p>
                     </div>
                     <div>
                         @php
@@ -57,11 +57,11 @@
                             $sisa = $tagihan->total_tagihan - $totalDibayar;
                         @endphp
                         <p class="text-xs text-ink-muted uppercase tracking-wider font-medium">Total Dibayar</p>
-                        <p class="text-sm text-ink font-mono mt-1">Rp {{ number_format($totalDibayar, 2) }}</p>
+                        <p class="text-sm text-ink rupiah mt-1">Rp {{ number_format($totalDibayar, 2, ',', '.') }}</p>
                     </div>
                     <div>
                         <p class="text-xs text-ink-muted uppercase tracking-wider font-medium">Sisa Tagihan</p>
-                        <p class="text-sm {{ $sisa > 0 ? 'text-status-watch30' : 'text-status-paid' }} font-mono mt-1">Rp {{ number_format(max(0, $sisa), 2) }}</p>
+                        <p class="text-sm {{ $sisa > 0 ? 'text-status-watch30' : 'text-status-paid' }} rupiah mt-1">Rp {{ number_format(max(0, $sisa), 2, ',', '.') }}</p>
                     </div>
 
                     <div class="pt-3 border-t border-line flex gap-2">
@@ -109,7 +109,7 @@
                             </div>
                             <div>
                                 <label for="jumlah_bayar" class="block text-sm font-medium text-ink mb-1">
-                                    Jumlah Bayar (Rp) — maksimal Rp {{ number_format($sisa, 2) }}
+                                    Jumlah Bayar (Rp) — maksimal Rp {{ number_format($sisa, 2, ',', '.') }}
                                 </label>
                                 <input type="text" id="jumlah_bayar" name="jumlah_bayar" value="{{ old('jumlah_bayar') }}" class="input-field font-mono text-right" inputmode="numeric" placeholder="0" required>
                                 @error('jumlah_bayar') <p class="mt-1 text-sm text-status-critical">{{ $message }}</p> @enderror
@@ -160,7 +160,7 @@
                                     <tr class="border-b border-line">
                                         <td class="table-cell font-mono">{{ $pem->tanggal_bayar->format('d/m/Y') }}</td>
                                         <td class="table-cell">{{ ucfirst($pem->metode_bayar) }}</td>
-                                        <td class="table-cell text-right font-mono">Rp {{ number_format($pem->jumlah_bayar, 2) }}</td>
+                                        <td class="table-cell rupiah">Rp {{ number_format($pem->jumlah_bayar, 2, ',', '.') }}</td>
                                         <td class="table-cell text-ink-muted">{{ $pem->keterangan ?: '-' }}</td>
                                     </tr>
                                 @endforeach
@@ -168,7 +168,7 @@
                             <tfoot>
                                 <tr class="border-t border-line font-medium">
                                     <td colspan="2" class="table-header text-right">Total</td>
-                                    <td class="table-cell text-right font-mono">Rp {{ number_format($totalDibayar, 2) }}</td>
+                                    <td class="table-cell rupiah">Rp {{ number_format($totalDibayar, 2, ',', '.') }}</td>
                                     <td></td>
                                 </tr>
                             </tfoot>
@@ -182,12 +182,12 @@
                                     <p class="text-sm font-mono">{{ $pem->tanggal_bayar->format('d/m/Y') }}</p>
                                     <p class="text-xs text-ink-muted">{{ ucfirst($pem->metode_bayar) }}{{ $pem->keterangan ? ' — '.$pem->keterangan : '' }}</p>
                                 </div>
-                                <span class="font-mono text-sm">Rp {{ number_format($pem->jumlah_bayar, 2) }}</span>
+                                <span class="rupiah text-sm">Rp {{ number_format($pem->jumlah_bayar, 2, ',', '.') }}</span>
                             </div>
                         @endforeach
                         <div class="p-4 flex items-center justify-between font-medium border-t border-line">
                             <span class="text-sm">Total</span>
-                            <span class="font-mono text-sm">Rp {{ number_format($totalDibayar, 2) }}</span>
+                            <span class="rupiah text-sm">Rp {{ number_format($totalDibayar, 2, ',', '.') }}</span>
                         </div>
                     </div>
                 @endif

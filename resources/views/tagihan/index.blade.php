@@ -55,7 +55,7 @@
                             </td>
                             <td class="table-cell font-mono text-sm">{{ $t->tanggal_tagihan->format('d/m/Y') }}</td>
                             <td class="table-cell font-mono text-sm">{{ $t->tanggal_jatuh_tempo->format('d/m/Y') }}</td>
-                            <td class="table-cell text-right font-mono">Rp {{ number_format($t->total_tagihan, 2) }}</td>
+                            <td class="table-cell rupiah">Rp {{ number_format($t->total_tagihan, 2, ',', '.') }}</td>
                             <td class="table-cell">
                                 <span class="{{ $badge }}">{{ $badgeText }}</span>
                             </td>
@@ -117,7 +117,7 @@
                         <a href="{{ route('pelanggan.show', $t->pelanggan) }}" class="text-action hover:underline">
                             {{ $t->pelanggan->nama_pelanggan }}
                         </a>
-                        <span class="font-mono text-ink-muted">Rp {{ number_format($t->total_tagihan, 2) }}</span>
+                        <span class="rupiah text-ink-muted">Rp {{ number_format($t->total_tagihan, 2, ',', '.') }}</span>
                     </div>
                     <div class="flex items-center justify-between text-xs text-ink-muted">
                         <span>Tagihan: {{ $t->tanggal_tagihan->format('d/m/Y') }}</span>

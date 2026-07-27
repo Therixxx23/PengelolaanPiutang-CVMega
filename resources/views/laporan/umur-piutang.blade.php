@@ -122,7 +122,7 @@
                         <span class="{{ $badgeClass }} text-sm font-medium">{{ $label }}</span>
                         <span class="text-xs text-ink-muted">{{ $countBucket }} tagihan</span>
                     </div>
-                    <span class="font-mono text-sm font-medium text-ink">Rp {{ number_format($totalBucket, 2) }}</span>
+                    <span class="rupiah text-sm font-medium text-ink">Rp {{ number_format($totalBucket, 2, ',', '.') }}</span>
                 </div>
 
                 @if ($items->isEmpty())
@@ -164,7 +164,7 @@
                                         </td>
                                         <td class="table-cell font-mono">{{ $t->tanggal_jatuh_tempo->format('d/m/Y') }}</td>
                                         <td class="table-cell text-right font-mono">{{ $t->days_overdue }}</td>
-                                        <td class="table-cell text-right font-mono">Rp {{ number_format($t->total_tagihan, 2) }}</td>
+                                        <td class="table-cell rupiah">Rp {{ number_format($t->total_tagihan, 2, ',', '.') }}</td>
                                     </tr>
                                 @endforeach
                             </tbody>
@@ -182,7 +182,7 @@
                                     @else
                                         <span class="font-mono text-ink">{{ $t->no_invoice }}</span>
                                     @endif
-                                    <span class="font-mono text-ink-muted">Rp {{ number_format($t->total_tagihan, 2) }}</span>
+                                    <span class="rupiah text-ink-muted">Rp {{ number_format($t->total_tagihan, 2, ',', '.') }}</span>
                                 </div>
                                 <div class="flex items-center justify-between text-sm">
                                     @if(Auth::user()->isAdministrasi())
@@ -213,7 +213,7 @@
         <div class="bg-surface border border-line rounded p-4">
             <div class="flex items-center justify-between text-sm">
                 <span class="font-medium text-ink">Total Piutang Belum Lunas</span>
-                <span class="font-mono font-semibold text-ink text-lg">Rp {{ number_format(array_sum(array_column($summary, 'total')), 2) }}</span>
+                <span class="rupiah font-semibold text-ink text-lg">Rp {{ number_format(array_sum(array_column($summary, 'total')), 2, ',', '.') }}</span>
             </div>
         </div>
     </div>

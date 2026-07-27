@@ -33,7 +33,7 @@
                             </td>
                             <td class="table-cell">{{ $p->wilayah ?: '-' }}</td>
                             <td class="table-cell font-mono">{{ $p->no_telepon ?: '-' }}</td>
-                            <td class="table-cell text-right font-mono">Rp {{ number_format($p->batas_kredit, 2) }}</td>
+                            <td class="table-cell rupiah">Rp {{ number_format($p->batas_kredit, 2, ',', '.') }}</td>
                             <td class="table-cell text-right font-mono">
                                 {{ $p->tagihan()->where('status', 'belum_lunas')->count() }}
                             </td>
@@ -81,7 +81,7 @@
                     </div>
                     <div class="text-sm">
                         <span class="text-ink-muted">Batas kredit:</span>
-                        <span class="font-mono ml-1">Rp {{ number_format($p->batas_kredit, 2) }}</span>
+                        <span class="rupiah ml-1">Rp {{ number_format($p->batas_kredit, 2, ',', '.') }}</span>
                     </div>
                     <div class="flex gap-2 pt-1">
                         @can('update', $p)

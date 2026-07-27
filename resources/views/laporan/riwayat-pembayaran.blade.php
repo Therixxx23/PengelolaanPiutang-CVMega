@@ -75,9 +75,9 @@
                                 @endif
                             </td>
                             <td class="table-cell">{{ ucfirst($p->metode_bayar) }}</td>
-                            <td class="table-cell text-right font-mono">Rp {{ number_format($p->jumlah_bayar, 2) }}</td>
-                            <td class="table-cell text-right font-mono {{ $sisa > 0 ? 'text-status-watch30' : 'text-status-paid' }}">
-                                Rp {{ number_format(max(0, $sisa), 2) }}
+                            <td class="table-cell rupiah">Rp {{ number_format($p->jumlah_bayar, 2, ',', '.') }}</td>
+                            <td class="table-cell rupiah {{ $sisa > 0 ? 'text-status-watch30' : 'text-status-paid' }}">
+                                Rp {{ number_format(max(0, $sisa), 2, ',', '.') }}
                                 @if ($sisa > 0)
                                     <span class="text-xs text-ink-muted">(sisa)</span>
                                 @else
@@ -107,7 +107,7 @@
                 <div class="p-4 space-y-2">
                     <div class="flex items-center justify-between text-sm">
                         <span class="font-mono">{{ $p->tanggal_bayar->format('d/m/Y') }}</span>
-                        <span class="font-mono">Rp {{ number_format($p->jumlah_bayar, 2) }}</span>
+                        <span class="rupiah">Rp {{ number_format($p->jumlah_bayar, 2, ',', '.') }}</span>
                     </div>
                     <div class="flex items-center justify-between text-sm">
                         @if(Auth::user()->isAdministrasi())
@@ -118,7 +118,7 @@
                             <span class="font-mono text-ink">{{ $p->tagihan->no_invoice }}</span>
                         @endif
                         <span class="text-xs {{ $sisa > 0 ? 'text-status-watch30' : 'text-status-paid' }}">
-                            Sisa: Rp {{ number_format(max(0, $sisa), 2) }}
+                            Sisa: Rp {{ number_format(max(0, $sisa), 2, ',', '.') }}
                             ({{ $sisa > 0 ? 'sisa' : 'lunas' }})
                         </span>
                     </div>

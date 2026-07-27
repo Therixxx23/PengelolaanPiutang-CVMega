@@ -4,11 +4,11 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-8">
         <div class="bg-surface border border-line rounded p-4">
             <p class="text-xs text-ink-muted uppercase tracking-wider font-medium">Total Piutang</p>
-            <p class="text-xl font-mono font-semibold text-ink mt-1">Rp {{ number_format($totalPiutang, 2) }}</p>
+            <p class="text-xl rupiah font-semibold text-ink mt-1">Rp {{ number_format($totalPiutang, 2, ',', '.') }}</p>
         </div>
         <div class="bg-surface border border-line rounded p-4">
             <p class="text-xs text-ink-muted uppercase tracking-wider font-medium">Total Tertagih</p>
-            <p class="text-xl font-mono font-semibold text-status-paid mt-1">Rp {{ number_format($totalTertagih, 2) }}</p>
+            <p class="text-xl rupiah font-semibold text-status-paid mt-1">Rp {{ number_format($totalTertagih, 2, ',', '.') }}</p>
         </div>
         <div class="bg-surface border border-line rounded p-4">
             <p class="text-xs text-ink-muted uppercase tracking-wider font-medium">Total Pelanggan</p>
@@ -60,10 +60,10 @@
                                 @endif
                             </td>
                             <td class="table-cell">{{ $r->pelanggan->wilayah ?: '-' }}</td>
-                            <td class="table-cell text-right font-mono">Rp {{ number_format($r->total_tagihan, 2) }}</td>
-                            <td class="table-cell text-right font-mono">Rp {{ number_format($r->total_terbayar, 2) }}</td>
-                            <td class="table-cell text-right font-mono font-medium {{ $r->sisa_piutang > 0 ? 'text-status-watch30' : 'text-status-paid' }}">
-                                Rp {{ number_format($r->sisa_piutang, 2) }}
+                            <td class="table-cell rupiah">Rp {{ number_format($r->total_tagihan, 2, ',', '.') }}</td>
+                            <td class="table-cell rupiah">Rp {{ number_format($r->total_terbayar, 2, ',', '.') }}</td>
+                            <td class="table-cell rupiah font-medium {{ $r->sisa_piutang > 0 ? 'text-status-watch30' : 'text-status-paid' }}">
+                                Rp {{ number_format($r->sisa_piutang, 2, ',', '.') }}
                             </td>
                             <td class="table-cell">
                                 @if ($worst)
@@ -124,13 +124,13 @@
                     </div>
                     <div class="flex items-center justify-between text-sm">
                         <span class="text-ink-muted">{{ $r->pelanggan->wilayah ?: '-' }}</span>
-                        <span class="font-mono {{ $r->sisa_piutang > 0 ? 'text-status-watch30' : 'text-status-paid' }}">
-                            Sisa: Rp {{ number_format($r->sisa_piutang, 2) }}
+                        <span class="rupiah {{ $r->sisa_piutang > 0 ? 'text-status-watch30' : 'text-status-paid' }}">
+                            Sisa: Rp {{ number_format($r->sisa_piutang, 2, ',', '.') }}
                         </span>
                     </div>
                     <div class="flex items-center justify-between text-xs text-ink-muted">
-                        <span>Tagihan: Rp {{ number_format($r->total_tagihan, 2) }}</span>
-                        <span>Terbayar: Rp {{ number_format($r->total_terbayar, 2) }}</span>
+                        <span>Tagihan: Rp {{ number_format($r->total_tagihan, 2, ',', '.') }}</span>
+                        <span>Terbayar: Rp {{ number_format($r->total_terbayar, 2, ',', '.') }}</span>
                     </div>
                 </div>
             @empty

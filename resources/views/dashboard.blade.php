@@ -13,7 +13,7 @@
             </div>
             <div class="bg-surface border border-line rounded p-4">
                 <p class="text-xs text-ink-muted uppercase tracking-wider font-medium">Total Piutang</p>
-                <p class="text-2xl font-mono font-semibold text-ink mt-1">Rp {{ number_format($totalPiutang, 0) }}</p>
+                <p class="text-2xl rupiah font-semibold text-ink mt-1">Rp {{ number_format($totalPiutang, 0, ',', '.') }}</p>
             </div>
         </div>
 
@@ -58,7 +58,7 @@
                                     </a>
                                 </td>
                                 <td class="table-cell">{{ $t->pelanggan->nama_pelanggan }}</td>
-                                <td class="table-cell text-right font-mono">Rp {{ number_format($t->total_tagihan, 0) }}</td>
+                                <td class="table-cell rupiah">Rp {{ number_format($t->total_tagihan, 0, ',', '.') }}</td>
                                 <td class="table-cell"><span class="{{ $badge }}">{{ $statusLabel }}</span></td>
                                 <td class="table-cell font-mono">{{ $t->tanggal_jatuh_tempo->format('d/m/Y') }}</td>
                             </tr>
@@ -103,7 +103,7 @@
                         </div>
                         <div class="flex items-center justify-between text-sm">
                             <span>{{ $t->pelanggan->nama_pelanggan }}</span>
-                            <span class="font-mono">Rp {{ number_format($t->total_tagihan, 0) }}</span>
+                            <span class="rupiah">Rp {{ number_format($t->total_tagihan, 0, ',', '.') }}</span>
                         </div>
                         <div class="text-xs text-ink-muted">
                             Jatuh tempo: {{ $t->tanggal_jatuh_tempo->format('d/m/Y') }}
@@ -123,15 +123,15 @@
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-8">
             <div class="bg-surface border border-line rounded p-4">
                 <p class="text-xs text-ink-muted uppercase tracking-wider font-medium">Total Piutang</p>
-                <p class="text-2xl font-mono font-semibold text-ink mt-1">Rp {{ number_format($totalPiutang, 0) }}</p>
+                <p class="text-2xl rupiah font-semibold text-ink mt-1">Rp {{ number_format($totalPiutang, 0, ',', '.') }}</p>
             </div>
             <div class="bg-surface border border-line rounded p-4">
                 <p class="text-xs text-ink-muted uppercase tracking-wider font-medium">Total Tertagih</p>
-                <p class="text-2xl font-mono font-semibold text-status-paid mt-1">Rp {{ number_format($totalTertagih, 0) }}</p>
+                <p class="text-2xl rupiah font-semibold text-status-paid mt-1">Rp {{ number_format($totalTertagih, 0, ',', '.') }}</p>
             </div>
             <div class="bg-surface border border-line rounded p-4">
                 <p class="text-xs text-ink-muted uppercase tracking-wider font-medium">Piutang Belum Tertagih</p>
-                <p class="text-2xl font-mono font-semibold text-status-watch30 mt-1">Rp {{ number_format(max(0, $totalPiutang - $totalTertagih), 0) }}</p>
+                <p class="text-2xl rupiah font-semibold text-status-watch30 mt-1">Rp {{ number_format(max(0, $totalPiutang - $totalTertagih), 0, ',', '.') }}</p>
             </div>
         </div>
 
@@ -158,7 +158,7 @@
                             <span class="{{ $meta['badge'] }}">{{ $meta['label'] }}</span>
                             <span class="text-xs text-ink-muted">{{ $item['count'] }} tagihan</span>
                         </div>
-                        <span class="font-mono text-sm font-medium text-ink">Rp {{ number_format($item['total'], 0) }}</span>
+                        <span class="rupiah text-sm font-medium text-ink">Rp {{ number_format($item['total'], 0, ',', '.') }}</span>
                     </div>
                 @endforeach
             </div>
