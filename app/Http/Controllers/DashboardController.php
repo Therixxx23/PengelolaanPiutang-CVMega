@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Pelanggan;
 use App\Models\Tagihan;
 use App\Services\PiutangAgingService;
 use Illuminate\Support\Facades\Auth;
@@ -18,14 +19,23 @@ class DashboardController extends Controller
                 ->whereBetween('tanggal_jatuh_tempo', [now()->startOfWeek(), now()->endOfWeek()])
                 ->count();
             $totalPiutang = $agingService->getTotalPiutang();
+            $totalPelangganAktif = Pelanggan::whereHas('tagihan', fn ($q) => $q->where('status', 'belum_lunas'))->count();
+            $agingSummary = $agingService->getBucketSummary();
             $tagihanTerbaru = Tagihan::with('pelanggan')
                 ->orderBy('created_at', 'desc')
                 ->take(5)
                 ->get();
+            $jatuhTempoMingguIni = Tagihan::with('pelanggan')
+                ->where('status', 'belum_lunas')
+                ->whereBetween('tanggal_jatuh_tempo', [now()->startOfWeek(), now()->endOfWeek()])
+                ->orderBy('tanggal_jatuh_tempo')
+                ->limit(5)
+                ->get();
 
             return view('dashboard', compact(
                 'tagihanBelumLunas', 'tagihanJatuhTempoMingguIni',
-                'totalPiutang', 'tagihanTerbaru'
+                'totalPiutang', 'totalPelangganAktif', 'agingSummary',
+                'tagihanTerbaru', 'jatuhTempoMingguIni'
             ));
         }
 

@@ -41,6 +41,7 @@
         <x-nav-link :href="route('profile.edit')" :active="false">
             {{ Auth::user()->name }}
         </x-nav-link>
+        <p class="px-3 text-xs text-ink-muted mt-0.5">{{ auth()->user()->role_label }}</p>
         <form method="POST" action="{{ route('logout') }}" class="mt-1">
             @csrf
             <button type="submit" class="w-full text-left px-3 py-2 text-sm text-ink-muted hover:text-ink transition">

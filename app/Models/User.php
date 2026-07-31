@@ -60,6 +60,17 @@ class User extends Authenticatable
         return in_array($this->role, ['bagian_keuangan', 'pimpinan']);
     }
 
+    public function getRoleLabelAttribute(): string
+    {
+        return match ($this->role) {
+            'admin' => 'Bagian Administrasi',
+            'bagian_administrasi' => 'Bagian Administrasi',
+            'bagian_keuangan' => 'Bagian Keuangan',
+            'pimpinan' => 'Pimpinan',
+            default => $this->role,
+        };
+    }
+
     protected function casts(): array
     {
         return [
