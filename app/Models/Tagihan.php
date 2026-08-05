@@ -20,14 +20,10 @@ class Tagihan extends Model
 
     protected $fillable = [
         'id_pelanggan',
-        'no_invoice',
         'tanggal_tagihan',
         'tanggal_jatuh_tempo',
         'total_tagihan',
-        'status',
         'approval_status',
-        'approved_by',
-        'approved_at',
         'approval_note',
     ];
 

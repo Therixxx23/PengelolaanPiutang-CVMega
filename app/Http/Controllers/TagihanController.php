@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StorePembayaranRequest;
 use App\Http\Requests\StoreTagihanRequest;
 use App\Http\Requests\UpdateTagihanRequest;
+use App\Models\LogAktivitas;
 use App\Models\Pelanggan;
 use App\Models\Pembayaran;
 use App\Models\Tagihan;
@@ -85,6 +87,8 @@ class TagihanController extends Controller
 
     public function store(StoreTagihanRequest $request, ApprovalService $approvalService)
     {
+        $this->authorize('create', Tagihan::class);
+
         $tagihan = new Tagihan($request->validated());
         $tagihan->id_pelanggan = $request->id_pelanggan;
         $tagihan->no_invoice = $this->generateNomorInvoice();
@@ -102,6 +106,21 @@ class TagihanController extends Controller
         $tagihan->approval_status = $approvalService->tentukanStatus($tagihan);
 
         $tagihan->save();
+
+        LogAktivitas::create([
+            'user_id' => auth()->id(),
+            'aksi' => 'buat_tagihan',
+            'model_type' => class_basename($tagihan),
+            'model_id' => $tagihan->id_tagihan,
+            'data_sebelum' => null,
+            'data_sesudah' => [
+                'no_invoice' => $tagihan->no_invoice,
+                'total_tagihan' => $tagihan->total_tagihan,
+                'approval_status' => $tagihan->approval_status,
+            ],
+            'ip_address' => request()->ip(),
+            'created_at' => now(),
+        ]);
 
         // Pesan berbeda tergantung status
         if ($tagihan->approval_status === 'menunggu_persetujuan') {
@@ -140,6 +159,8 @@ class TagihanController extends Controller
 
     public function update(UpdateTagihanRequest $request, Tagihan $tagihan)
     {
+        $this->authorize('update', $tagihan);
+
         $tagihan->update($request->validated());
 
         return redirect()->route('tagihan.index')
@@ -155,19 +176,12 @@ class TagihanController extends Controller
             ->with('success', 'Tagihan berhasil dihapus.');
     }
 
-    public function bayar(Request $request, Tagihan $tagihan, PembayaranService $pembayaranService)
+    public function bayar(StorePembayaranRequest $request, Tagihan $tagihan, PembayaranService $pembayaranService)
     {
         $this->authorize('create', Pembayaran::class);
 
-        $validated = $request->validate([
-            'tanggal_bayar' => ['required', 'date'],
-            'jumlah_bayar' => ['required', 'numeric', 'min:0.01'],
-            'metode_bayar' => ['required', 'string', 'max:30'],
-            'keterangan' => ['nullable', 'string', 'max:500'],
-        ]);
-
         try {
-            $pembayaranService->catatPembayaran($tagihan, $validated);
+            $pembayaranService->catatPembayaran($tagihan, $request->validated());
         } catch (ValidationException $e) {
             return back()->withErrors($e->errors())->withInput();
         } catch (\LogicException $e) {

@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\LogAktivitas;
 use App\Models\Tagihan;
 use App\Models\User;
 use Illuminate\Support\Carbon;
@@ -27,11 +28,17 @@ class ApprovalService
             throw new \LogicException('Hanya tagihan berstatus "menunggu persetujuan" yang dapat disetujui.');
         }
 
-        $tagihan->update([
+        $sebelum = ['approval_status' => 'menunggu_persetujuan'];
+
+        $tagihan->approval_status = 'aktif';
+        $tagihan->approved_by = $user->id;
+        $tagihan->approved_at = now();
+        $tagihan->approval_note = $catatan;
+        $tagihan->save();
+
+        $this->log('setujui_tagihan', $tagihan, $sebelum, [
             'approval_status' => 'aktif',
             'approved_by' => $user->id,
-            'approved_at' => now(),
-            'approval_note' => $catatan,
         ]);
 
         return $tagihan;
@@ -47,10 +54,16 @@ class ApprovalService
             throw new \InvalidArgumentException('Alasan penolakan wajib diisi.');
         }
 
-        $tagihan->update([
+        $sebelum = ['approval_status' => 'menunggu_persetujuan'];
+
+        $tagihan->approval_status = 'ditolak';
+        $tagihan->approved_by = $user->id;
+        $tagihan->approved_at = now();
+        $tagihan->approval_note = $catatan;
+        $tagihan->save();
+
+        $this->log('tolak_tagihan', $tagihan, $sebelum, [
             'approval_status' => 'ditolak',
-            'approved_by' => $user->id,
-            'approved_at' => now(),
             'approval_note' => $catatan,
         ]);
 
@@ -86,5 +99,25 @@ class ApprovalService
             'total' => $total,
             'menunggu' => $menunggu,
         ];
+    }
+
+    private function log(string $aksi, $model, array $sebelum = [], array $sesudah = []): void
+    {
+        $userId = auth()->id();
+
+        if ($userId === null) {
+            return;
+        }
+
+        LogAktivitas::create([
+            'user_id' => $userId,
+            'aksi' => $aksi,
+            'model_type' => class_basename($model),
+            'model_id' => $model->getKey(),
+            'data_sebelum' => $sebelum ?: null,
+            'data_sesudah' => $sesudah ?: null,
+            'ip_address' => request()->ip(),
+            'created_at' => now(),
+        ]);
     }
 }

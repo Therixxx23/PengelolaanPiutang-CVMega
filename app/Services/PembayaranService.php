@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\LogAktivitas;
 use App\Models\Pembayaran;
 use App\Models\Tagihan;
 use Illuminate\Validation\ValidationException;
@@ -41,9 +42,35 @@ class PembayaranService
         $totalBaru = $totalDibayar + $data['jumlah_bayar'];
 
         if (abs($totalBaru - $tagihan->total_tagihan) < 0.01) {
-            $tagihan->update(['status' => 'lunas']);
+            $tagihan->status = 'lunas';
+            $tagihan->save();
         }
 
+        $this->log('catat_pembayaran', $pembayaran, [], [
+            'jumlah_bayar' => $pembayaran->jumlah_bayar,
+            'id_tagihan' => $pembayaran->id_tagihan,
+        ]);
+
         return $pembayaran;
+    }
+
+    private function log(string $aksi, $model, array $sebelum = [], array $sesudah = []): void
+    {
+        $userId = auth()->id();
+
+        if ($userId === null) {
+            return;
+        }
+
+        LogAktivitas::create([
+            'user_id' => $userId,
+            'aksi' => $aksi,
+            'model_type' => class_basename($model),
+            'model_id' => $model->getKey(),
+            'data_sebelum' => $sebelum ?: null,
+            'data_sesudah' => $sesudah ?: null,
+            'ip_address' => request()->ip(),
+            'created_at' => now(),
+        ]);
     }
 }
