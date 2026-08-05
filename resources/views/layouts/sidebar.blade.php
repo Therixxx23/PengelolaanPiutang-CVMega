@@ -33,6 +33,9 @@
                         @endif
                     </span>
                 </x-nav-link>
+                <x-nav-link :href="route('log-aktivitas')" :active="request()->routeIs('log-aktivitas')">
+                    Log Aktivitas
+                </x-nav-link>
             @endif
         @endauth
 
