@@ -10,6 +10,18 @@ class PembayaranService
 {
     public function catatPembayaran(Tagihan $tagihan, array $data): Pembayaran
     {
+        if (! $tagihan->bisa_dibayar) {
+            if ($tagihan->approval_status === 'menunggu_persetujuan') {
+                throw new \LogicException('Tagihan ini sedang menunggu persetujuan Pimpinan dan belum bisa menerima pembayaran.');
+            }
+
+            if ($tagihan->approval_status === 'ditolak') {
+                throw new \LogicException('Tagihan ini telah ditolak dan tidak bisa menerima pembayaran.');
+            }
+
+            throw new \LogicException('Tagihan sudah lunas dan tidak bisa menerima pembayaran lagi.');
+        }
+
         $totalDibayar = $tagihan->pembayaran()->sum('jumlah_bayar');
         $sisaTagihan = $tagihan->total_tagihan - $totalDibayar;
 

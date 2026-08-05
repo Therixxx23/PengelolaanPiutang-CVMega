@@ -40,7 +40,7 @@ class LaporanUmurPiutangController extends Controller
         }
 
         // Query berbasis periode untuk summary bucketing
-        $query = Tagihan::with('pelanggan')->where('status', 'belum_lunas');
+        $query = Tagihan::aktif()->with('pelanggan')->where('status', 'belum_lunas');
         TagihanFilterService::applyPeriodeFilter($query, $periode);
         $allTagihan = $query->get();
 
@@ -66,7 +66,7 @@ class LaporanUmurPiutangController extends Controller
         $paginatedTagihan = null;
 
         if ($bucket !== 'semua') {
-            $viewQuery = Tagihan::with('pelanggan')->where('status', 'belum_lunas');
+            $viewQuery = Tagihan::aktif()->with('pelanggan')->where('status', 'belum_lunas');
             TagihanFilterService::applyPeriodeFilter($viewQuery, $periode);
             TagihanFilterService::applyBucketFilter($viewQuery, $bucket);
 

@@ -33,7 +33,7 @@ class TagihanBelumLunasExport
 
         $writer->addRow(Row::fromValuesWithStyle($headers, $headerStyle));
 
-        $query = Tagihan::with('pelanggan', 'pembayaran')
+        $query = Tagihan::aktif()->with('pelanggan', 'pembayaran')
             ->where('status', 'belum_lunas');
 
         TagihanFilterService::applyPeriodeFilter($query, $this->periode);

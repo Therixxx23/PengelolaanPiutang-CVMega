@@ -31,7 +31,7 @@ class RekapitulasiExport
 
         $writer->addRow(Row::fromValuesWithStyle($headers, $headerStyle));
 
-        $pelanggan = Pelanggan::with(['tagihan.pembayaran'])
+        $pelanggan = Pelanggan::with(['tagihan' => fn ($q) => $q->aktif(), 'tagihan.pembayaran'])
             ->when($this->search, fn ($q) => $q->where('nama_pelanggan', 'like', "%{$this->search}%"))
             ->when($this->wilayah !== 'semua', fn ($q) => $q->where('wilayah', $this->wilayah))
             ->orderBy('nama_pelanggan')

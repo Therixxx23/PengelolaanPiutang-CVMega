@@ -25,6 +25,10 @@ class Tagihan extends Model
         'tanggal_jatuh_tempo',
         'total_tagihan',
         'status',
+        'approval_status',
+        'approved_by',
+        'approved_at',
+        'approval_note',
     ];
 
     protected function casts(): array
@@ -34,6 +38,8 @@ class Tagihan extends Model
             'tanggal_jatuh_tempo' => 'date',
             'total_tagihan' => 'decimal:2',
             'status' => 'string',
+            'approval_status' => 'string',
+            'approved_at' => 'datetime',
         ];
     }
 
@@ -45,6 +51,51 @@ class Tagihan extends Model
     public function pembayaran(): HasMany
     {
         return $this->hasMany(Pembayaran::class, 'id_tagihan', 'id_tagihan');
+    }
+
+    public function approvedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'approved_by');
+    }
+
+    public function getButuhApprovalAttribute(): bool
+    {
+        $totalBaru = (float) $this->total_tagihan;
+
+        $melebihiThreshold = $totalBaru >= (float) config('piutang.approval_threshold');
+
+        $totalPiutangAktif = (float) $this->pelanggan->tagihan()
+            ->where('status', 'belum_lunas')
+            ->where('id_tagihan', '!=', $this->id_tagihan)
+            ->sum('total_tagihan');
+
+        $batasKredit = (float) $this->pelanggan->batas_kredit;
+        $melebihiBatasKredit = $batasKredit > 0
+            && ($totalPiutangAktif + $totalBaru) > $batasKredit;
+
+        return $melebihiThreshold || $melebihiBatasKredit;
+    }
+
+    public function getBisaDibayarAttribute(): bool
+    {
+        return $this->status === 'belum_lunas'
+            && $this->approval_status === 'aktif';
+    }
+
+    public function scopeMenungguApproval(Builder $query): void
+    {
+        $query->where('approval_status', 'menunggu_persetujuan');
+    }
+
+    public function scopeAktif(Builder $query): void
+    {
+        $query->where('approval_status', 'aktif');
+    }
+
+    public function scopeBisaDibayar(Builder $query): void
+    {
+        $query->where('status', 'belum_lunas')
+            ->where('approval_status', 'aktif');
     }
 
     public function getIsOverdueAttribute(): bool

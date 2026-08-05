@@ -29,7 +29,31 @@ class TagihanFactory extends Factory
             'tanggal_jatuh_tempo' => $tanggalJatuhTempo->format('Y-m-d'),
             'total_tagihan' => fake()->randomFloat(2, 500_000, 50_000_000),
             'status' => 'belum_lunas',
+            'approval_status' => 'aktif',
+            'approved_by' => null,
+            'approved_at' => null,
+            'approval_note' => null,
         ];
+    }
+
+    public function menungguPersetujuan(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'approval_status' => 'menunggu_persetujuan',
+            'approved_by' => null,
+            'approved_at' => null,
+            'approval_note' => null,
+        ]);
+    }
+
+    public function ditolak(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'approval_status' => 'ditolak',
+            'approved_by' => null,
+            'approved_at' => null,
+            'approval_note' => null,
+        ]);
     }
 
     public function lunas(): static

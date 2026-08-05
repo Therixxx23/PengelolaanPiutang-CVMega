@@ -8,6 +8,7 @@ use App\Models\Tagihan;
 use App\Policies\PelangganPolicy;
 use App\Policies\PembayaranPolicy;
 use App\Policies\TagihanPolicy;
+use App\Services\ApprovalService;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
@@ -15,7 +16,7 @@ class AppServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        //
+        $this->app->singleton(ApprovalService::class);
     }
 
     public function boot(): void

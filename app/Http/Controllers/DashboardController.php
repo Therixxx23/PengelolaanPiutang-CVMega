@@ -14,18 +14,18 @@ class DashboardController extends Controller
         $user = Auth::user();
 
         if ($user->isAdministrasi()) {
-            $tagihanBelumLunas = Tagihan::where('status', 'belum_lunas')->count();
-            $tagihanJatuhTempoMingguIni = Tagihan::where('status', 'belum_lunas')
+            $tagihanBelumLunas = Tagihan::aktif()->where('status', 'belum_lunas')->count();
+            $tagihanJatuhTempoMingguIni = Tagihan::aktif()->where('status', 'belum_lunas')
                 ->whereBetween('tanggal_jatuh_tempo', [now()->startOfWeek(), now()->endOfWeek()])
                 ->count();
             $totalPiutang = $agingService->getTotalPiutang();
-            $totalPelangganAktif = Pelanggan::whereHas('tagihan', fn ($q) => $q->where('status', 'belum_lunas'))->count();
+            $totalPelangganAktif = Pelanggan::whereHas('tagihan', fn ($q) => $q->aktif()->where('status', 'belum_lunas'))->count();
             $agingSummary = $agingService->getBucketSummary();
-            $tagihanTerbaru = Tagihan::with('pelanggan')
+            $tagihanTerbaru = Tagihan::aktif()->with('pelanggan')
                 ->orderBy('created_at', 'desc')
                 ->take(5)
                 ->get();
-            $jatuhTempoMingguIni = Tagihan::with('pelanggan')
+            $jatuhTempoMingguIni = Tagihan::aktif()->with('pelanggan')
                 ->where('status', 'belum_lunas')
                 ->whereBetween('tanggal_jatuh_tempo', [now()->startOfWeek(), now()->endOfWeek()])
                 ->orderBy('tanggal_jatuh_tempo')

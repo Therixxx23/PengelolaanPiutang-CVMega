@@ -18,7 +18,7 @@ class LaporanRekapitulasiController extends Controller
         $wilayah = $request->get('wilayah', 'semua');
         $totalSemua = Pelanggan::count();
 
-        $semuaPelanggan = Pelanggan::with(['tagihan.pembayaran'])
+        $semuaPelanggan = Pelanggan::with(['tagihan' => fn ($q) => $q->aktif(), 'tagihan.pembayaran'])
             ->when($search, fn ($q) => $q->where('nama_pelanggan', 'like', "%{$search}%"))
             ->when($wilayah !== 'semua', fn ($q) => $q->where('wilayah', $wilayah))
             ->orderBy('nama_pelanggan')

@@ -9,7 +9,8 @@ class PiutangAgingService
 {
     public function getBucketedTagihan(): array
     {
-        $tagihan = Tagihan::with('pelanggan')
+        $tagihan = Tagihan::aktif()
+            ->with('pelanggan')
             ->where('status', 'belum_lunas')
             ->get();
 
@@ -79,17 +80,17 @@ class PiutangAgingService
 
     public function getTotalPiutang(): float
     {
-        return Tagihan::where('status', 'belum_lunas')->sum('total_tagihan');
+        return Tagihan::aktif()->where('status', 'belum_lunas')->sum('total_tagihan');
     }
 
     public function getTotalTertagih(): float
     {
-        return Tagihan::where('status', 'lunas')->sum('total_tagihan');
+        return Tagihan::aktif()->where('status', 'lunas')->sum('total_tagihan');
     }
 
     public function getAllPelangganSummary(): Collection
     {
-        return Tagihan::with('pelanggan', 'pembayaran')
+        return Tagihan::aktif()->with('pelanggan', 'pembayaran')
             ->get()
             ->groupBy('id_pelanggan')
             ->map(function (Collection $tagihan, $idPelanggan) {
