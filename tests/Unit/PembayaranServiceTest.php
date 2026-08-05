@@ -3,6 +3,7 @@
 namespace Tests\Unit;
 
 use App\Models\Tagihan;
+use App\Models\User;
 use App\Services\PembayaranService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Validation\ValidationException;
@@ -18,6 +19,7 @@ class PembayaranServiceTest extends TestCase
     {
         parent::setUp();
         $this->service = app(PembayaranService::class);
+        $this->actingAs(User::factory()->create());
     }
 
     public function test_full_payment_flags_tagihan_as_lunas(): void
@@ -34,6 +36,11 @@ class PembayaranServiceTest extends TestCase
         $this->assertDatabaseHas('tagihan', [
             'id_tagihan' => $tagihan->id_tagihan,
             'status' => 'lunas',
+        ]);
+        $this->assertDatabaseHas('log_aktivitas', [
+            'aksi' => 'catat_pembayaran',
+            'model_type' => 'Pembayaran',
+            'model_id' => $pembayaran->id_pembayaran,
         ]);
     }
 
