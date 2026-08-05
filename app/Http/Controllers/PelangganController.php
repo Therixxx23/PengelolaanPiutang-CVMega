@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StorePelangganRequest;
 use App\Http\Requests\UpdatePelangganRequest;
 use App\Models\Pelanggan;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class PelangganController extends Controller
@@ -52,6 +53,16 @@ class PelangganController extends Controller
             ]);
 
         return response()->json($results->values());
+    }
+
+    public function info(Pelanggan $pelanggan): JsonResponse
+    {
+        return response()->json([
+            'batas_kredit' => $pelanggan->batas_kredit,
+            'piutang_aktif' => $pelanggan->tagihan()
+                ->where('status', 'belum_lunas')
+                ->sum('total_tagihan'),
+        ]);
     }
 
     public function create()

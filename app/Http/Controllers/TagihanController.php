@@ -7,6 +7,7 @@ use App\Http\Requests\UpdateTagihanRequest;
 use App\Models\Pelanggan;
 use App\Models\Pembayaran;
 use App\Models\Tagihan;
+use App\Services\ApprovalService;
 use App\Services\InvoiceNumberService;
 use App\Services\PembayaranService;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -82,28 +83,41 @@ class TagihanController extends Controller
         return view('tagihan.create', compact('pelanggan', 'noInvoice'));
     }
 
-    public function store(StoreTagihanRequest $request)
+    public function store(StoreTagihanRequest $request, ApprovalService $approvalService)
     {
-        $validated = $request->validated();
-        $pelanggan = Pelanggan::find($validated['id_pelanggan']);
-        $tagihanBaru = (float) $validated['total_tagihan'];
-        $warning = null;
+        $tagihan = new Tagihan($request->validated());
+        $tagihan->id_pelanggan = $request->id_pelanggan;
+        $tagihan->no_invoice = $this->generateNomorInvoice();
+        $tagihan->status = 'belum_lunas';
 
-        if ($pelanggan && $pelanggan->batas_kredit > 0) {
-            $kredit = $pelanggan->cekBatasKredit($tagihanBaru);
-            if ($kredit['exceeded']) {
-                $warning = 'Total piutang '.e($pelanggan->nama_pelanggan).' melebihi batas kredit sebesar Rp '.number_format($kredit['kelebihan'], 0, ',', '.').'. Sisa limit: Rp '.number_format($kredit['sisa_limit'], 0, ',', '.').'.';
-            }
+        // Load relasi pelanggan dulu supaya accessor
+        // butuh_approval bisa hitung batas_kredit.
+        $tagihan->setRelation(
+            'pelanggan',
+            Pelanggan::find($request->id_pelanggan)
+        );
+
+        // Tentukan approval_status otomatis (mulai sebagai aktif).
+        $tagihan->approval_status = 'aktif';
+        $tagihan->approval_status = $approvalService->tentukanStatus($tagihan);
+
+        $tagihan->save();
+
+        // Pesan berbeda tergantung status
+        if ($tagihan->approval_status === 'menunggu_persetujuan') {
+            return redirect()
+                ->route('tagihan.show', $tagihan)
+                ->with('warning', 'Tagihan berhasil dibuat namun memerlukan persetujuan Pimpinan karena melebihi threshold. Tagihan belum aktif dan belum bisa menerima pembayaran.');
         }
 
-        Tagihan::create($validated);
+        return redirect()
+            ->route('tagihan.show', $tagihan)
+            ->with('success', 'Tagihan berhasil dibuat dan langsung aktif.');
+    }
 
-        $redirect = redirect()->route('tagihan.index')->with('success', 'Tagihan berhasil dibuat.');
-        if ($warning) {
-            $redirect->with('warning', $warning);
-        }
-
-        return $redirect;
+    private function generateNomorInvoice(): string
+    {
+        return app(InvoiceNumberService::class)->generate();
     }
 
     public function show(Tagihan $tagihan)
@@ -156,6 +170,8 @@ class TagihanController extends Controller
             $pembayaranService->catatPembayaran($tagihan, $validated);
         } catch (ValidationException $e) {
             return back()->withErrors($e->errors())->withInput();
+        } catch (\LogicException $e) {
+            return back()->with('error', $e->getMessage());
         }
 
         return redirect()->route('tagihan.show', $tagihan)

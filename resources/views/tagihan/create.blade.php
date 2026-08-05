@@ -1,8 +1,38 @@
 <x-app-layout>
     <x-slot name="header">Buat Tagihan</x-slot>
 
+    @php
+        $threshold = config('piutang.approval_threshold');
+        $selectedPelanggan = $pelanggan->firstWhere('id_pelanggan', old('id_pelanggan'));
+        $batasKreditAwal = $selectedPelanggan ? (float) $selectedPelanggan->batas_kredit : 0;
+        $piutangAktifAwal = $selectedPelanggan ? (float) $selectedPelanggan->total_piutang_aktif : 0;
+    @endphp
+
     <div class="max-w-2xl">
-        <form action="{{ route('tagihan.store') }}" method="POST" class="bg-surface border border-line rounded p-6 space-y-4" x-data="{}">
+        <form action="{{ route('tagihan.store') }}" method="POST" class="bg-surface border border-line rounded p-6 space-y-4" x-data="{
+            totalTagihan: {{ old('total_tagihan', 0) }},
+            threshold: {{ $threshold }},
+            batasKredit: {{ $batasKreditAwal }},
+            piutangAktif: {{ $piutangAktifAwal }},
+            init() {
+                this.cekThreshold();
+            },
+            cekThreshold() {
+                const total = parseFloat(this.totalTagihan) || 0;
+                const butuhApproval =
+                    total >= this.threshold ||
+                    (this.batasKredit > 0 && (total + this.piutangAktif) > this.batasKredit);
+                document.getElementById('approval-warning').style.display = butuhApproval ? 'block' : 'none';
+            },
+            async fetchPelangganInfo(id) {
+                if (!id) return;
+                const res = await fetch('/pelanggan/' + id + '/info');
+                const data = await res.json();
+                this.batasKredit = parseFloat(data.batas_kredit) || 0;
+                this.piutangAktif = parseFloat(data.piutang_aktif) || 0;
+                this.cekThreshold();
+            }
+        }">
             @csrf
 
             <div>
@@ -33,6 +63,7 @@
                         } else {
                             info.classList.add('hidden');
                         }
+                        fetchPelangganInfo($event.target.value);
                     "
                 >
                     <option value="">Pilih pelanggan...</option>
@@ -71,8 +102,26 @@
 
             <div>
                 <label for="total_tagihan" class="block text-sm font-medium text-ink mb-1">Total Tagihan (Rp)</label>
-                <input type="text" id="total_tagihan" name="total_tagihan" value="{{ old('total_tagihan') }}" class="input-field font-mono text-right" inputmode="numeric" placeholder="0" required>
+                <input type="text" id="total_tagihan" name="total_tagihan" value="{{ old('total_tagihan') }}" class="input-field font-mono text-right" inputmode="numeric" placeholder="0" required
+                    x-model="totalTagihan"
+                    x-on:input="cekThreshold()">
                 @error('total_tagihan') <p class="mt-1 text-sm text-status-critical">{{ $message }}</p> @enderror
+            </div>
+
+            <div id="approval-warning"
+                style="display:none; margin-bottom:16px; padding:12px 16px;
+                       background:#FFF8F0; border:1px solid #C8862A;
+                       border-radius:6px; border-left:3px solid #C8862A">
+                <p style="font-size:13px; color:#C8862A; margin:0; font-weight:500">
+                    ⚠ Tagihan ini akan memerlukan persetujuan Pimpinan
+                </p>
+                <p style="font-size:12px; color:#5B6470; margin:4px 0 0">
+                    Nilai tagihan melebihi threshold Rp
+                    {{ number_format($threshold, 0, ',', '.') }}
+                    atau melebihi batas kredit pelanggan. Tagihan akan
+                    masuk status "Menunggu Persetujuan" dan belum bisa
+                    menerima pembayaran sampai disetujui Pimpinan.
+                </p>
             </div>
 
             <div class="flex items-center gap-3 pt-2">

@@ -27,7 +27,7 @@ class CreditLimitTest extends TestCase
 
         $response->assertSessionHas('success');
         $response->assertSessionMissing('warning');
-        $this->assertDatabaseHas('tagihan', ['no_invoice' => 'INV/2026/06/000001']);
+        $this->assertDatabaseHas('tagihan', ['approval_status' => 'aktif']);
     }
 
     public function test_pelanggan_exactly_at_limit_no_warning(): void
@@ -72,12 +72,11 @@ class CreditLimitTest extends TestCase
             'total_tagihan' => 50_000_000,
         ]);
 
-        $response->assertSessionHas('success');
         $response->assertSessionHas('warning');
-        $this->assertDatabaseHas('tagihan', ['no_invoice' => 'INV/2026/06/000003']);
+        $this->assertDatabaseHas('tagihan', ['approval_status' => 'menunggu_persetujuan']);
     }
 
-    public function test_credit_limit_warning_contains_amount_details(): void
+    public function test_exceeding_credit_limit_triggers_approval(): void
     {
         $admin = User::factory()->create(['role' => 'bagian_administrasi']);
         $pelanggan = Pelanggan::factory()->create(['batas_kredit' => 100_000_000]);
@@ -96,10 +95,8 @@ class CreditLimitTest extends TestCase
             'total_tagihan' => 30_000_000,
         ]);
 
-        $warning = session('warning');
-        $this->assertStringContainsString('melebihi batas kredit', $warning);
-        $this->assertStringContainsString('Rp 20.000.000', $warning);
-        $this->assertStringContainsString('Rp 10.000.000', $warning);
+        $response->assertSessionHas('warning');
+        $this->assertDatabaseHas('tagihan', ['approval_status' => 'menunggu_persetujuan']);
     }
 
     public function test_pelanggan_without_credit_limit_no_warning(): void
@@ -118,7 +115,7 @@ class CreditLimitTest extends TestCase
             'no_invoice' => 'INV/2026/06/000005',
             'tanggal_tagihan' => now()->format('Y-m-d'),
             'tanggal_jatuh_tempo' => now()->addDays(30)->format('Y-m-d'),
-            'total_tagihan' => 500_000_000,
+            'total_tagihan' => 50_000_000,
         ]);
 
         $response->assertSessionHas('success');

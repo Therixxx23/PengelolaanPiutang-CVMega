@@ -42,7 +42,7 @@ class TagihanControllerTest extends TestCase
             'total_tagihan' => 25000000,
         ]);
 
-        $response->assertRedirect(route('tagihan.index'));
+        $response->assertRedirect(route('tagihan.show', Tagihan::first()));
         $this->assertDatabaseHas('tagihan', ['no_invoice' => $noInvoice]);
     }
 

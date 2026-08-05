@@ -19,6 +19,49 @@
         </div>
     </x-slot>
 
+    @if($tagihan->approval_status === 'menunggu_persetujuan')
+    <div style="padding:16px; background:#FFF8F0;
+                border:1px solid #C8862A; border-radius:8px;
+                border-left:4px solid #C8862A; margin-bottom:20px">
+        <p style="font-weight:600; color:#C8862A; margin:0">
+            ⏳ Menunggu Persetujuan Pimpinan
+        </p>
+        <p style="font-size:13px; color:#5B6470; margin:4px 0 0">
+            Tagihan ini melebihi threshold dan sedang menunggu
+            persetujuan. Pembayaran belum bisa dicatat sampai
+            Pimpinan menyetujui.
+        </p>
+    </div>
+
+    @elseif($tagihan->approval_status === 'ditolak')
+    <div style="padding:16px; background:#FFF5F5;
+                border:1px solid #B33A2E; border-radius:8px;
+                border-left:4px solid #B33A2E; margin-bottom:20px">
+        <p style="font-weight:600; color:#B33A2E; margin:0">
+            ✕ Tagihan Ditolak
+        </p>
+        <p style="font-size:13px; color:#5B6470; margin:4px 0 0">
+            Ditolak oleh {{ $tagihan->approvedBy->name }}
+            pada {{ $tagihan->approved_at->format('d/m/Y H:i') }}
+        </p>
+        <p style="font-size:13px; color:#B33A2E; margin:4px 0 0;
+                  font-style:italic">
+            Alasan: {{ $tagihan->approval_note }}
+        </p>
+    </div>
+
+    @elseif($tagihan->approval_status === 'aktif'
+            && $tagihan->approved_by)
+    <div style="padding:12px 16px; background:#F0FAF5;
+                border:1px solid #3E7C58; border-radius:8px;
+                border-left:4px solid #3E7C58; margin-bottom:20px">
+        <p style="font-size:13px; color:#3E7C58; margin:0">
+            ✓ Disetujui oleh {{ $tagihan->approvedBy->name }}
+            pada {{ $tagihan->approved_at->format('d/m/Y H:i') }}
+        </p>
+    </div>
+    @endif
+
     @php
         $railClass = $tagihan->status === 'lunas' ? 'aging-rail-paid' : ($tagihan->is_overdue ? ($tagihan->aging_bucket === '0-30' ? 'aging-rail-watch30' : ($tagihan->aging_bucket === '31-60' ? 'aging-rail-watch60' : 'aging-rail-critical')) : 'aging-rail-lancar');
     @endphp
@@ -86,7 +129,7 @@
         <div class="lg:col-span-2 space-y-6">
             {{-- Catat Pembayaran --}}
             @can('create', App\Models\Pembayaran::class)
-                @if ($sisa > 0)
+                @if ($tagihan->bisa_dibayar)
                     <div class="bg-surface border border-line rounded p-6">
                         <h2 class="font-display text-lg font-semibold text-ink mb-4">Catat Pembayaran</h2>
                         <form action="{{ route('tagihan.bayar', $tagihan) }}" method="POST" class="space-y-4">
@@ -122,7 +165,7 @@
                             <button type="submit" class="btn-primary">Catat Pembayaran</button>
                         </form>
                     </div>
-                @else
+                @elseif ($tagihan->status === 'lunas')
                     <div class="bg-surface border border-line border-l-[3px] border-status-paid rounded p-6">
                         <p class="text-sm text-status-paid font-medium">Tagihan ini sudah lunas.</p>
                     </div>
@@ -139,7 +182,7 @@
                     <div class="px-4 py-8 text-center text-sm text-ink-muted">
                         Belum ada pembayaran untuk tagihan ini.
                         @can('create', App\Models\Pembayaran::class)
-                            @if ($sisa > 0)
+                            @if ($tagihan->bisa_dibayar)
                                 <span class="block mt-1">Gunakan form di atas untuk mencatat pembayaran pertama.</span>
                             @endif
                         @endcan
