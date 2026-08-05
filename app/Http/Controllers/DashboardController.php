@@ -5,47 +5,99 @@ namespace App\Http\Controllers;
 use App\Models\Pelanggan;
 use App\Models\Tagihan;
 use App\Services\PiutangAgingService;
-use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
 {
-    public function __invoke(PiutangAgingService $agingService)
+    public function index(PiutangAgingService $agingService)
     {
-        $user = Auth::user();
+        $user = auth()->user();
 
-        if ($user->isAdministrasi()) {
-            $tagihanBelumLunas = Tagihan::aktif()->where('status', 'belum_lunas')->count();
-            $tagihanJatuhTempoMingguIni = Tagihan::aktif()->where('status', 'belum_lunas')
-                ->whereBetween('tanggal_jatuh_tempo', [now()->startOfWeek(), now()->endOfWeek()])
-                ->count();
-            $totalPiutang = $agingService->getTotalPiutang();
-            $totalPelangganAktif = Pelanggan::whereHas('tagihan', fn ($q) => $q->aktif()->where('status', 'belum_lunas'))->count();
-            $agingSummary = $agingService->getBucketSummary();
-            $tagihanTerbaru = Tagihan::aktif()->with('pelanggan')
-                ->orderBy('created_at', 'desc')
-                ->take(5)
-                ->get();
-            $jatuhTempoMingguIni = Tagihan::aktif()->with('pelanggan')
+        // Data umum untuk semua role
+        $data = [
+            'totalBelumLunas' => Tagihan::aktif()
+                ->where('status', 'belum_lunas')->count(),
+            'jatuhTempoMingguIni' => Tagihan::aktif()
                 ->where('status', 'belum_lunas')
-                ->whereBetween('tanggal_jatuh_tempo', [now()->startOfWeek(), now()->endOfWeek()])
-                ->orderBy('tanggal_jatuh_tempo')
-                ->limit(5)
-                ->get();
+                ->whereBetween('tanggal_jatuh_tempo', [
+                    now()->startOfWeek(),
+                    now()->endOfWeek(),
+                ])->count(),
+            'totalPiutang' => Tagihan::aktif()
+                ->where('status', 'belum_lunas')
+                ->sum('total_tagihan'),
+            'totalPelangganAktif' => Pelanggan::whereHas('tagihan',
+                fn ($q) => $q->where('status', 'belum_lunas')
+                    ->where('approval_status', 'aktif'))->count(),
+        ];
 
-            return view('dashboard', compact(
-                'tagihanBelumLunas', 'tagihanJatuhTempoMingguIni',
-                'totalPiutang', 'totalPelangganAktif', 'agingSummary',
-                'tagihanTerbaru', 'jatuhTempoMingguIni'
-            ));
+        // Data khusus Pimpinan
+        if ($user->isPimpinan()) {
+            $data['menungguApproval'] = Tagihan::menungguApproval()
+                ->with('pelanggan')
+                ->latest()->limit(5)->get();
+
+            $data['totalMenunggu'] = Tagihan::menungguApproval()
+                ->count();
+
+            $data['disetujuiHariIni'] = Tagihan::where('approval_status', 'aktif')
+                ->whereDate('approved_at', today())
+                ->count();
+
+            $data['ditolakHariIni'] = Tagihan::where('approval_status', 'ditolak')
+                ->whereDate('approved_at', today())
+                ->count();
+
+            $data['nilaiMenunggu'] = Tagihan::menungguApproval()
+                ->sum('total_tagihan');
+
+            // Top 5 pelanggan dengan piutang terbesar
+            $data['topPiutang'] = Pelanggan::withSum([
+                'tagihan as total_piutang' => fn ($q) => $q->where('status', 'belum_lunas')
+                    ->where('approval_status', 'aktif'),
+            ], 'total_tagihan')
+                ->orderByDesc('total_piutang')
+                ->limit(5)->get();
+
+            // Aging summary
+            $data['agingSummary'] = $agingService->getBucketSummary();
         }
 
-        $summary = $agingService->getBucketSummary();
-        $totalPiutang = $agingService->getTotalPiutang();
-        $totalTertagih = $agingService->getTotalTertagih();
-        $buckets = $agingService->getBucketedTagihan();
+        // Data khusus Bagian Administrasi
+        if ($user->isAdministrasi()) {
+            $data['tagihanTerbaru'] = Tagihan::with('pelanggan')
+                ->latest()->limit(5)->get();
 
-        return view('dashboard', compact(
-            'summary', 'totalPiutang', 'totalTertagih', 'buckets'
-        ));
+            $data['jatuhTempoList'] = Tagihan::aktif()
+                ->with('pelanggan')
+                ->where('status', 'belum_lunas')
+                ->whereBetween('tanggal_jatuh_tempo', [
+                    now(), now()->addDays(7),
+                ])
+                ->orderBy('tanggal_jatuh_tempo')
+                ->limit(5)->get();
+
+            $data['tagihanDitolak'] = Tagihan::where('approval_status', 'ditolak')
+                ->with('pelanggan')
+                ->latest('approved_at')
+                ->limit(3)->get();
+
+            $data['agingSummary'] = $agingService->getBucketSummary();
+        }
+
+        // Data khusus Bagian Keuangan
+        if ($user->isKeuangan()) {
+            $data['tagihanTerbaru'] = Tagihan::aktif()
+                ->with('pelanggan')
+                ->latest()->limit(5)->get();
+            $data['agingSummary'] = $agingService->getBucketSummary();
+            $data['topPiutang'] = Pelanggan::withSum([
+                'tagihan as total_piutang' => fn ($q) => $q->where('status', 'belum_lunas')
+                    ->where('approval_status', 'aktif'),
+            ], 'total_tagihan')
+                ->orderByDesc('total_piutang')
+                ->limit(5)->get();
+        }
+
+        return view('dashboard', $data);
     }
 }

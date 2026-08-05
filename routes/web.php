@@ -4,6 +4,7 @@ use App\Http\Controllers\ApprovalController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LaporanRekapitulasiController;
 use App\Http\Controllers\LaporanUmurPiutangController;
+use App\Http\Controllers\LogAktivitasController;
 use App\Http\Controllers\PelangganController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RiwayatPembayaranController;
@@ -14,7 +15,7 @@ Route::get('/', function () {
     return redirect()->route('login');
 });
 
-Route::get('/dashboard', DashboardController::class)
+Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
@@ -23,12 +24,15 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     Route::get('pelanggan/suggest', [PelangganController::class, 'suggest'])
+        ->middleware('throttle:30,1')
         ->name('pelanggan.suggest');
     Route::resource('pelanggan', PelangganController::class);
     Route::get('pelanggan/{pelanggan}/info', [PelangganController::class, 'info'])
+        ->middleware('throttle:30,1')
         ->name('pelanggan.info');
 
     Route::get('tagihan/suggest', [TagihanController::class, 'suggest'])
+        ->middleware('throttle:30,1')
         ->name('tagihan.suggest');
     Route::resource('tagihan', TagihanController::class);
 
@@ -54,6 +58,9 @@ Route::middleware('auth')->group(function () {
         Route::post('{tagihan}/setujui', [ApprovalController::class, 'setujui'])->name('setujui');
         Route::post('{tagihan}/tolak', [ApprovalController::class, 'tolak'])->name('tolak');
     });
+
+    Route::get('/log-aktivitas', [LogAktivitasController::class, 'index'])
+        ->name('log-aktivitas');
 });
 
 require __DIR__.'/auth.php';
