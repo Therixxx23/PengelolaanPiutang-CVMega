@@ -31,4 +31,15 @@ class TagihanPolicy
     {
         return $user->isAdministrasi();
     }
+
+    public function viewApproval(User $user): bool
+    {
+        return $user->isPimpinan();
+    }
+
+    public function approve(User $user, Tagihan $tagihan): bool
+    {
+        return $user->isPimpinan()
+            && $tagihan->approval_status === 'menunggu_persetujuan';
+    }
 }

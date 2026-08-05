@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ApprovalController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LaporanRekapitulasiController;
 use App\Http\Controllers\LaporanUmurPiutangController;
@@ -24,6 +25,8 @@ Route::middleware('auth')->group(function () {
     Route::get('pelanggan/suggest', [PelangganController::class, 'suggest'])
         ->name('pelanggan.suggest');
     Route::resource('pelanggan', PelangganController::class);
+    Route::get('pelanggan/{pelanggan}/info', [PelangganController::class, 'info'])
+        ->name('pelanggan.info');
 
     Route::get('tagihan/suggest', [TagihanController::class, 'suggest'])
         ->name('tagihan.suggest');
@@ -45,6 +48,12 @@ Route::middleware('auth')->group(function () {
         ->name('laporan.rekapitulasi.export');
     Route::get('/laporan/rekapitulasi', LaporanRekapitulasiController::class)
         ->name('laporan.rekapitulasi');
+
+    Route::prefix('approval')->name('approval.')->group(function () {
+        Route::get('/', [ApprovalController::class, 'index'])->name('index');
+        Route::post('{tagihan}/setujui', [ApprovalController::class, 'setujui'])->name('setujui');
+        Route::post('{tagihan}/tolak', [ApprovalController::class, 'tolak'])->name('tolak');
+    });
 });
 
 require __DIR__.'/auth.php';
