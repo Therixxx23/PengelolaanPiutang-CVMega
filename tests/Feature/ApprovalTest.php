@@ -151,7 +151,7 @@ class ApprovalTest extends TestCase
     public function test_pembayaran_tagihan_menunggu_mengembalikan_error(): void
     {
         $admin = $this->admin();
-        $tagihan = Tagihan::factory()->menungguPersetujuan()->create();
+        $tagihan = Tagihan::factory()->menungguPersetujuan()->create(['total_tagihan' => 50_000_000]);
 
         $response = $this->actingAs($admin)->post(route('tagihan.bayar', $tagihan), [
             'tanggal_bayar' => now()->format('Y-m-d'),

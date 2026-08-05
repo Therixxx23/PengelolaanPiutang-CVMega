@@ -3,9 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Models\Pelanggan;
-use App\Models\Tagihan;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
 class UpdateTagihanRequest extends FormRequest
 {
@@ -18,20 +16,24 @@ class UpdateTagihanRequest extends FormRequest
     {
         return [
             'id_pelanggan' => ['required', 'exists:'.Pelanggan::class.',id_pelanggan'],
-            'no_invoice' => ['required', 'string', 'max:30', Rule::unique(Tagihan::class)->ignore($this->route('tagihan'))],
-            'tanggal_tagihan' => ['required', 'date'],
-            'tanggal_jatuh_tempo' => ['required', 'date', 'after_or_equal:tanggal_tagihan'],
-            'total_tagihan' => ['required', 'numeric', 'min:0'],
-            'status' => ['sometimes', 'in:belum_lunas,lunas'],
+            'tanggal_tagihan' => ['required', 'date', 'before_or_equal:today'],
+            'tanggal_jatuh_tempo' => ['required', 'date', 'after:tanggal_tagihan'],
+            'total_tagihan' => ['required', 'numeric', 'min:1000', 'max:999999999999'],
         ];
     }
 
     public function messages(): array
     {
         return [
-            'id_pelanggan.required' => 'Pilih pelanggan.',
+            'id_pelanggan.required' => 'Pelanggan wajib dipilih.',
+            'id_pelanggan.exists' => 'Pelanggan tidak ditemukan.',
+            'tanggal_tagihan.required' => 'Tanggal tagihan wajib diisi.',
+            'tanggal_tagihan.before_or_equal' => 'Tanggal tagihan tidak boleh di masa depan.',
+            'tanggal_jatuh_tempo.required' => 'Tanggal jatuh tempo wajib diisi.',
+            'tanggal_jatuh_tempo.after' => 'Jatuh tempo harus setelah tanggal tagihan.',
             'total_tagihan.required' => 'Total tagihan wajib diisi.',
-            'tanggal_jatuh_tempo.after_or_equal' => 'Jatuh tempo harus setelah atau sama dengan tanggal tagihan.',
+            'total_tagihan.min' => 'Nilai tagihan minimal Rp 1.000.',
+            'total_tagihan.max' => 'Nilai tagihan terlalu besar.',
         ];
     }
 }

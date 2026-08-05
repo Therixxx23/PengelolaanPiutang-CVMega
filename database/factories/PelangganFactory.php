@@ -24,7 +24,7 @@ class PelangganFactory extends Factory
             'nama_pelanggan' => fake()->company(),
             'alamat' => fake()->address(),
             'wilayah' => $wilayah,
-            'no_telepon' => fake()->phoneNumber(),
+            'no_telepon' => fake()->numerify('08##########'),
             'batas_kredit' => fake()->randomFloat(2, 10_000_000, 200_000_000),
         ];
     }
