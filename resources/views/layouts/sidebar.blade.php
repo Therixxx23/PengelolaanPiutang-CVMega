@@ -20,6 +20,20 @@
                     Tagihan
                 </x-nav-link>
             @endif
+
+            @if(Auth::user()->isPimpinan())
+                @php $menungguApproval = \App\Models\Tagihan::menungguApproval()->count(); @endphp
+                <x-nav-link :href="route('approval.index')" :active="request()->routeIs('approval.*')">
+                    <span class="flex items-center justify-between">
+                        <span>Persetujuan</span>
+                        @if($menungguApproval > 0)
+                            <span class="inline-flex items-center bg-status-critical text-white text-[11px] px-1.5 py-0.5 rounded-full font-semibold">
+                                {{ $menungguApproval }}
+                            </span>
+                        @endif
+                    </span>
+                </x-nav-link>
+            @endif
         @endauth
 
         <div class="pt-4 mt-4 border-t border-line">
