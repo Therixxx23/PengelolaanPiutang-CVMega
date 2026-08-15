@@ -56,18 +56,24 @@ class Tagihan extends Model
 
     public function getButuhApprovalAttribute(): bool
     {
-        $totalBaru = (float) $this->total_tagihan;
+        $totalBaru = (string) $this->total_tagihan;
 
-        $melebihiThreshold = $totalBaru >= (float) config('piutang.approval_threshold');
+        $melebihiThreshold = bccomp(
+            $totalBaru,
+            (string) config('piutang.approval_threshold'),
+            2
+        ) >= 0;
 
-        $totalPiutangAktif = (float) $this->pelanggan->tagihan()
+        $totalPiutangAktif = (string) $this->pelanggan->tagihan()
             ->where('status', 'belum_lunas')
             ->where('id_tagihan', '!=', $this->id_tagihan)
             ->sum('total_tagihan');
 
-        $batasKredit = (float) $this->pelanggan->batas_kredit;
-        $melebihiBatasKredit = $batasKredit > 0
-            && ($totalPiutangAktif + $totalBaru) > $batasKredit;
+        $batasKredit = (string) $this->pelanggan->batas_kredit;
+        $totalBaruTotal = bcadd($totalPiutangAktif, $totalBaru, 2);
+
+        $melebihiBatasKredit = bccomp($batasKredit, '0', 2) > 0
+            && bccomp($totalBaruTotal, $batasKredit, 2) > 0;
 
         return $melebihiThreshold || $melebihiBatasKredit;
     }

@@ -12,6 +12,7 @@ use App\Models\Tagihan;
 use App\Services\ApprovalService;
 use App\Services\InvoiceNumberService;
 use App\Services\PembayaranService;
+use App\Support\LikeQuery;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
@@ -28,9 +29,11 @@ class TagihanController extends Controller
 
         $tagihan = Tagihan::with('pelanggan')
             ->when($search, function ($q) use ($search) {
-                $q->where('no_invoice', 'like', "%{$search}%")
-                    ->orWhereHas('pelanggan', function ($q) use ($search) {
-                        $q->where('nama_pelanggan', 'like', "%{$search}%");
+                $like = '%'.LikeQuery::escape($search).'%';
+
+                $q->where('no_invoice', 'like', $like)
+                    ->orWhereHas('pelanggan', function ($q) use ($like) {
+                        $q->where('nama_pelanggan', 'like', $like);
                     });
             })
             ->when($status !== 'semua', function ($q) use ($status) {
@@ -52,12 +55,14 @@ class TagihanController extends Controller
             return response()->json([]);
         }
 
-        $invoices = Tagihan::where('no_invoice', 'like', "%{$q}%")
+        $like = '%'.LikeQuery::escape($q).'%';
+
+        $invoices = Tagihan::where('no_invoice', 'like', $like)
             ->limit(5)
             ->pluck('no_invoice')
             ->map(fn ($v) => ['type' => 'invoice', 'label' => $v]);
 
-        $pelanggan = Pelanggan::where('nama_pelanggan', 'like', "%{$q}%")
+        $pelanggan = Pelanggan::where('nama_pelanggan', 'like', $like)
             ->limit(5)
             ->pluck('nama_pelanggan')
             ->map(fn ($v) => ['type' => 'pelanggan', 'label' => $v]);
@@ -78,7 +83,7 @@ class TagihanController extends Controller
                 'wilayah' => $p->wilayah,
                 'batas_kredit' => $p->batas_kredit,
                 'total_piutang_aktif' => $p->totalPiutangAktif(),
-                'sisa_limit' => max(0, (float) $p->batas_kredit - $p->totalPiutangAktif()),
+                'sisa_limit' => $p->cekBatasKredit('0')['sisa_limit'],
             ]);
         $noInvoice = $invoiceService->generate();
 

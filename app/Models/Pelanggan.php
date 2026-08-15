@@ -36,27 +36,31 @@ class Pelanggan extends Model
         return $this->hasMany(Tagihan::class, 'id_pelanggan', 'id_pelanggan');
     }
 
-    public function totalPiutangAktif(): float
+    public function totalPiutangAktif(): string
     {
-        return (float) $this->tagihan()
+        return (string) $this->tagihan()
             ->where('status', 'belum_lunas')
             ->sum('total_tagihan');
     }
 
-    public function cekBatasKredit(float $tagihanBaru): array
+    public function cekBatasKredit(string $tagihanBaru): array
     {
         $totalAktif = $this->totalPiutangAktif();
-        $totalBaru = $totalAktif + $tagihanBaru;
-        $batas = (float) $this->batas_kredit;
-        $sisaLimit = max(0, $batas - $totalAktif);
+        $totalBaru = bcadd($totalAktif, $tagihanBaru, 2);
+        $batas = (string) $this->batas_kredit;
+        $sisaLimit = bccomp($batas, $totalAktif, 2) > 0
+            ? bcsub($batas, $totalAktif, 2)
+            : '0';
 
         return [
-            'exceeded' => $batas > 0 && $totalBaru > $batas,
+            'exceeded' => bccomp($batas, '0', 2) > 0 && bccomp($totalBaru, $batas, 2) > 0,
             'total_piutang_aktif' => $totalAktif,
             'total_baru' => $totalBaru,
             'batas_kredit' => $batas,
             'sisa_limit' => $sisaLimit,
-            'kelebihan' => max(0, $totalBaru - $batas),
+            'kelebihan' => bccomp($totalBaru, $batas, 2) > 0
+                ? bcsub($totalBaru, $batas, 2)
+                : '0',
         ];
     }
 }

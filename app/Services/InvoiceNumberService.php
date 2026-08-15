@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Tagihan;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class InvoiceNumberService
@@ -11,18 +12,21 @@ class InvoiceNumberService
     {
         $now = now();
         $prefix = 'INV/'.$now->format('Y/m/');
+        $lockKey = 'invoice-number:'.$prefix;
 
-        $lastInvoice = Tagihan::where('no_invoice', 'like', $prefix.'%')
-            ->select(DB::raw('MAX(no_invoice) as last'))
-            ->value('last');
+        return Cache::lock($lockKey, 10)->block(5, function () use ($prefix) {
+            $lastInvoice = Tagihan::where('no_invoice', 'like', $prefix.'%')
+                ->select(DB::raw('MAX(no_invoice) as last'))
+                ->value('last');
 
-        if ($lastInvoice) {
-            $lastNumber = (int) substr($lastInvoice, -6);
-            $nextNumber = $lastNumber + 1;
-        } else {
-            $nextNumber = 1;
-        }
+            if ($lastInvoice) {
+                $lastNumber = (int) substr($lastInvoice, -6);
+                $nextNumber = $lastNumber + 1;
+            } else {
+                $nextNumber = 1;
+            }
 
-        return $prefix.str_pad((string) $nextNumber, 6, '0', STR_PAD_LEFT);
+            return $prefix.str_pad((string) $nextNumber, 6, '0', STR_PAD_LEFT);
+        });
     }
 }

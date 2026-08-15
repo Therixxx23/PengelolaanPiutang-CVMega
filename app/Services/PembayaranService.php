@@ -23,12 +23,12 @@ class PembayaranService
             throw new \LogicException('Tagihan sudah lunas dan tidak bisa menerima pembayaran lagi.');
         }
 
-        $totalDibayar = $tagihan->pembayaran()->sum('jumlah_bayar');
-        $sisaTagihan = $tagihan->total_tagihan - $totalDibayar;
+        $totalDibayar = (string) $tagihan->pembayaran()->sum('jumlah_bayar');
+        $sisaTagihan = bcsub((string) $tagihan->total_tagihan, $totalDibayar, 2);
 
-        if ($data['jumlah_bayar'] > $sisaTagihan) {
+        if (bccomp((string) $data['jumlah_bayar'], $sisaTagihan, 2) > 0) {
             throw ValidationException::withMessages([
-                'jumlah_bayar' => 'Jumlah bayar melebihi sisa tagihan (Rp '.number_format($sisaTagihan, 2).').',
+                'jumlah_bayar' => 'Jumlah bayar melebihi sisa tagihan (Rp '.number_format((float) $sisaTagihan, 2).').',
             ]);
         }
 
@@ -39,9 +39,9 @@ class PembayaranService
             'keterangan' => $data['keterangan'] ?? null,
         ]);
 
-        $totalBaru = $totalDibayar + $data['jumlah_bayar'];
+        $totalBaru = bcadd($totalDibayar, (string) $data['jumlah_bayar'], 2);
 
-        if (abs($totalBaru - $tagihan->total_tagihan) < 0.01) {
+        if (bccomp($totalBaru, (string) $tagihan->total_tagihan, 2) === 0) {
             $tagihan->status = 'lunas';
             $tagihan->save();
         }

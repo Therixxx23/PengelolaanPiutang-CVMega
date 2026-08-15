@@ -16,12 +16,13 @@ class StorePembayaranRequest extends FormRequest
     {
         $tagihan = $this->route('tagihan');
 
-        $sudahDibayar = $tagihan ? (float) $tagihan->pembayaran()->sum('jumlah_bayar') : 0;
-        $sisaTagihan = $tagihan ? (float) $tagihan->total_tagihan - $sudahDibayar : 0;
+        $sudahDibayar = $tagihan ? (string) $tagihan->pembayaran()->sum('jumlah_bayar') : '0';
+        $sisaTagihan = $tagihan ? bcsub((string) $tagihan->total_tagihan, $sudahDibayar, 2) : '0';
+        $maksimumBayar = bccomp($sisaTagihan, '0', 2) < 0 ? '0' : $sisaTagihan;
 
         return [
             'tanggal_bayar' => ['required', 'date', 'before_or_equal:today'],
-            'jumlah_bayar' => ['required', 'numeric', 'min:1000', 'max:'.max(0, $sisaTagihan)],
+            'jumlah_bayar' => ['required', 'numeric', 'min:1000', 'max:'.$maksimumBayar],
             'metode_bayar' => ['required', 'in:tunai,transfer,giro,cek'],
             'keterangan' => ['nullable', 'string', 'max:500'],
         ];
