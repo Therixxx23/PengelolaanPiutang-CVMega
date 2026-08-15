@@ -6,6 +6,7 @@ use App\Models\LogAktivitas;
 use App\Models\Pelanggan;
 use App\Models\Pembayaran;
 use App\Models\Tagihan;
+use App\Models\User;
 use App\Policies\LogAktivitasPolicy;
 use App\Policies\PelangganPolicy;
 use App\Policies\PembayaranPolicy;
@@ -30,6 +31,10 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(Tagihan::class, TagihanPolicy::class);
         Gate::policy(Pembayaran::class, PembayaranPolicy::class);
         Gate::policy(LogAktivitas::class, LogAktivitasPolicy::class);
+
+        Gate::define('viewLaporan', function (User $user) {
+            return $user->isAdministrasi() || $user->canViewReports();
+        });
 
         RateLimiter::for('login', function (Request $request) {
             return [

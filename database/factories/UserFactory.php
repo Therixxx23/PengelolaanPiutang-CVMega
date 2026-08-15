@@ -54,4 +54,11 @@ class UserFactory extends Factory
             'email_verified_at' => null,
         ]);
     }
+
+    public function newModel(array $attributes = [])
+    {
+        $model = $this->modelName();
+
+        return tap(new $model, fn ($instance) => $instance->forceFill($attributes));
+    }
 }

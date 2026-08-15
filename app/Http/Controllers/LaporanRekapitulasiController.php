@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Exports\RekapitulasiExport;
 use App\Models\Pelanggan;
 use App\Services\PiutangAgingService;
+use App\Support\LikeQuery;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
@@ -14,12 +15,14 @@ class LaporanRekapitulasiController extends Controller
 {
     public function __invoke(Request $request, PiutangAgingService $agingService)
     {
+        $this->authorize('viewLaporan');
+
         $search = $request->get('search', '');
         $wilayah = $request->get('wilayah', 'semua');
         $totalSemua = Pelanggan::count();
 
         $semuaPelanggan = Pelanggan::with(['tagihan' => fn ($q) => $q->aktif(), 'tagihan.pembayaran'])
-            ->when($search, fn ($q) => $q->where('nama_pelanggan', 'like', "%{$search}%"))
+            ->when($search, fn ($q) => $q->where('nama_pelanggan', 'like', '%'.LikeQuery::escape($search).'%'))
             ->when($wilayah !== 'semua', fn ($q) => $q->where('wilayah', $wilayah))
             ->orderBy('nama_pelanggan')
             ->get();
@@ -81,6 +84,8 @@ class LaporanRekapitulasiController extends Controller
 
     public function exportExcel(Request $request)
     {
+        $this->authorize('viewLaporan');
+
         $search = $request->get('search', '');
         $wilayah = $request->get('wilayah', 'semua');
 

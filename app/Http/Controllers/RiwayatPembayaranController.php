@@ -10,6 +10,8 @@ class RiwayatPembayaranController extends Controller
 {
     public function __invoke(Request $request)
     {
+        $this->authorize('viewLaporan');
+
         $query = Pembayaran::with(['tagihan.pelanggan', 'tagihan.pembayaran'])
             ->orderBy('tanggal_bayar', 'desc');
 

@@ -29,6 +29,8 @@ class LaporanUmurPiutangController extends Controller
 
     public function __invoke(PiutangAgingService $agingService)
     {
+        $this->authorize('viewLaporan');
+
         $bucket = request('bucket', 'semua');
         $periode = request('periode', 'semua');
 
@@ -89,6 +91,8 @@ class LaporanUmurPiutangController extends Controller
 
     public function exportExcel()
     {
+        $this->authorize('viewLaporan');
+
         $bucket = request('bucket', 'semua');
         $periode = request('periode', 'semua');
 
