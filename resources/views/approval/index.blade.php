@@ -9,14 +9,11 @@
     </x-slot>
 
     <div x-data="{
-        open: false,
-        tagihanId: null,
         actionUrl: ''
     }"
     x-on:open-tolak.window="
-        open = true;
-        tagihanId = $event.detail.id;
-        actionUrl = '/approval/' + tagihanId + '/tolak'
+        actionUrl = '/approval/' + $event.detail.id + '/tolak';
+        $dispatch('open-modal', 'tolak-tagihan')
     ">
 
         <div class="bg-surface border border-line rounded overflow-hidden">
@@ -104,44 +101,31 @@
         @endif
 
         {{-- Modal penolakan (satu modal untuk semua baris) --}}
-        <div x-show="open"
-            style="position:fixed; inset:0; background:rgba(0,0,0,0.4);
-                   z-index:100; display:flex; align-items:center;
-                   justify-content:center">
-
-            <div style="background:white; border-radius:8px; padding:24px;
-                        width:480px; max-width:90vw">
-                <h3 style="margin:0 0 16px; color:#1B2027">Alasan Penolakan</h3>
+        <x-modal name="tolak-tagihan" maxWidth="md" :show="$errors->has('approval_note')">
+            <div class="p-6">
+                <h3 class="text-lg font-semibold text-ink mb-4">Alasan Penolakan</h3>
                 <form method="POST" x-bind:action="actionUrl">
                     @csrf
                     <textarea name="approval_note"
                         placeholder="Jelaskan alasan penolakan tagihan ini (minimal 10 karakter)..."
                         required
-                        style="width:100%; height:120px; padding:10px;
-                               border:1px solid #DCE2E0; border-radius:6px;
-                               font-size:14px; resize:vertical;
-                               outline-color:#B33A2E; box-sizing:border-box"></textarea>
+                        class="input-field"
+                        style="height:120px; resize:vertical"></textarea>
                     @error('approval_note')
                         <p class="mt-1 text-sm text-status-critical">{{ $message }}</p>
                     @enderror
-                    <div style="display:flex; gap:8px; justify-content:flex-end;
-                                margin-top:12px">
+                    <div class="flex gap-2 justify-end mt-4">
                         <button type="button"
-                            x-on:click="open = false"
-                            style="padding:8px 16px; border:1px solid #DCE2E0;
-                                   border-radius:6px; background:white;
-                                   color:#5B6470; cursor:pointer">
+                            x-on:click="$dispatch('close-modal', 'tolak-tagihan')"
+                            class="btn-secondary">
                             Batal
                         </button>
-                        <button type="submit"
-                            style="padding:8px 16px; background:#B33A2E;
-                                   color:white; border:none; border-radius:6px;
-                                   cursor:pointer">
+                        <button type="submit" class="btn-destructive">
                             Tolak Tagihan
                         </button>
                     </div>
                 </form>
             </div>
-        </div>
+        </x-modal>
     </div>
 </x-app-layout>
