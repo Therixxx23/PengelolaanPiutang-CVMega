@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Pelanggan;
+use App\Models\Pembayaran;
 use App\Models\Tagihan;
 use App\Models\User;
 use App\Services\InvoiceNumberService;
@@ -63,6 +64,92 @@ class TagihanControllerTest extends TestCase
         $this->assertDatabaseHas('tagihan', [
             'id_tagihan' => $tagihan->id_tagihan,
             'total_tagihan' => 30000000,
+        ]);
+    }
+
+    public function test_update_cannot_lower_total_below_already_paid(): void
+    {
+        $admin = User::factory()->create(['role' => 'bagian_administrasi']);
+        $tagihan = Tagihan::factory()->create([
+            'id_pelanggan' => $this->pelanggan->id_pelanggan,
+            'total_tagihan' => 100000,
+        ]);
+        Pembayaran::factory()->create([
+            'id_tagihan' => $tagihan->id_tagihan,
+            'jumlah_bayar' => 40000,
+        ]);
+
+        $response = $this->actingAs($admin)->put(route('tagihan.update', $tagihan), [
+            'id_pelanggan' => $this->pelanggan->id_pelanggan,
+            'no_invoice' => $tagihan->no_invoice,
+            'tanggal_tagihan' => $tagihan->tanggal_tagihan->format('Y-m-d'),
+            'tanggal_jatuh_tempo' => $tagihan->tanggal_jatuh_tempo->format('Y-m-d'),
+            'total_tagihan' => 30000,
+        ]);
+
+        $response->assertSessionHasErrors('total_tagihan');
+        $this->assertDatabaseHas('tagihan', [
+            'id_tagihan' => $tagihan->id_tagihan,
+            'total_tagihan' => 100000,
+        ]);
+    }
+
+    public function test_update_total_to_paid_amount_marks_tagihan_lunas(): void
+    {
+        $admin = User::factory()->create(['role' => 'bagian_administrasi']);
+        $tagihan = Tagihan::factory()->create([
+            'id_pelanggan' => $this->pelanggan->id_pelanggan,
+            'total_tagihan' => 100000,
+            'status' => 'belum_lunas',
+        ]);
+        Pembayaran::factory()->create([
+            'id_tagihan' => $tagihan->id_tagihan,
+            'jumlah_bayar' => 40000,
+        ]);
+
+        $response = $this->actingAs($admin)->put(route('tagihan.update', $tagihan), [
+            'id_pelanggan' => $this->pelanggan->id_pelanggan,
+            'no_invoice' => $tagihan->no_invoice,
+            'tanggal_tagihan' => $tagihan->tanggal_tagihan->format('Y-m-d'),
+            'tanggal_jatuh_tempo' => $tagihan->tanggal_jatuh_tempo->format('Y-m-d'),
+            'total_tagihan' => 40000,
+        ]);
+
+        $response->assertRedirect(route('tagihan.index'));
+        $this->assertDatabaseHas('tagihan', [
+            'id_tagihan' => $tagihan->id_tagihan,
+            'total_tagihan' => 40000,
+            'status' => 'lunas',
+            'approval_status' => 'aktif',
+        ]);
+    }
+
+    public function test_update_total_above_threshold_requires_approval(): void
+    {
+        $admin = User::factory()->create(['role' => 'bagian_administrasi']);
+        $this->pelanggan->update(['batas_kredit' => 10000000000]);
+        $tagihan = Tagihan::factory()->create([
+            'id_pelanggan' => $this->pelanggan->id_pelanggan,
+            'total_tagihan' => 50000000,
+            'approval_status' => 'aktif',
+            'status' => 'belum_lunas',
+        ]);
+
+        $threshold = (int) config('piutang.approval_threshold');
+
+        $response = $this->actingAs($admin)->put(route('tagihan.update', $tagihan), [
+            'id_pelanggan' => $this->pelanggan->id_pelanggan,
+            'no_invoice' => $tagihan->no_invoice,
+            'tanggal_tagihan' => $tagihan->tanggal_tagihan->format('Y-m-d'),
+            'tanggal_jatuh_tempo' => $tagihan->tanggal_jatuh_tempo->format('Y-m-d'),
+            'total_tagihan' => $threshold + 1,
+        ]);
+
+        $response->assertRedirect(route('tagihan.index'));
+        $this->assertDatabaseHas('tagihan', [
+            'id_tagihan' => $tagihan->id_tagihan,
+            'total_tagihan' => $threshold + 1,
+            'approval_status' => 'menunggu_persetujuan',
         ]);
     }
 

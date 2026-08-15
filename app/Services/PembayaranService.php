@@ -39,12 +39,7 @@ class PembayaranService
             'keterangan' => $data['keterangan'] ?? null,
         ]);
 
-        $totalBaru = bcadd($totalDibayar, (string) $data['jumlah_bayar'], 2);
-
-        if (bccomp($totalBaru, (string) $tagihan->total_tagihan, 2) === 0) {
-            $tagihan->status = 'lunas';
-            $tagihan->save();
-        }
+        $this->sinkronkanStatus($tagihan);
 
         $this->log('catat_pembayaran', $pembayaran, [], [
             'jumlah_bayar' => $pembayaran->jumlah_bayar,
@@ -52,6 +47,17 @@ class PembayaranService
         ]);
 
         return $pembayaran;
+    }
+
+    public function sinkronkanStatus(Tagihan $tagihan): void
+    {
+        $totalDibayar = (string) $tagihan->pembayaran()->sum('jumlah_bayar');
+
+        $tagihan->status = bccomp($totalDibayar, (string) $tagihan->total_tagihan, 2) >= 0
+            ? 'lunas'
+            : 'belum_lunas';
+
+        $tagihan->save();
     }
 
     private function log(string $aksi, $model, array $sebelum = [], array $sesudah = []): void

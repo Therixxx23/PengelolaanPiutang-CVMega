@@ -162,11 +162,20 @@ class TagihanController extends Controller
         return view('tagihan.edit', compact('tagihan', 'pelanggan'));
     }
 
-    public function update(UpdateTagihanRequest $request, Tagihan $tagihan)
+    public function update(UpdateTagihanRequest $request, Tagihan $tagihan, PembayaranService $pembayaranService, ApprovalService $approvalService)
     {
         $this->authorize('update', $tagihan);
 
         $tagihan->update($request->validated());
+
+        $pembayaranService->sinkronkanStatus($tagihan);
+        $tagihan->approval_status = $approvalService->tentukanStatus($tagihan);
+        $tagihan->save();
+
+        if ($tagihan->approval_status === 'menunggu_persetujuan') {
+            return redirect()->route('tagihan.index')
+                ->with('warning', 'Tagihan berhasil diperbarui namun kini memerlukan persetujuan Pimpinan karena melebihi batas kredit atau threshold.');
+        }
 
         return redirect()->route('tagihan.index')
             ->with('success', 'Tagihan berhasil diperbarui.');
