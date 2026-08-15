@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StorePelangganRequest;
 use App\Http\Requests\UpdatePelangganRequest;
 use App\Models\Pelanggan;
+use App\Support\LikeQuery;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -18,10 +19,12 @@ class PelangganController extends Controller
         $wilayah = request('wilayah', 'semua');
         $totalSemua = Pelanggan::count();
 
+        $like = '%'.LikeQuery::escape($search).'%';
+
         $pelanggan = Pelanggan::withCount(['tagihan as tagihan_aktif' => fn ($q) => $q->where('status', 'belum_lunas')])
             ->when($search, fn ($q) => $q
-                ->where('nama_pelanggan', 'like', "%{$search}%")
-                ->orWhere('wilayah', 'like', "%{$search}%")
+                ->where('nama_pelanggan', 'like', $like)
+                ->orWhere('wilayah', 'like', $like)
             )
             ->when($wilayah !== 'semua', fn ($q) => $q->where('wilayah', $wilayah))
             ->orderBy('nama_pelanggan')
@@ -42,8 +45,10 @@ class PelangganController extends Controller
             return response()->json([]);
         }
 
-        $results = Pelanggan::where('nama_pelanggan', 'like', "%{$q}%")
-            ->orWhere('wilayah', 'like', "%{$q}%")
+        $like = '%'.LikeQuery::escape($q).'%';
+
+        $results = Pelanggan::where('nama_pelanggan', 'like', $like)
+            ->orWhere('wilayah', 'like', $like)
             ->limit(8)
             ->get(['nama_pelanggan', 'wilayah'])
             ->map(fn ($p) => [

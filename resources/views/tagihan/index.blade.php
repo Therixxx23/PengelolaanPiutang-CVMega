@@ -73,7 +73,7 @@
     <script>
     function suggestSearch() {
         return {
-            query: '{{ $search }}',
+            query: @js($search),
             results: [],
             open: false,
             highlighted: -1,

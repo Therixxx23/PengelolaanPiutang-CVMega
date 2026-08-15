@@ -3,6 +3,7 @@
 namespace App\Exports;
 
 use App\Models\Pelanggan;
+use App\Support\LikeQuery;
 use OpenSpout\Common\Entity\Row;
 use OpenSpout\Common\Entity\Style\Style;
 use OpenSpout\Writer\AbstractWriter;
@@ -32,7 +33,7 @@ class RekapitulasiExport
         $writer->addRow(Row::fromValuesWithStyle($headers, $headerStyle));
 
         $pelanggan = Pelanggan::with(['tagihan' => fn ($q) => $q->aktif(), 'tagihan.pembayaran'])
-            ->when($this->search, fn ($q) => $q->where('nama_pelanggan', 'like', "%{$this->search}%"))
+            ->when($this->search, fn ($q) => $q->where('nama_pelanggan', 'like', '%'.LikeQuery::escape($this->search).'%'))
             ->when($this->wilayah !== 'semua', fn ($q) => $q->where('wilayah', $this->wilayah))
             ->orderBy('nama_pelanggan')
             ->get();
