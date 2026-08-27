@@ -165,6 +165,54 @@
             @endforeach
         </div>
 
+        {{-- Monitoring Tim Sales --}}
+        @if($monitoringSales->count() > 0)
+        <div style="margin-top:24px; border:1px solid #DCE2E0;
+                    border-radius:8px; padding:20px">
+            <h3 style="margin:0 0 16px; font-size:16px; color:#1B2027">
+                Monitoring Tim Sales
+            </h3>
+            <table style="width:100%; table-layout:fixed">
+                <thead>
+                    <tr>
+                        <th style="text-align:left; font-size:11px; color:#5B6470">
+                            NAMA SALES
+                        </th>
+                        <th style="text-align:center; font-size:11px; color:#5B6470">
+                            TOTAL
+                        </th>
+                        <th style="text-align:center; font-size:11px; color:#C8862A">
+                            SEDANG PROSES
+                        </th>
+                        <th style="text-align:center; font-size:11px; color:#5B6470">
+                            BELUM DITAGIH
+                        </th>
+                        <th style="text-align:center; font-size:11px; color:#3E7C58">
+                            SUDAH DITAGIH
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($monitoringSales as $sales)
+                    <tr>
+                        <td>{{ $sales->name }}</td>
+                        <td style="text-align:center">{{ $sales->total_assigned }}</td>
+                        <td style="text-align:center; color:#C8862A; font-weight:500">
+                            {{ $sales->sedang_proses }}
+                        </td>
+                        <td style="text-align:center; color:#5B6470">
+                            {{ $sales->belum_ditagih }}
+                        </td>
+                        <td style="text-align:center; color:#3E7C58; font-weight:500">
+                            {{ $sales->sudah_ditagih }}
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+        @endif
+
     @elseif (Auth::user()->isAdministrasi())
         {{-- ==== LAYOUT BAGIAN ADMINISTRASI ==== --}}
 
@@ -504,6 +552,120 @@
                     </div>
                 @endforeach
             </div>
+        </div>
+
+    @elseif (Auth::user()->isSales())
+        {{-- ==== LAYOUT SALES ==== --}}
+
+        <div style="display:flex; gap:16px; margin-bottom:16px; flex-wrap:wrap">
+            <div style="flex:1; border:1px solid #DCE2E0; border-radius:8px; padding:16px">
+                <div style="font-size:11px; color:#5B6470; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; margin-bottom:4px">
+                    Belum Ditagih
+                </div>
+                <div style="font-family:'IBM Plex Mono',monospace; font-size:20px; color:#5B6470; font-weight:600">
+                    {{ $ringkasanStatus['belum_ditagih'] }}
+                </div>
+            </div>
+            <div style="flex:1; border:1px solid #E5C99B; border-radius:8px; padding:16px; background:#FFFBF5">
+                <div style="font-size:11px; color:#C8862A; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; margin-bottom:4px">
+                    Sedang Ditagih
+                </div>
+                <div style="font-family:'IBM Plex Mono',monospace; font-size:20px; color:#B8612A; font-weight:600">
+                    {{ $ringkasanStatus['sedang_ditagih'] }}
+                </div>
+            </div>
+            <div style="flex:1; border:1px solid #D5DCE8; border-radius:8px; padding:16px; background:#F7F9FD">
+                <div style="font-size:11px; color:#6B7CA3; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; margin-bottom:4px">
+                    Janji Bayar
+                </div>
+                <div style="font-family:'IBM Plex Mono',monospace; font-size:20px; color:#6B7CA3; font-weight:600">
+                    {{ $ringkasanStatus['janji_bayar'] }}
+                </div>
+            </div>
+            <div style="flex:1; border:1px solid #BFD8C8; border-radius:8px; padding:16px; background:#F6FBF8">
+                <div style="font-size:11px; color:#3E7C58; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; margin-bottom:4px">
+                    Sudah Ditagih
+                </div>
+                <div style="font-family:'IBM Plex Mono',monospace; font-size:20px; color:#3E7C58; font-weight:600">
+                    {{ $ringkasanStatus['sudah_ditagih'] }}
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-surface border border-line rounded overflow-hidden">
+            <div class="px-4 py-3 border-b border-line">
+                <h2 class="font-display text-lg font-semibold text-ink">Tagihan yang Perlu Ditagih ({{ $totalAssigned }})</h2>
+            </div>
+            <div class="overflow-x-auto">
+                <table style="width:100%; table-layout:fixed">
+                    <thead>
+                        <tr class="border-b border-line">
+                            <th style="width:16%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">No. Invoice</th>
+                            <th style="width:22%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Pelanggan</th>
+                            <th style="width:20%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Lembaga</th>
+                            <th style="width:12%; padding:12px 16px; text-align:right; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Total</th>
+                            <th style="width:10%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Jatuh Tempo</th>
+                            <th style="width:12%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Status Penagihan</th>
+                            <th style="width:8%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse ($tagihanAssigned as $t)
+                            @php
+                                $rail = match (true) {
+                                    $t->status === 'lunas' => '#3E7C58',
+                                    !$t->tanggal_jatuh_tempo->isPast() => '#6B7CA3',
+                                    $t->days_overdue <= 30 => '#C8862A',
+                                    $t->days_overdue <= 60 => '#B8612A',
+                                    default => '#B33A2E',
+                                };
+                                $spColor = $t->status_penagihan_color;
+                            @endphp
+                            <tr class="border-b border-line" style="border-left:3px solid {{ $rail }}">
+                                <td style="padding:12px 16px; font-size:13px; font-family:'IBM Plex Mono',monospace">
+                                    <a href="{{ route('tagihan.show-sales', $t) }}" style="color:#0E6E66; text-decoration:none; font-weight:500">
+                                        {{ $t->no_invoice }}
+                                    </a>
+                                </td>
+                                <td style="padding:12px 16px; font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis" title="{{ $t->pelanggan->nama_pelanggan }}">
+                                    {{ $t->pelanggan->nama_pelanggan }}
+                                </td>
+                                <td style="padding:12px 16px; font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis" title="{{ $t->pelanggan->nama_lembaga }}">
+                                    {{ $t->pelanggan->nama_lembaga ?: '-' }}
+                                </td>
+                                <td style="padding:12px 16px; font-size:13px; font-family:'IBM Plex Mono',monospace; text-align:right; white-space:nowrap">
+                                    Rp {{ number_format((float) $t->total_tagihan, 0, ',', '.') }}
+                                </td>
+                                <td style="padding:12px 16px; font-size:13px; font-family:'IBM Plex Mono',monospace">
+                                    {{ $t->tanggal_jatuh_tempo->format('d/m/Y') }}
+                                </td>
+                                <td style="padding:12px 16px; white-space:nowrap">
+                                    <span style="font-size:11px; padding:2px 8px; border-radius:4px; white-space:nowrap; background:{{ $spColor }}20; color:{{ $spColor }}; border:1px solid {{ $spColor }}">
+                                        {{ $t->status_penagihan_label }}
+                                    </span>
+                                </td>
+                                <td style="padding:12px 16px; white-space:nowrap">
+                                    <a href="{{ route('tagihan.show-sales', $t) }}"
+                                       style="font-size:11px; padding:4px 10px; border-radius:4px; border:1px solid #0E6E66; color:#0E6E66; background:white; text-decoration:none; font-weight:500">
+                                        Update Status
+                                    </a>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="7" style="padding:32px; text-align:center; color:#5B6470; font-size:14px">
+                                    Belum ada tagihan yang di-assign ke Anda.
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+            @if ($tagihanAssigned->hasPages())
+                <div style="padding:12px 16px; border-top:1px solid #DCE2E0">
+                    {{ $tagihanAssigned->links() }}
+                </div>
+            @endif
         </div>
     @endif
 </x-app-layout>

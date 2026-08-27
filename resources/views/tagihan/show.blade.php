@@ -276,4 +276,98 @@
             @endif
         </div>
     </div>
+
+    {{-- Status & Riwayat Penagihan --}}
+    <div style="margin-top:24px; border:1px solid #DCE2E0; border-radius:8px; padding:20px">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px">
+            <h3 style="margin:0; font-size:15px; color:#1B2027">Status Penagihan</h3>
+            @can('update', $tagihan)
+                <span style="font-size:12px; color:#5B6470">
+                    {{ $tagihan->assignedSales ? 'Assigned ke: '.$tagihan->assignedSales->name : 'Belum di-assign ke sales' }}
+                </span>
+            @endcan
+        </div>
+
+        <div style="margin-top:12px">
+            <span style="font-size:13px; padding:4px 12px; border-radius:6px;
+                         background:{{ $tagihan->status_penagihan_color }}20;
+                         color:{{ $tagihan->status_penagihan_color }};
+                         border:1px solid {{ $tagihan->status_penagihan_color }}">
+                {{ $tagihan->status_penagihan_label }}
+            </span>
+        </div>
+
+        @can('updatePenagihan', $tagihan)
+            <form method="POST" action="{{ route('tagihan.update-status', $tagihan) }}"
+                  style="margin-top:16px">
+                @csrf @method('PATCH')
+                <div style="display:flex; gap:8px; align-items:flex-start; flex-wrap:wrap">
+                    <select name="status_penagihan"
+                            style="padding:8px 12px; border:1px solid #DCE2E0; border-radius:6px; font-size:14px; color:#1B2027; background:white">
+                        @foreach([
+                            'belum_ditagih' => 'Belum Ditagih',
+                            'sedang_ditagih' => 'Sedang Ditagih',
+                            'janji_bayar' => 'Janji Bayar',
+                            'sudah_ditagih' => 'Sudah Ditagih',
+                        ] as $val => $label)
+                            <option value="{{ $val }}" {{ $tagihan->status_penagihan === $val ? 'selected' : '' }}>
+                                {{ $label }}
+                            </option>
+                        @endforeach
+                    </select>
+                    <input type="text" name="catatan" placeholder="Catatan (opsional)..."
+                           value="{{ old('catatan') }}"
+                           style="flex:1; min-width:200px; padding:8px 12px; border:1px solid #DCE2E0; border-radius:6px; font-size:14px; color:#1B2027">
+                    <button type="submit"
+                            style="padding:8px 16px; background:#0E6E66; color:white; border:none; border-radius:6px; cursor:pointer; font-size:14px">
+                        Update
+                    </button>
+                </div>
+                @error('status_penagihan') <p style="color:#B33A2E; font-size:13px; margin:8px 0 0">{{ $message }}</p> @enderror
+            </form>
+        @endcan
+
+        @can('update', $tagihan)
+            <div style="margin-top:16px; padding-top:16px; border-top:1px solid #EEF0EF">
+                <p style="font-size:12px; color:#5B6470; margin:0 0 8px">Assign ke Sales:</p>
+                <form method="POST" action="{{ route('tagihan.assign-sales', $tagihan) }}"
+                      style="display:flex; gap:8px">
+                    @csrf @method('PATCH')
+                    <select name="sales_id"
+                            style="padding:8px 12px; border:1px solid #DCE2E0; border-radius:6px; font-size:14px; color:#1B2027; background:white">
+                        <option value="">-- Belum di-assign --</option>
+                        @foreach(\App\Models\User::where('role','sales')->where('is_active',true)->get() as $s)
+                            <option value="{{ $s->id }}" {{ $tagihan->assigned_sales_id == $s->id ? 'selected' : '' }}>
+                                {{ $s->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                    <button type="submit"
+                            style="padding:8px 16px; border:1px solid #0E6E66; color:#0E6E66; background:white; border-radius:6px; cursor:pointer; font-size:14px">
+                        Assign
+                    </button>
+                </form>
+            </div>
+        @endcan
+
+        @if ($tagihan->catatanPenagihan->count() > 0)
+            <div style="margin-top:16px">
+                <p style="font-size:12px; color:#5B6470; margin-bottom:8px; font-weight:500">Riwayat Penagihan</p>
+                @foreach ($tagihan->catatanPenagihan as $cat)
+                    <div style="padding:10px 12px; border-left:3px solid {{ $tagihan->status_penagihan_color }}; margin-bottom:8px; background:#F9F9F9">
+                        <div style="display:flex; justify-content:space-between; font-size:12px; color:#5B6470">
+                            <span>{{ $cat->user->name }}</span>
+                            <span>{{ $cat->created_at->format('d/m/Y H:i') }}</span>
+                        </div>
+                        <span style="font-size:12px; font-weight:500; color:#1B2027">
+                            {{ $cat->status_penagihan_label ?? $cat->status_penagihan }}
+                        </span>
+                        @if($cat->catatan)
+                            <p style="font-size:13px; margin:4px 0 0; color:#3d3d3a">{{ $cat->catatan }}</p>
+                        @endif
+                    </div>
+                @endforeach
+            </div>
+        @endif
+    </div>
 </x-app-layout>
