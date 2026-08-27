@@ -12,6 +12,7 @@ use App\Models\Tagihan;
 use App\Services\ApprovalService;
 use App\Services\InvoiceNumberService;
 use App\Services\PembayaranService;
+use App\Services\PenagihanService;
 use App\Support\LikeQuery;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
@@ -148,7 +149,7 @@ class TagihanController extends Controller
     {
         $this->authorize('view', $tagihan);
 
-        $tagihan->load(['pelanggan', 'pembayaran']);
+        $tagihan->load(['pelanggan', 'pembayaran', 'items', 'assignedSales', 'catatanPenagihan.user']);
 
         return view('tagihan.show', compact('tagihan'));
     }
@@ -217,5 +218,58 @@ class TagihanController extends Controller
         $filename = 'Surat-Tagihan-'.str_replace('/', '-', $tagihan->no_invoice).'.pdf';
 
         return $pdf->download($filename);
+    }
+
+    public function showSales(Tagihan $tagihan)
+    {
+        $this->authorize('viewSales', $tagihan);
+
+        $tagihan->load(['pelanggan', 'items', 'catatanPenagihan.user']);
+
+        return view('tagihan.show-sales', compact('tagihan'));
+    }
+
+    public function updateStatus(
+        Request $request,
+        Tagihan $tagihan,
+        PenagihanService $service
+    ) {
+        $this->authorize('updatePenagihan', $tagihan);
+
+        $request->validate([
+            'status_penagihan' => 'required|in:belum_ditagih,sedang_ditagih,'
+                .'janji_bayar,sudah_ditagih',
+            'catatan' => 'nullable|string|max:500',
+        ], [
+            'status_penagihan.required' => 'Status wajib dipilih.',
+            'status_penagihan.in' => 'Status tidak valid.',
+        ]);
+
+        $service->updateStatus(
+            $tagihan,
+            auth()->user(),
+            $request->status_penagihan,
+            $request->catatan
+        );
+
+        return back()->with('success',
+            'Status penagihan diperbarui: '.$tagihan->fresh()->status_penagihan_label
+        );
+    }
+
+    public function assignSales(
+        Request $request,
+        Tagihan $tagihan,
+        PenagihanService $service
+    ) {
+        $this->authorize('update', $tagihan);
+
+        $request->validate([
+            'sales_id' => 'nullable|exists:users,id',
+        ]);
+
+        $service->assignSales($tagihan, $request->sales_id);
+
+        return back()->with('success', 'Sales berhasil di-assign.');
     }
 }

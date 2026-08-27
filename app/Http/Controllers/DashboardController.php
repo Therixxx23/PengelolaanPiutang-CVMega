@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Pelanggan;
 use App\Models\Tagihan;
+use App\Models\User;
 use App\Services\PiutangAgingService;
 
 class DashboardController extends Controller
@@ -60,6 +61,23 @@ class DashboardController extends Controller
 
             // Aging summary
             $data['agingSummary'] = $agingService->getBucketSummary();
+
+            // Monitoring Tim Sales
+            $data['monitoringSales'] = User::where('role', 'sales')
+                ->where('is_active', true)
+                ->withCount([
+                    'assignedTagihan as total_assigned' => fn ($q) => $q->where('approval_status', 'aktif')
+                        ->where('status', 'belum_lunas'),
+                    'assignedTagihan as belum_ditagih' => fn ($q) => $q->where('approval_status', 'aktif')
+                        ->where('status', 'belum_lunas')
+                        ->where('status_penagihan', 'belum_ditagih'),
+                    'assignedTagihan as sedang_proses' => fn ($q) => $q->where('approval_status', 'aktif')
+                        ->where('status', 'belum_lunas')
+                        ->whereIn('status_penagihan', ['sedang_ditagih', 'janji_bayar']),
+                    'assignedTagihan as sudah_ditagih' => fn ($q) => $q->where('approval_status', 'aktif')
+                        ->where('status', 'belum_lunas')
+                        ->where('status_penagihan', 'sudah_ditagih'),
+                ])->get();
         }
 
         // Data khusus Bagian Administrasi
@@ -96,6 +114,32 @@ class DashboardController extends Controller
             ], 'total_tagihan')
                 ->orderByDesc('total_piutang')
                 ->limit(5)->get();
+        }
+
+        // Data khusus Sales
+        if ($user->isSales()) {
+            $data['tagihanAssigned'] = Tagihan::aktif()
+                ->where('assigned_sales_id', $user->id)
+                ->with('pelanggan')
+                ->orderBy('tanggal_jatuh_tempo')
+                ->paginate(10);
+
+            $data['ringkasanStatus'] = [
+                'belum_ditagih' => Tagihan::aktif()
+                    ->where('assigned_sales_id', $user->id)
+                    ->where('status_penagihan', 'belum_ditagih')->count(),
+                'sedang_ditagih' => Tagihan::aktif()
+                    ->where('assigned_sales_id', $user->id)
+                    ->where('status_penagihan', 'sedang_ditagih')->count(),
+                'janji_bayar' => Tagihan::aktif()
+                    ->where('assigned_sales_id', $user->id)
+                    ->where('status_penagihan', 'janji_bayar')->count(),
+                'sudah_ditagih' => Tagihan::aktif()
+                    ->where('assigned_sales_id', $user->id)
+                    ->where('status_penagihan', 'sudah_ditagih')->count(),
+            ];
+
+            $data['totalAssigned'] = array_sum($data['ringkasanStatus']);
         }
 
         return view('dashboard', $data);

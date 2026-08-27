@@ -50,6 +50,18 @@ Route::middleware('auth')->group(function () {
     Route::post('/tagihan/{tagihan}/bayar', [TagihanController::class, 'bayar'])
         ->name('tagihan.bayar');
 
+    Route::patch('tagihan/{tagihan}/status-penagihan',
+        [TagihanController::class, 'updateStatus'])
+        ->name('tagihan.update-status');
+
+    Route::patch('tagihan/{tagihan}/assign-sales',
+        [TagihanController::class, 'assignSales'])
+        ->name('tagihan.assign-sales');
+
+    Route::get('tagihan/{tagihan}/sales',
+        [TagihanController::class, 'showSales'])
+        ->name('tagihan.show-sales');
+
     Route::get('/tagihan/{tagihan}/pdf', [TagihanController::class, 'exportPdf'])
         ->name('tagihan.pdf');
 

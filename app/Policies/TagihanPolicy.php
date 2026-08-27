@@ -47,4 +47,30 @@ class TagihanPolicy
         return $user->isPimpinan()
             && $tagihan->approval_status === 'menunggu_persetujuan';
     }
+
+    public function viewSales(User $user, Tagihan $tagihan): bool
+    {
+        if ($user->role === 'sales') {
+            return $tagihan->assigned_sales_id === $user->id;
+        }
+
+        return in_array($user->role, [
+            'pimpinan',
+            'bagian_administrasi',
+            'bagian_keuangan',
+        ]);
+    }
+
+    public function updatePenagihan(User $user, Tagihan $tagihan): bool
+    {
+        if ($user->role === 'sales') {
+            return $tagihan->assigned_sales_id === $user->id
+                && $tagihan->approval_status === 'aktif';
+        }
+
+        return in_array($user->role, [
+            'pimpinan',
+            'bagian_administrasi',
+        ]);
+    }
 }
