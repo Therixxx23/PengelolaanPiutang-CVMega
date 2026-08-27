@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ApprovalController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ImportController;
 use App\Http\Controllers\LaporanRekapitulasiController;
 use App\Http\Controllers\LaporanUmurPiutangController;
 use App\Http\Controllers\LogAktivitasController;
@@ -36,6 +37,12 @@ Route::middleware('auth')->group(function () {
         ->middleware('throttle:30,1')
         ->name('tagihan.suggest');
     Route::resource('tagihan', TagihanController::class);
+
+    Route::prefix('import')->name('import.')->group(function () {
+        Route::get('/', [ImportController::class, 'index'])->name('index');
+        Route::post('preview', [ImportController::class, 'preview'])->name('preview');
+        Route::post('store', [ImportController::class, 'store'])->name('store');
+    });
 
     Route::resource('users', UserController::class)
         ->except(['show']);

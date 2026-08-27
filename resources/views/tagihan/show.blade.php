@@ -235,6 +235,45 @@
                     </div>
                 @endif
             </div>
+            {{-- Detail Item Barang (impor SIPLAH) --}}
+            @if ($tagihan->items->isNotEmpty())
+                <div class="bg-surface border border-line rounded overflow-hidden">
+                    <div class="px-4 py-3 border-b border-line">
+                        <h2 class="font-display text-lg font-semibold text-ink">Detail Item Barang</h2>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead>
+                                <tr class="border-b border-line">
+                                    <th class="table-header">Nama Barang</th>
+                                    <th class="table-header">Satuan</th>
+                                    <th class="table-header text-right">Qty</th>
+                                    <th class="table-header text-right">Harga</th>
+                                    <th class="table-header text-right">Diskon</th>
+                                    <th class="table-header text-right">Sub Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($tagihan->items as $item)
+                                    <tr class="border-b border-line">
+                                        <td class="table-cell">
+                                            {{ $item->nama_barang }}
+                                            @if ($item->kelas)
+                                                <span class="block text-xs text-ink-muted">{{ $item->kelas }}</span>
+                                            @endif
+                                        </td>
+                                        <td class="table-cell">{{ $item->satuan ?: '-' }}</td>
+                                        <td class="table-cell text-right">{{ $item->qty_netto }}</td>
+                                        <td class="table-cell rupiah">Rp {{ number_format($item->harga_jual, 0, ',', '.') }}</td>
+                                        <td class="table-cell rupiah">{{ $item->persen_diskon ?: '-' }}</td>
+                                        <td class="table-cell rupiah">Rp {{ number_format($item->netto_penj, 2, ',', '.') }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            @endif
         </div>
     </div>
 </x-app-layout>

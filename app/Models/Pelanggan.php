@@ -22,6 +22,14 @@ class Pelanggan extends Model
         'wilayah',
         'no_telepon',
         'batas_kredit',
+        'kode_pelanggan',
+        'kode_lembaga',
+        'nama_lembaga',
+        'status_lembaga',
+        'provinsi',
+        'kabupaten',
+        'kecamatan',
+        'desa',
     ];
 
     protected function casts(): array

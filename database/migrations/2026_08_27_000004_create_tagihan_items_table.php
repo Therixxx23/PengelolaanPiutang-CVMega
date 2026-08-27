@@ -12,7 +12,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('id_tagihan')->constrained('tagihan', 'id_tagihan')->cascadeOnDelete();
             $table->string('kode_barang')->nullable();
-            $table->string('nama_barang')->nullable();
+            $table->text('nama_barang');
             $table->string('kelas')->nullable();
             $table->string('spesifikasi')->nullable();
             $table->string('satuan')->nullable();
@@ -22,14 +22,14 @@ return new class extends Migration
             $table->string('kode_supplier')->nullable();
             $table->string('nama_supplier')->nullable();
             $table->decimal('harga_jual', 14, 2)->default(0);
-            $table->decimal('qty_bruto', 14, 2)->default(0);
+            $table->integer('qty_bruto')->default(0);
             $table->decimal('nilai_bruto', 14, 2)->default(0);
-            $table->decimal('persen_diskon', 14, 2)->default(0);
+            $table->string('persen_diskon', 10)->nullable();
             $table->decimal('nilai_diskon', 14, 2)->default(0);
             $table->decimal('nilai_netto', 14, 2)->default(0);
-            $table->decimal('qty_retur', 14, 2)->default(0);
+            $table->integer('qty_retur')->default(0);
             $table->decimal('nilai_retur', 14, 2)->default(0);
-            $table->decimal('qty_netto', 14, 2)->default(0);
+            $table->integer('qty_netto')->default(0);
             $table->decimal('netto_penj', 14, 2)->default(0);
             $table->timestamps();
 

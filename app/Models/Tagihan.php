@@ -20,11 +20,20 @@ class Tagihan extends Model
 
     protected $fillable = [
         'id_pelanggan',
+        'no_invoice',
+        'no_sj',
         'tanggal_tagihan',
         'tanggal_jatuh_tempo',
         'total_tagihan',
+        'status',
         'approval_status',
         'approval_note',
+        'kode_sales',
+        'nama_sales',
+        'sumber_dana',
+        'status_penagihan',
+        'catatan_penagihan_terakhir',
+        'assigned_sales_id',
     ];
 
     protected function casts(): array
@@ -47,6 +56,16 @@ class Tagihan extends Model
     public function pembayaran(): HasMany
     {
         return $this->hasMany(Pembayaran::class, 'id_tagihan', 'id_tagihan');
+    }
+
+    public function items(): HasMany
+    {
+        return $this->hasMany(TagihanItem::class, 'id_tagihan');
+    }
+
+    public function assignedSales(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'assigned_sales_id');
     }
 
     public function approvedBy(): BelongsTo

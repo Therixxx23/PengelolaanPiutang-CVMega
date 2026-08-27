@@ -10,15 +10,16 @@ return new class extends Migration
     {
         Schema::create('import_log', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
+            $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
             $table->string('nama_file');
             $table->integer('total_baris')->default(0);
+            $table->integer('total_faktur')->default(0);
             $table->integer('faktur_baru')->default(0);
             $table->integer('faktur_skip')->default(0);
             $table->integer('pelanggan_baru')->default(0);
-            $table->enum('status', ['sukses', 'gagal'])->default('sukses');
+            $table->enum('status', ['sukses', 'gagal', 'sebagian']);
             $table->text('pesan_error')->nullable();
-            $table->timestamp('created_at')->useCurrent();
+            $table->timestamps();
 
             $table->index('user_id');
         });

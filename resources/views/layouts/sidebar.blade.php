@@ -40,9 +40,17 @@
                     Log Aktivitas
                 </x-nav-link>
             @endif
-        @endauth
+            @endauth
 
-        <div class="pt-4 mt-4 border-t border-line">
+            @auth
+                @if(Auth::user()->isAdministrasi() || Auth::user()->isPimpinan())
+                    <x-nav-link :href="route('import.index')" :active="request()->routeIs('import.*')">
+                        Import SIPLAH
+                    </x-nav-link>
+                @endif
+            @endauth
+
+            <div class="pt-4 mt-4 border-t border-line">
             <p class="px-3 text-xs font-medium text-ink-muted uppercase tracking-wider mb-2">Laporan</p>
 
             <x-nav-link :href="route('laporan.umur-piutang')" :active="request()->routeIs('laporan.umur-piutang')">

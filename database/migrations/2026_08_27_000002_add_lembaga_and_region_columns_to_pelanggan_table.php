@@ -9,14 +9,14 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('pelanggan', function (Blueprint $table) {
-            $table->string('kode_pelanggan')->nullable()->after('id_pelanggan');
-            $table->string('kode_lembaga')->nullable()->after('nama_pelanggan');
-            $table->string('nama_lembaga')->nullable()->after('kode_lembaga');
-            $table->string('status_lembaga')->nullable()->after('nama_lembaga');
-            $table->string('provinsi')->nullable()->after('alamat');
-            $table->string('kabupaten')->nullable()->after('provinsi');
-            $table->string('kecamatan')->nullable()->after('kabupaten');
-            $table->string('desa')->nullable()->after('kecamatan');
+            $table->string('kode_pelanggan', 50)->nullable()->unique()->after('no_telepon');
+            $table->string('kode_lembaga', 50)->nullable()->after('kode_pelanggan');
+            $table->string('nama_lembaga', 200)->nullable()->after('kode_lembaga');
+            $table->string('status_lembaga', 20)->nullable()->after('nama_lembaga');
+            $table->string('provinsi', 100)->nullable()->after('status_lembaga');
+            $table->string('kabupaten', 100)->nullable()->after('provinsi');
+            $table->string('kecamatan', 100)->nullable()->after('kabupaten');
+            $table->string('desa', 100)->nullable()->after('kecamatan');
         });
     }
 

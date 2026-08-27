@@ -25,6 +25,8 @@ return new class extends Migration
                 ->after('id_pelanggan')
                 ->constrained('users')
                 ->nullOnDelete();
+
+            $table->string('no_sj', 50)->nullable()->after('no_invoice');
         });
     }
 
@@ -39,6 +41,7 @@ return new class extends Migration
                 'status_penagihan',
                 'catatan_penagihan_terakhir',
                 'assigned_sales_id',
+                'no_sj',
             ]);
         });
     }
