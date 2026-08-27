@@ -6,6 +6,7 @@ namespace App\Models;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -70,6 +71,11 @@ class User extends Authenticatable
     public function scopeAktif(Builder $query): void
     {
         $query->where('is_active', true);
+    }
+
+    public function assignedTagihan(): HasMany
+    {
+        return $this->hasMany(Tagihan::class, 'assigned_sales_id');
     }
 
     public function getRoleLabelAttribute(): string

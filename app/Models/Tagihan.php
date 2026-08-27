@@ -63,6 +63,11 @@ class Tagihan extends Model
         return $this->hasMany(TagihanItem::class, 'id_tagihan');
     }
 
+    public function catatanPenagihan(): HasMany
+    {
+        return $this->hasMany(CatatanPenagihan::class, 'id_tagihan')->latest();
+    }
+
     public function assignedSales(): BelongsTo
     {
         return $this->belongsTo(User::class, 'assigned_sales_id');
@@ -101,6 +106,28 @@ class Tagihan extends Model
     {
         return $this->status === 'belum_lunas'
             && $this->approval_status === 'aktif';
+    }
+
+    public function getStatusPenagihanLabelAttribute(): string
+    {
+        return match ($this->status_penagihan) {
+            'belum_ditagih' => 'Belum Ditagih',
+            'sedang_ditagih' => 'Sedang Ditagih',
+            'janji_bayar' => 'Janji Bayar',
+            'sudah_ditagih' => 'Sudah Ditagih',
+            default => '-',
+        };
+    }
+
+    public function getStatusPenagihanColorAttribute(): string
+    {
+        return match ($this->status_penagihan) {
+            'belum_ditagih' => '#5B6470',
+            'sedang_ditagih' => '#C8862A',
+            'janji_bayar' => '#6B7CA3',
+            'sudah_ditagih' => '#3E7C58',
+            default => '#5B6470',
+        };
     }
 
     public function scopeMenungguApproval(Builder $query): void

@@ -19,7 +19,7 @@ return new class extends Migration
                 'sudah_ditagih',
             ]);
             $table->text('catatan')->nullable();
-            $table->timestamp('created_at')->useCurrent();
+            $table->timestamps();
 
             $table->index(['id_tagihan', 'user_id']);
         });
