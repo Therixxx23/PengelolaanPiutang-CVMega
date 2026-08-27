@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -22,6 +23,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role',
+        'is_active',
     ];
 
     /**
@@ -54,9 +57,19 @@ class User extends Authenticatable
         return $this->role === 'pimpinan';
     }
 
+    public function isSales(): bool
+    {
+        return $this->role === 'sales';
+    }
+
     public function canViewReports(): bool
     {
         return in_array($this->role, ['bagian_keuangan', 'pimpinan']);
+    }
+
+    public function scopeAktif(Builder $query): void
+    {
+        $query->where('is_active', true);
     }
 
     public function getRoleLabelAttribute(): string
@@ -66,6 +79,7 @@ class User extends Authenticatable
             'bagian_administrasi' => 'Bagian Administrasi',
             'bagian_keuangan' => 'Bagian Keuangan',
             'pimpinan' => 'Pimpinan',
+            'sales' => 'Sales / Penagih',
             default => $this->role,
         };
     }
@@ -76,6 +90,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'role' => 'string',
+            'is_active' => 'boolean',
         ];
     }
 }

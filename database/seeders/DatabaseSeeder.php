@@ -30,6 +30,12 @@ class DatabaseSeeder extends Seeder
             'role' => 'pimpinan',
         ]);
 
+        User::factory()->sales()->create([
+            'name' => 'Sales Dummy',
+            'email' => 'sales@example.com',
+            'role' => 'sales',
+        ]);
+
         $pelangganList = Pelanggan::factory(8)->create();
 
         foreach ($pelangganList as $pelanggan) {

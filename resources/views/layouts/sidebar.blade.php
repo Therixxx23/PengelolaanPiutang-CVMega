@@ -23,6 +23,9 @@
 
             @if(Auth::user()->isPimpinan())
                 @php $menungguApproval = \App\Models\Tagihan::menungguApproval()->count(); @endphp
+                <x-nav-link :href="route('users.index')" :active="request()->routeIs('users.*')">
+                    Manajemen User
+                </x-nav-link>
                 <x-nav-link :href="route('approval.index')" :active="request()->routeIs('approval.*')">
                     <span class="flex items-center justify-between">
                         <span>Persetujuan</span>

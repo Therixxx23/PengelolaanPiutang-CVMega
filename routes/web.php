@@ -9,6 +9,7 @@ use App\Http\Controllers\PelangganController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RiwayatPembayaranController;
 use App\Http\Controllers\TagihanController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -35,6 +36,9 @@ Route::middleware('auth')->group(function () {
         ->middleware('throttle:30,1')
         ->name('tagihan.suggest');
     Route::resource('tagihan', TagihanController::class);
+
+    Route::resource('users', UserController::class)
+        ->except(['show']);
 
     Route::post('/tagihan/{tagihan}/bayar', [TagihanController::class, 'bayar'])
         ->name('tagihan.bayar');
