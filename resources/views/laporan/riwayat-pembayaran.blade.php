@@ -32,12 +32,23 @@
                        style="padding:8px 12px; border:1px solid #DCE2E0; border-radius:6px; font-family:Inter,sans-serif; font-size:14px; color:#1B2027; outline-color:#0E6E66">
             </div>
 
+            <div style="display:flex; flex-direction:column; gap:4px">
+                <label style="font-size:11px; color:#5B6470; font-weight:500">DANA</label>
+                <select name="sumber_dana"
+                        style="width:140px; padding:8px 12px; border:1px solid #DCE2E0; border-radius:6px; font-family:Inter,sans-serif; font-size:14px; color:#1B2027; outline-color:#0E6E66">
+                    <option value="semua" {{ $sumber_dana === 'semua' ? 'selected' : '' }}>Semua Dana</option>
+                    @foreach($daftarSumber as $s)
+                        <option value="{{ $s }}" {{ $sumber_dana === $s ? 'selected' : '' }}>{{ $s }}</option>
+                    @endforeach
+                </select>
+            </div>
+
             <button type="submit"
                     style="padding:8px 20px; background:#0E6E66; color:white; border:none; border-radius:6px; font-size:14px; cursor:pointer; font-family:'IBM Plex Sans',sans-serif; font-weight:500">
                 Filter
             </button>
 
-            @if(request()->anyFilled(['id_pelanggan', 'dari', 'sampai']))
+            @if(request()->anyFilled(['id_pelanggan', 'dari', 'sampai', 'sumber_dana']))
                 <a href="{{ route('riwayat-pembayaran') }}"
                    style="padding:8px 16px; border:1px solid #DCE2E0; border-radius:6px; font-size:14px; color:#5B6470; font-family:Inter,sans-serif; text-decoration:none">
                     Reset
@@ -79,12 +90,14 @@
                 <thead>
                     <tr class="border-b border-line">
                         <th style="width:10%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Tanggal</th>
-                        <th style="width:18%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">No. Invoice</th>
-                        <th style="width:16%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Pelanggan</th>
-                        <th style="width:9%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Metode</th>
-                        <th style="width:15%; padding:12px 16px; text-align:right; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Jumlah</th>
-                        <th style="width:15%; padding:12px 16px; text-align:right; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Sisa Tagihan</th>
-                        <th style="width:17%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Keterangan</th>
+                        <th style="width:14%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">No. Invoice</th>
+                        <th style="width:7%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">No. SJ</th>
+                        <th style="width:14%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Lembaga</th>
+                        <th style="width:8%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Metode</th>
+                        <th style="width:6%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Dana</th>
+                        <th style="width:12%; padding:12px 16px; text-align:right; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Jumlah</th>
+                        <th style="width:13%; padding:12px 16px; text-align:right; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Sisa Tagihan</th>
+                        <th style="width:16%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Keterangan</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -106,12 +119,19 @@
                                     {{ $p->tagihan->no_invoice }}
                                 </a>
                             </td>
+                            <td style="padding:12px 16px; font-size:11px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:0; font-family:'IBM Plex Mono',monospace; color:#5B6470"
+                                title="{{ $p->tagihan->no_sj ?: '-' }}">
+                                {{ $p->tagihan->no_sj ?: '-' }}
+                            </td>
                             <td style="padding:12px 16px; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:0"
-                                title="{{ $p->tagihan->pelanggan->nama_pelanggan }}">
-                                {{ $p->tagihan->pelanggan->nama_pelanggan }}
+                                title="{{ $p->tagihan->pelanggan->nama_lembaga ?: $p->tagihan->pelanggan->nama_pelanggan }}">
+                                {{ $p->tagihan->pelanggan->nama_lembaga ?: $p->tagihan->pelanggan->nama_pelanggan }}
                             </td>
                             <td style="padding:12px 16px; font-size:14px">
                                 {{ ucfirst($p->metode_bayar) }}
+                            </td>
+                            <td style="padding:12px 16px; white-space:nowrap">
+                                <x-badge-sumber-dana :sumber="$p->tagihan->sumber_dana" />
                             </td>
                             <td style="padding:12px 16px; text-align:right; white-space:nowrap; font-family:'IBM Plex Mono',monospace; font-size:14px">
                                 Rp {{ number_format($p->jumlah_bayar, 2, ',', '.') }}
@@ -131,7 +151,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" style="padding:32px; text-align:center; color:#5B6470; font-size:14px">
+                            <td colspan="9" style="padding:32px; text-align:center; color:#5B6470; font-size:14px">
                                 Belum ada pembayaran yang tercatat. Sesuaikan filter atau buat pembayaran baru dari halaman tagihan.
                             </td>
                         </tr>
@@ -164,8 +184,14 @@
                         </span>
                     </div>
                     <div class="flex items-center justify-between text-xs" style="color:#5B6470">
-                        <span>{{ $p->tagihan->pelanggan->nama_pelanggan }}</span>
+                        <span>{{ $p->tagihan->pelanggan->nama_lembaga ?: $p->tagihan->pelanggan->nama_pelanggan }}</span>
                         <span>{{ ucfirst($p->metode_bayar) }}{{ $p->keterangan ? ' — '.$p->keterangan : '' }}</span>
+                    </div>
+                    <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:6px" class="text-xs text-ink-muted">
+                        <span>
+                            <span style="font-family:'IBM Plex Mono',monospace">{{ $p->tagihan->no_sj ?: '-' }}</span>
+                        </span>
+                        <x-badge-sumber-dana :sumber="$p->tagihan->sumber_dana" />
                     </div>
                 </div>
             @empty

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Pelanggan;
 use App\Models\Pembayaran;
+use App\Models\Tagihan;
 use Illuminate\Http\Request;
 
 class RiwayatPembayaranController extends Controller
@@ -15,9 +16,17 @@ class RiwayatPembayaranController extends Controller
         $query = Pembayaran::with(['tagihan.pelanggan', 'tagihan.pembayaran'])
             ->orderBy('tanggal_bayar', 'desc');
 
+        $sumber_dana = $request->get('sumber_dana', 'semua');
+
         if ($request->filled('id_pelanggan')) {
             $query->whereHas('tagihan', function ($q) use ($request) {
                 $q->where('id_pelanggan', $request->id_pelanggan);
+            });
+        }
+
+        if ($sumber_dana !== 'semua') {
+            $query->whereHas('tagihan', function ($q) use ($sumber_dana) {
+                $q->where('sumber_dana', $sumber_dana);
             });
         }
 
@@ -37,10 +46,13 @@ class RiwayatPembayaranController extends Controller
         ];
 
         $pembayaran = $query->paginate(15);
-        $pembayaran->appends(request()->only(['id_pelanggan', 'dari', 'sampai']));
+        $pembayaran->appends(request()->only(['id_pelanggan', 'dari', 'sampai', 'sumber_dana']));
 
         $pelanggan = Pelanggan::orderBy('nama_pelanggan')->get();
+        $daftarSumber = Tagihan::whereNotNull('sumber_dana')->distinct()->orderBy('sumber_dana')->pluck('sumber_dana');
 
-        return view('laporan.riwayat-pembayaran', compact('pembayaran', 'pelanggan', 'summary'));
+        return view('laporan.riwayat-pembayaran', compact(
+            'pembayaran', 'pelanggan', 'summary', 'sumber_dana', 'daftarSumber'
+        ));
     }
 }
