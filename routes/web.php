@@ -3,6 +3,7 @@
 use App\Http\Controllers\ApprovalController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ImportController;
+use App\Http\Controllers\LaporanImportSiplahController;
 use App\Http\Controllers\LaporanRekapitulasiController;
 use App\Http\Controllers\LaporanUmurPiutangController;
 use App\Http\Controllers\LogAktivitasController;
@@ -76,6 +77,10 @@ Route::middleware('auth')->group(function () {
         ->name('laporan.rekapitulasi.export');
     Route::get('/laporan/rekapitulasi', LaporanRekapitulasiController::class)
         ->name('laporan.rekapitulasi');
+    Route::get('/laporan/import-siplah', LaporanImportSiplahController::class)
+        ->name('laporan.import-siplah');
+    Route::get('/laporan/import-siplah/export', [LaporanImportSiplahController::class, 'exportExcel'])
+        ->name('laporan.import-siplah.export');
 
     Route::prefix('approval')->name('approval.')->group(function () {
         Route::get('/', [ApprovalController::class, 'index'])->name('index');

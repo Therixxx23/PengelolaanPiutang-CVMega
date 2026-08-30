@@ -62,6 +62,9 @@
                     <x-nav-link :href="route('laporan.rekapitulasi')" :active="request()->routeIs('laporan.rekapitulasi')">
                         Rekapitulasi
                     </x-nav-link>
+                    <x-nav-link :href="route('laporan.import-siplah')" :active="request()->routeIs('laporan.import-siplah*')">
+                        Laporan SIPLAH
+                    </x-nav-link>
                 </div>
                 @endif
             @endauth
