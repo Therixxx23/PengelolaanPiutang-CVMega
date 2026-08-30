@@ -178,20 +178,43 @@
 
     <div class="bg-surface border border-line rounded overflow-hidden">
         <div class="hidden sm:block overflow-x-auto">
-            <table style="width:100%; table-layout:fixed">
+            <style>
+                .tabel-tagihan th {
+                    padding: 10px 8px;
+                    font-size: 11px;
+                    color: #5B6470;
+                    font-weight: 600;
+                    letter-spacing: 0.04em;
+                    text-transform: uppercase;
+                    border-bottom: 2px solid #DCE2E0;
+                    background: #F6F7F6;
+                    text-align: left;
+                    white-space: nowrap;
+                }
+                .tabel-tagihan td {
+                    padding: 8px 6px;
+                    border-bottom: 1px solid #DCE2E0;
+                    vertical-align: middle;
+                    font-size: 13px;
+                }
+                .tabel-tagihan tr:hover td {
+                    background: #FAFAFA;
+                }
+            </style>
+            <table style="width:100%; min-width:1100px; table-layout:fixed; border-collapse:collapse" class="tabel-tagihan">
                 <thead>
-                    <tr class="border-b border-line">
-                        <th style="width:14%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">No. Invoice</th>
-                        <th style="width:8%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">No. SJ</th>
-                        <th style="width:14%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Lembaga</th>
-                        <th style="width:8%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Tanggal</th>
-                        <th style="width:8%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Jatuh Tempo</th>
-                        <th style="width:10%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Sales</th>
-                        <th style="width:6%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Dana</th>
-                        <th style="width:10%; padding:12px 16px; text-align:right; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Total</th>
-                        <th style="width:8%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Status</th>
-                        <th style="width:8%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Penagihan</th>
-                        <th style="width:6%; padding:12px 16px; text-align:right; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em"></th>
+                    <tr>
+                        <th style="width:13%">No. Invoice</th>
+                        <th style="width:7%">No. SJ</th>
+                        <th style="width:15%">Lembaga</th>
+                        <th style="width:9%">Tanggal</th>
+                        <th style="width:9%">Jatuh Tempo</th>
+                        <th style="width:10%">Sales</th>
+                        <th style="width:6%">Dana</th>
+                        <th style="width:10%; text-align:right">Total</th>
+                        <th style="width:10%">Status</th>
+                        <th style="width:7%">Penagihan</th>
+                        <th style="width:4%; text-align:right"></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -214,63 +237,66 @@
                             };
                             $bg = $color . '20';
                         @endphp
-                        <tr class="border-b border-line hover:bg-paper transition aging-rail-{{ $rail }}">
-                            <td style="padding:12px 16px; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:0"
+                        <tr class="aging-rail-{{ $rail }}">
+                            <td style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:0"
                                 title="{{ $t->no_invoice }}">
                                 <a href="{{ route('tagihan.show', $t) }}"
                                    style="color:#0E6E66; text-decoration:none; font-family:'IBM Plex Mono',monospace; font-weight:500">
                                     {{ $t->no_invoice }}
                                 </a>
                             </td>
-                            <td style="padding:12px 16px; font-size:11px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:0; font-family:'IBM Plex Mono',monospace; color:#5B6470"
+                            <td style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:0; font-family:'IBM Plex Mono',monospace; font-size:11px; color:#5B6470"
                                 title="{{ $t->no_sj ?: '-' }}">
                                 {{ $t->no_sj ?: '-' }}
                             </td>
-                            <td style="padding:12px 16px; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:0"
+                            <td style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:0"
                                 title="{{ $t->pelanggan->nama_lembaga ?: $t->pelanggan->nama_pelanggan }}">
                                 <a href="{{ route('pelanggan.show', $t->pelanggan) }}"
                                    style="color:#0E6E66; text-decoration:none">
                                     {{ $t->pelanggan->nama_lembaga ?: $t->pelanggan->nama_pelanggan }}
                                 </a>
                             </td>
-                            <td style="padding:12px 16px; font-size:14px; font-family:'IBM Plex Mono',monospace">{{ $t->tanggal_tagihan->format('d/m/Y') }}</td>
-                            <td style="padding:12px 16px; font-size:14px; font-family:'IBM Plex Mono',monospace">{{ $t->tanggal_jatuh_tempo->format('d/m/Y') }}</td>
-                            <td style="padding:12px 16px; font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:0; color:#5B6470"
+                            <td style="white-space:nowrap; font-size:13px; font-family:'IBM Plex Mono',monospace">{{ $t->tanggal_tagihan->format('d/m/Y') }}</td>
+                            <td style="white-space:nowrap; font-size:13px; font-family:'IBM Plex Mono',monospace; color:{{ $t->tanggal_jatuh_tempo->isPast() && $t->status === 'belum_lunas' ? '#B33A2E' : '#1B2027' }}">{{ $t->tanggal_jatuh_tempo->format('d/m/Y') }}</td>
+                            <td style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:0; font-size:12px; color:#5B6470"
                                 title="{{ $t->nama_sales ?: '-' }}">
                                 {{ $t->nama_sales ?: '-' }}
                             </td>
-                            <td style="padding:12px 16px; white-space:nowrap">
+                            <td style="white-space:nowrap; padding:8px 6px">
                                 <x-badge-sumber-dana :sumber="$t->sumber_dana" />
                             </td>
-                            <td style="padding:12px 16px; font-size:14px; white-space:nowrap; text-align:right; font-family:'IBM Plex Mono',monospace">
-                                Rp {{ number_format($t->total_tagihan, 2, ',', '.') }}
+                            <td style="text-align:right; white-space:nowrap; font-size:13px">
+                                <span style="color:#5B6470; margin-right:2px">Rp</span>
+                                <span style="font-family:'IBM Plex Mono',monospace">{{ number_format($t->total_tagihan, 0, ',', '.') }}</span>
                             </td>
-                            <td style="padding:12px 16px; white-space:nowrap">
-                                <span style="font-size:11px; padding:2px 8px; border-radius:4px; white-space:nowrap; background:{{ $bg }}; color:{{ $color }}; border:1px solid {{ $color }}">
+                            <td style="white-space:nowrap; padding:8px 6px">
+                                <span style="font-size:11px; padding:3px 8px; border-radius:4px; white-space:nowrap; background:{{ $bg }}; color:{{ $color }}; border:1px solid {{ $color }}">
                                     {{ $label }}
                                 </span>
                             </td>
-                            <td style="padding:12px 16px; white-space:nowrap">
+                            <td style="white-space:nowrap; padding:8px 6px">
                                 @if($t->status_penagihan)
                                     <x-badge-penagihan :status="$t->status_penagihan" />
                                 @endif
                             </td>
-                            <td style="padding:12px 16px; text-align:right; white-space:nowrap">
-                                <div style="display:flex; align-items:center; justify-content:flex-end; gap:6px">
+                            <td style="white-space:nowrap; padding:8px 6px; text-align:right">
+                                <div style="display:flex; gap:4px; align-items:center; justify-content:flex-end">
                                     @can('update', $t)
                                         <a href="{{ route('tagihan.edit', $t) }}"
-                                           style="padding:2px 8px; border:1px solid #0E6E66; color:#0E6E66; background:white; border-radius:4px; font-size:11px; text-decoration:none; font-family:Inter,sans-serif; font-weight:500">
+                                           style="font-size:12px; padding:4px 10px; border:1px solid #0E6E66; color:#0E6E66; background:white; border-radius:4px; text-decoration:none; white-space:nowrap">
                                             Edit
                                         </a>
                                     @endcan
                                     @can('delete', $t)
-                                        <form action="{{ route('tagihan.destroy', $t) }}" method="POST" onsubmit="return confirm('Hapus tagihan ini?')">
+                                        <button onclick="confirm('Hapus tagihan ini?') || event.preventDefault()"
+                                                form="form-hapus-{{ $t->id_tagihan }}"
+                                                style="font-size:12px; padding:4px 10px; border:1px solid #B33A2E; color:#B33A2E; background:white; border-radius:4px; cursor:pointer; white-space:nowrap">
+                                            Hapus
+                                        </button>
+                                        <form id="form-hapus-{{ $t->id_tagihan }}" method="POST"
+                                              action="{{ route('tagihan.destroy', $t) }}" style="display:none">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit"
-                                                    style="padding:2px 8px; border:1px solid #B33A2E; color:#B33A2E; background:white; border-radius:4px; font-size:11px; cursor:pointer; font-family:Inter,sans-serif; font-weight:500">
-                                                Hapus
-                                            </button>
                                         </form>
                                     @endcan
                                 </div>

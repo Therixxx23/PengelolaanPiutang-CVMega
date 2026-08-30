@@ -95,7 +95,7 @@
 
     <div class="bg-surface border border-line rounded overflow-hidden">
         <div class="hidden sm:block overflow-x-auto">
-            <table style="width:100%; table-layout:fixed">
+            <table style="width:100%; min-width:1100px; table-layout:fixed">
                 <thead>
                     <tr class="border-b border-line">
                         <th style="width:4%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">No</th>

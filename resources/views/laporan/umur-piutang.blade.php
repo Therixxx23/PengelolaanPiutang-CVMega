@@ -175,7 +175,7 @@
                     </div>
                 @else
                     <div class="hidden sm:block overflow-x-auto">
-                        <table class="w-full">
+                        <table class="w-full" style="min-width:1000px">
                             <thead>
                                 <tr class="border-b border-line">
                                     <th class="table-header">Invoice</th>
