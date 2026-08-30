@@ -26,9 +26,12 @@ class TagihanController extends Controller
 
         $search = request('search', '');
         $status = request('status', 'semua');
+        $sumber_dana = request('sumber_dana', 'semua');
+        $sales = request('sales', 'semua');
+        $penagihan = request('penagihan', 'semua');
         $totalSemua = Tagihan::count();
 
-        $tagihan = Tagihan::with('pelanggan')
+        $tagihan = Tagihan::with(['pelanggan', 'items'])
             ->when($search, function ($q) use ($search) {
                 $like = '%'.LikeQuery::escape($search).'%';
 
@@ -40,12 +43,33 @@ class TagihanController extends Controller
             ->when($status !== 'semua', function ($q) use ($status) {
                 $q->where('status', $status);
             })
+            ->when($sumber_dana !== 'semua', function ($q) use ($sumber_dana) {
+                $q->where('sumber_dana', $sumber_dana);
+            })
+            ->when($sales !== 'semua', function ($q) use ($sales) {
+                $q->where('nama_sales', $sales);
+            })
+            ->when($penagihan !== 'semua', function ($q) use ($penagihan) {
+                $q->where('status_penagihan', $penagihan);
+            })
             ->latest('tanggal_tagihan')
             ->paginate(10);
 
-        $tagihan->appends(['search' => $search, 'status' => $status]);
+        $tagihan->appends([
+            'search' => $search,
+            'status' => $status,
+            'sumber_dana' => $sumber_dana,
+            'sales' => $sales,
+            'penagihan' => $penagihan,
+        ]);
 
-        return view('tagihan.index', compact('tagihan', 'search', 'status', 'totalSemua'));
+        $daftarSumber = Tagihan::whereNotNull('sumber_dana')->distinct()->orderBy('sumber_dana')->pluck('sumber_dana');
+        $daftarSales = Tagihan::whereNotNull('nama_sales')->distinct()->orderBy('nama_sales')->pluck('nama_sales');
+
+        return view('tagihan.index', compact(
+            'tagihan', 'search', 'status', 'sumber_dana', 'sales', 'penagihan',
+            'daftarSumber', 'daftarSales', 'totalSemua'
+        ));
     }
 
     public function suggest(Request $request)

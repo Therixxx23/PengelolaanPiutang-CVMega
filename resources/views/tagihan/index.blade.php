@@ -9,8 +9,8 @@
         @endcan
     </div>
 
-    <form method="GET" action="{{ route('tagihan.index') }}">
-        <div style="display:flex; gap:8px; align-items:center; margin-bottom:16px">
+    <form method="GET" action="{{ route('tagihan.index') }}" id="form-filter">
+        <div style="display:flex; gap:8px; align-items:center; margin-bottom:0">
             <div x-data="suggestSearch()" style="flex:1; position:relative">
                 <input
                     type="text"
@@ -60,12 +60,46 @@
                     style="padding:8px 20px; background:#0E6E66; color:white; border:none; border-radius:6px; font-size:14px; cursor:pointer; font-family:'IBM Plex Sans',sans-serif; font-weight:500">
                 Cari
             </button>
-            @if($search || $status !== 'semua')
+            @if($search || $status !== 'semua' || $sumber_dana !== 'semua' || $sales !== 'semua' || $penagihan !== 'semua')
                 <a href="{{ route('tagihan.index') }}"
                    style="padding:8px 16px; border:1px solid #DCE2E0; border-radius:6px; font-size:14px; color:#5B6470; font-family:Inter,sans-serif; text-decoration:none">
                     Reset
                 </a>
             @endif
+        </div>
+
+        <div style="display:flex; gap:12px; align-items:center; margin-top:8px; flex-wrap:wrap">
+            <div style="display:flex; align-items:center; gap:6px">
+                <label style="font-size:12px; color:#5B6470">Dana:</label>
+                <select name="sumber_dana" form="form-filter"
+                        style="width:140px; padding:6px 10px; border:1px solid #DCE2E0; border-radius:6px; font-family:Inter,sans-serif; font-size:13px; color:#1B2027; outline-color:#0E6E66">
+                    <option value="semua" {{ $sumber_dana === 'semua' ? 'selected' : '' }}>Semua</option>
+                    @foreach($daftarSumber as $s)
+                        <option value="{{ $s }}" {{ $sumber_dana === $s ? 'selected' : '' }}>{{ $s }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div style="display:flex; align-items:center; gap:6px">
+                <label style="font-size:12px; color:#5B6470">Sales:</label>
+                <select name="sales" form="form-filter"
+                        style="width:180px; padding:6px 10px; border:1px solid #DCE2E0; border-radius:6px; font-family:Inter,sans-serif; font-size:13px; color:#1B2027; outline-color:#0E6E66">
+                    <option value="semua" {{ $sales === 'semua' ? 'selected' : '' }}>Semua</option>
+                    @foreach($daftarSales as $sl)
+                        <option value="{{ $sl }}" {{ $sales === $sl ? 'selected' : '' }}>{{ $sl }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div style="display:flex; align-items:center; gap:6px">
+                <label style="font-size:12px; color:#5B6470">Penagihan:</label>
+                <select name="penagihan" form="form-filter"
+                        style="width:160px; padding:6px 10px; border:1px solid #DCE2E0; border-radius:6px; font-family:Inter,sans-serif; font-size:13px; color:#1B2027; outline-color:#0E6E66">
+                    <option value="semua" {{ $penagihan === 'semua' ? 'selected' : '' }}>Semua</option>
+                    <option value="belum_ditagih" {{ $penagihan === 'belum_ditagih' ? 'selected' : '' }}>Belum Ditagih</option>
+                    <option value="sedang_ditagih" {{ $penagihan === 'sedang_ditagih' ? 'selected' : '' }}>Sedang Ditagih</option>
+                    <option value="janji_bayar" {{ $penagihan === 'janji_bayar' ? 'selected' : '' }}>Janji Bayar</option>
+                    <option value="sudah_ditagih" {{ $penagihan === 'sudah_ditagih' ? 'selected' : '' }}>Sudah Ditagih</option>
+                </select>
+            </div>
         </div>
     </form>
 
@@ -130,10 +164,13 @@
     @endpush
 
     <p style="font-size:13px; color:#5B6470; margin-bottom:8px">
-        @if($search || $status !== 'semua')
+        @if($search || $status !== 'semua' || $sumber_dana !== 'semua' || $sales !== 'semua' || $penagihan !== 'semua')
             Menampilkan {{ $tagihan->total() }} dari {{ $totalSemua }} tagihan
             @if($search) untuk "{{ $search }}"@endif
             @if($status !== 'semua') · {{ ucfirst(str_replace('_', ' ', $status)) }}@endif
+            @if($sumber_dana !== 'semua') · Dana: {{ $sumber_dana }}@endif
+            @if($sales !== 'semua') · Sales: {{ $sales }}@endif
+            @if($penagihan !== 'semua') · Penagihan: {{ ucfirst(str_replace('_', ' ', $penagihan)) }}@endif
         @else
             {{ $totalSemua }} tagihan
         @endif
@@ -144,13 +181,17 @@
             <table style="width:100%; table-layout:fixed">
                 <thead>
                     <tr class="border-b border-line">
-                        <th style="width:18%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">No. Invoice</th>
-                        <th style="width:18%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Pelanggan</th>
-                        <th style="width:10%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Tanggal</th>
-                        <th style="width:10%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Jatuh Tempo</th>
-                        <th style="width:16%; padding:12px 16px; text-align:right; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Total</th>
-                        <th style="width:14%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Status</th>
-                        <th style="width:14%; padding:12px 16px; text-align:right; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em"></th>
+                        <th style="width:14%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">No. Invoice</th>
+                        <th style="width:8%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">No. SJ</th>
+                        <th style="width:14%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Lembaga</th>
+                        <th style="width:8%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Tanggal</th>
+                        <th style="width:8%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Jatuh Tempo</th>
+                        <th style="width:10%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Sales</th>
+                        <th style="width:6%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Dana</th>
+                        <th style="width:10%; padding:12px 16px; text-align:right; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Total</th>
+                        <th style="width:8%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Status</th>
+                        <th style="width:8%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Penagihan</th>
+                        <th style="width:6%; padding:12px 16px; text-align:right; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em"></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -181,15 +222,26 @@
                                     {{ $t->no_invoice }}
                                 </a>
                             </td>
+                            <td style="padding:12px 16px; font-size:11px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:0; font-family:'IBM Plex Mono',monospace; color:#5B6470"
+                                title="{{ $t->no_sj ?: '-' }}">
+                                {{ $t->no_sj ?: '-' }}
+                            </td>
                             <td style="padding:12px 16px; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:0"
-                                title="{{ $t->pelanggan->nama_pelanggan }}">
+                                title="{{ $t->pelanggan->nama_lembaga ?: $t->pelanggan->nama_pelanggan }}">
                                 <a href="{{ route('pelanggan.show', $t->pelanggan) }}"
                                    style="color:#0E6E66; text-decoration:none">
-                                    {{ $t->pelanggan->nama_pelanggan }}
+                                    {{ $t->pelanggan->nama_lembaga ?: $t->pelanggan->nama_pelanggan }}
                                 </a>
                             </td>
                             <td style="padding:12px 16px; font-size:14px; font-family:'IBM Plex Mono',monospace">{{ $t->tanggal_tagihan->format('d/m/Y') }}</td>
                             <td style="padding:12px 16px; font-size:14px; font-family:'IBM Plex Mono',monospace">{{ $t->tanggal_jatuh_tempo->format('d/m/Y') }}</td>
+                            <td style="padding:12px 16px; font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:0; color:#5B6470"
+                                title="{{ $t->nama_sales ?: '-' }}">
+                                {{ $t->nama_sales ?: '-' }}
+                            </td>
+                            <td style="padding:12px 16px; white-space:nowrap">
+                                <x-badge-sumber-dana :sumber="$t->sumber_dana" />
+                            </td>
                             <td style="padding:12px 16px; font-size:14px; white-space:nowrap; text-align:right; font-family:'IBM Plex Mono',monospace">
                                 Rp {{ number_format($t->total_tagihan, 2, ',', '.') }}
                             </td>
@@ -197,6 +249,11 @@
                                 <span style="font-size:11px; padding:2px 8px; border-radius:4px; white-space:nowrap; background:{{ $bg }}; color:{{ $color }}; border:1px solid {{ $color }}">
                                     {{ $label }}
                                 </span>
+                            </td>
+                            <td style="padding:12px 16px; white-space:nowrap">
+                                @if($t->status_penagihan)
+                                    <x-badge-penagihan :status="$t->status_penagihan" />
+                                @endif
                             </td>
                             <td style="padding:12px 16px; text-align:right; white-space:nowrap">
                                 <div style="display:flex; align-items:center; justify-content:flex-end; gap:6px">
@@ -221,8 +278,8 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" style="padding:32px; text-align:center; color:#5B6470; font-size:14px">
-                                @if($search || $status !== 'semua')
+                            <td colspan="11" style="padding:32px; text-align:center; color:#5B6470; font-size:14px">
+                                @if($search || $status !== 'semua' || $sumber_dana !== 'semua' || $sales !== 'semua' || $penagihan !== 'semua')
                                     Tidak ada tagihan yang cocok dengan pencarian ini.
                                     <a href="{{ route('tagihan.index') }}" style="color:#0E6E66; text-decoration:none">Reset pencarian</a>
                                 @else
@@ -270,10 +327,21 @@
                     </div>
                     <div class="flex items-center justify-between text-sm">
                         <a href="{{ route('pelanggan.show', $t->pelanggan) }}" style="color:#0E6E66; text-decoration:none">
-                            {{ $t->pelanggan->nama_pelanggan }}
+                            {{ $t->pelanggan->nama_lembaga ?: $t->pelanggan->nama_pelanggan }}
                         </a>
                         <span style="font-family:'IBM Plex Mono',monospace; color:#5B6470; font-size:14px">Rp {{ number_format($t->total_tagihan, 2, ',', '.') }}</span>
                     </div>
+                    @if($t->no_sj || $t->nama_sales || $t->sumber_dana)
+                        <div style="display:flex; align-items:center; justify-content:space-between; font-size:12px; color:#5B6470; flex-wrap:wrap; gap:6px">
+                            <span>
+                                <span style="font-family:'IBM Plex Mono',monospace">{{ $t->no_sj ?: '-' }}</span>
+                                @if($t->nama_sales)
+                                    · {{ $t->nama_sales }}
+                                @endif
+                            </span>
+                            <x-badge-sumber-dana :sumber="$t->sumber_dana" />
+                        </div>
+                    @endif
                     <div class="flex items-center justify-between text-xs" style="color:#5B6470">
                         <span>Tagihan: {{ $t->tanggal_tagihan->format('d/m/Y') }}</span>
                         <span>Jatuh tempo: {{ $t->tanggal_jatuh_tempo->format('d/m/Y') }}</span>
@@ -299,7 +367,7 @@
                 </div>
             @empty
                 <div class="p-8 text-center" style="color:#5B6470; font-size:14px">
-                    @if($search || $status !== 'semua')
+                    @if($search || $status !== 'semua' || $sumber_dana !== 'semua' || $sales !== 'semua' || $penagihan !== 'semua')
                         Tidak ada tagihan yang cocok dengan pencarian ini.
                         <a href="{{ route('tagihan.index') }}" style="color:#0E6E66; text-decoration:none">Reset pencarian</a>
                     @else
