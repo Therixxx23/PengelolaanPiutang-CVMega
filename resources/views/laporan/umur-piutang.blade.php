@@ -68,6 +68,45 @@
             </div>
         </div>
 
+        {{-- Filter Dana & Sales --}}
+        <div>
+            <p class="text-xs text-ink-muted font-medium mb-2">Dana &amp; Sales:</p>
+            <form method="GET" action="{{ route('laporan.umur-piutang') }}" style="display:flex; gap:12px; align-items:center; flex-wrap:wrap">
+                <input type="hidden" name="bucket" value="{{ $bucket }}">
+                <input type="hidden" name="periode" value="{{ $periode }}">
+                <div style="display:flex; align-items:center; gap:6px">
+                    <label style="font-size:12px; color:#5B6470">Dana:</label>
+                    <select name="sumber_dana"
+                            style="width:140px; padding:6px 10px; border:1px solid #DCE2E0; border-radius:6px; font-family:Inter,sans-serif; font-size:13px; color:#1B2027; outline-color:#0E6E66">
+                        <option value="semua" {{ $sumber_dana === 'semua' ? 'selected' : '' }}>Semua</option>
+                        @foreach($daftarSumber as $s)
+                            <option value="{{ $s }}" {{ $sumber_dana === $s ? 'selected' : '' }}>{{ $s }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div style="display:flex; align-items:center; gap:6px">
+                    <label style="font-size:12px; color:#5B6470">Sales:</label>
+                    <select name="sales"
+                            style="width:180px; padding:6px 10px; border:1px solid #DCE2E0; border-radius:6px; font-family:Inter,sans-serif; font-size:13px; color:#1B2027; outline-color:#0E6E66">
+                        <option value="semua" {{ $sales === 'semua' ? 'selected' : '' }}>Semua</option>
+                        @foreach($daftarSales as $sl)
+                            <option value="{{ $sl }}" {{ $sales === $sl ? 'selected' : '' }}>{{ $sl }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <button type="submit"
+                        style="padding:6px 16px; background:#0E6E66; color:white; border:none; border-radius:6px; font-size:13px; cursor:pointer; font-family:'IBM Plex Sans',sans-serif; font-weight:500">
+                    Terapkan
+                </button>
+                @if($sumber_dana !== 'semua' || $sales !== 'semua')
+                    <a href="{{ route('laporan.umur-piutang', array_filter(['bucket' => $bucket, 'periode' => $periode])) }}"
+                       style="padding:6px 14px; border:1px solid #DCE2E0; border-radius:6px; font-size:13px; color:#5B6470; font-family:Inter,sans-serif; text-decoration:none">
+                        Reset
+                    </a>
+                @endif
+            </form>
+        </div>
+
         {{-- Info Hasil Filter --}}
         @php
             $bucketLabelMap = [
@@ -120,7 +159,12 @@
                 <div class="px-4 py-3 border-b border-line flex items-center justify-between">
                     <div class="flex items-center gap-3">
                         <span class="{{ $badgeClass }} text-sm font-medium">{{ $label }}</span>
-                        <span class="text-xs text-ink-muted">{{ $countBucket }} tagihan</span>
+                        <span class="text-xs text-ink-muted">
+                            {{ $countBucket }} tagihan
+                            @if($countBucket > 0)
+                                · Rp {{ App\Support\RupiahCompact::format($totalBucket) }}
+                            @endif
+                        </span>
                     </div>
                     <span class="rupiah text-sm font-medium text-ink">Rp {{ number_format($totalBucket, 2, ',', '.') }}</span>
                 </div>
@@ -135,8 +179,12 @@
                             <thead>
                                 <tr class="border-b border-line">
                                     <th class="table-header">Invoice</th>
-                                    <th class="table-header">Pelanggan</th>
-                                    <th class="table-header">Jatuh Tempo</th>
+                                    <th class="table-header">No. SJ</th>
+                                    <th class="table-header">Lembaga</th>
+                                    <th class="table-header">Kabupaten</th>
+                                    <th class="table-header">Sales</th>
+                                    <th class="table-header">Dana</th>
+                                    <th class="table-header">JT</th>
                                     <th class="table-header text-right">Hari Lewat</th>
                                     <th class="table-header text-right">Total</th>
                                 </tr>
@@ -153,14 +201,26 @@
                                                 <span class="font-mono text-ink">{{ $t->no_invoice }}</span>
                                             @endif
                                         </td>
+                                        <td class="table-cell" style="font-size:11px; font-family:'IBM Plex Mono',monospace; color:#5B6470">
+                                            {{ $t->no_sj ?: '-' }}
+                                        </td>
                                         <td class="table-cell">
                                             @if(Auth::user()->isAdministrasi())
                                                 <a href="{{ route('pelanggan.show', $t->pelanggan) }}" class="text-action hover:underline">
-                                                    {{ $t->pelanggan->nama_pelanggan }}
+                                                    {{ $t->pelanggan->nama_lembaga ?: $t->pelanggan->nama_pelanggan }}
                                                 </a>
                                             @else
-                                                <span class="text-ink">{{ $t->pelanggan->nama_pelanggan }}</span>
+                                                <span class="text-ink">{{ $t->pelanggan->nama_lembaga ?: $t->pelanggan->nama_pelanggan }}</span>
                                             @endif
+                                        </td>
+                                        <td class="table-cell">
+                                            {{ $t->pelanggan->kabupaten ?: '-' }}
+                                        </td>
+                                        <td class="table-cell" style="font-size:12px; color:#5B6470">
+                                            {{ $t->nama_sales ?: '-' }}
+                                        </td>
+                                        <td class="table-cell">
+                                            <x-badge-sumber-dana :sumber="$t->sumber_dana" />
                                         </td>
                                         <td class="table-cell font-mono">{{ $t->tanggal_jatuh_tempo->format('d/m/Y') }}</td>
                                         <td class="table-cell text-right font-mono">{{ $t->days_overdue }}</td>
@@ -187,12 +247,23 @@
                                 <div class="flex items-center justify-between text-sm">
                                     @if(Auth::user()->isAdministrasi())
                                         <a href="{{ route('pelanggan.show', $t->pelanggan) }}" class="text-action hover:underline">
-                                            {{ $t->pelanggan->nama_pelanggan }}
+                                            {{ $t->pelanggan->nama_lembaga ?: $t->pelanggan->nama_pelanggan }}
                                         </a>
                                     @else
-                                        <span class="text-ink">{{ $t->pelanggan->nama_pelanggan }}</span>
+                                        <span class="text-ink">{{ $t->pelanggan->nama_lembaga ?: $t->pelanggan->nama_pelanggan }}</span>
                                     @endif
                                     <span class="text-ink-muted">{{ $t->days_overdue }} hari lewat</span>
+                                </div>
+                                <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:6px" class="text-xs text-ink-muted">
+                                    <span>
+                                        <span style="font-family:'IBM Plex Mono',monospace">{{ $t->no_sj ?: '-' }}</span>
+                                        @if($t->nama_sales)
+                                            · {{ $t->nama_sales }}
+                                        @endif
+                                    </span>
+                                    <span style="display:inline-flex; align-items:center; gap:6px">
+                                        <x-badge-sumber-dana :sumber="$t->sumber_dana" />
+                                    </span>
                                 </div>
                                 <div class="text-xs text-ink-muted">
                                     Jatuh tempo: {{ $t->tanggal_jatuh_tempo->format('d/m/Y') }}

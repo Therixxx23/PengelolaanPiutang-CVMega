@@ -33,6 +33,8 @@ class LaporanUmurPiutangController extends Controller
 
         $bucket = request('bucket', 'semua');
         $periode = request('periode', 'semua');
+        $sumber_dana = request('sumber_dana', 'semua');
+        $sales = request('sales', 'semua');
 
         if (! in_array($bucket, self::VALID_BUCKETS)) {
             $bucket = 'semua';
@@ -42,8 +44,10 @@ class LaporanUmurPiutangController extends Controller
         }
 
         // Query berbasis periode untuk summary bucketing
-        $query = Tagihan::aktif()->with('pelanggan')->where('status', 'belum_lunas');
+        $query = Tagihan::aktif()->with(['pelanggan', 'items'])->where('status', 'belum_lunas');
         TagihanFilterService::applyPeriodeFilter($query, $periode);
+        $query->when($sumber_dana !== 'semua', fn ($q) => $q->where('sumber_dana', $sumber_dana))
+            ->when($sales !== 'semua', fn ($q) => $q->where('nama_sales', $sales));
         $allTagihan = $query->get();
 
         $buckets = [
@@ -68,12 +72,19 @@ class LaporanUmurPiutangController extends Controller
         $paginatedTagihan = null;
 
         if ($bucket !== 'semua') {
-            $viewQuery = Tagihan::aktif()->with('pelanggan')->where('status', 'belum_lunas');
+            $viewQuery = Tagihan::aktif()->with(['pelanggan', 'items'])->where('status', 'belum_lunas');
             TagihanFilterService::applyPeriodeFilter($viewQuery, $periode);
             TagihanFilterService::applyBucketFilter($viewQuery, $bucket);
+            $viewQuery->when($sumber_dana !== 'semua', fn ($q) => $q->where('sumber_dana', $sumber_dana))
+                ->when($sales !== 'semua', fn ($q) => $q->where('nama_sales', $sales));
 
             $paginatedTagihan = $viewQuery->paginate(10);
-            $paginatedTagihan->appends(['bucket' => $bucket, 'periode' => $periode]);
+            $paginatedTagihan->appends([
+                'bucket' => $bucket,
+                'periode' => $periode,
+                'sumber_dana' => $sumber_dana,
+                'sales' => $sales,
+            ]);
         }
 
         // Deskripsi export
@@ -83,9 +94,13 @@ class LaporanUmurPiutangController extends Controller
 
         $bucketKeys = $bucket === 'semua' ? array_keys($buckets) : [$bucket];
 
+        $daftarSumber = Tagihan::whereNotNull('sumber_dana')->distinct()->orderBy('sumber_dana')->pluck('sumber_dana');
+        $daftarSales = Tagihan::whereNotNull('nama_sales')->distinct()->orderBy('nama_sales')->pluck('nama_sales');
+
         return view('laporan.umur-piutang', compact(
             'buckets', 'summary', 'bucket', 'bucketKeys', 'paginatedTagihan',
-            'periode', 'exportDescription',
+            'periode', 'sumber_dana', 'sales', 'daftarSumber', 'daftarSales',
+            'exportDescription',
         ));
     }
 
