@@ -1,7 +1,7 @@
 <x-app-layout>
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px">
         <h1 class="font-display text-2xl font-semibold text-ink">Laporan Rekapitulasi</h1>
-        <a href="{{ route('laporan.rekapitulasi.export', request()->only('search', 'wilayah')) }}"
+        <a href="{{ route('laporan.rekapitulasi.export', request()->only('search', 'wilayah', 'kabupaten')) }}"
            style="background:#0E6E66; color:white; padding:8px 16px; border-radius:6px; font-size:14px; text-decoration:none; font-family:'IBM Plex Sans',sans-serif; font-weight:500">
             Export Excel
         </a>
@@ -25,12 +25,20 @@
                 @endforeach
             </select>
 
+            <select name="kabupaten"
+                    style="width:180px; padding:8px 12px; border:1px solid #DCE2E0; border-radius:6px; font-family:Inter,sans-serif; font-size:14px; color:#1B2027; outline-color:#0E6E66">
+                <option value="semua" {{ $kabupaten === 'semua' ? 'selected' : '' }}>Semua Kabupaten</option>
+                @foreach($daftarKabupaten as $k)
+                    <option value="{{ $k }}" {{ $kabupaten === $k ? 'selected' : '' }}>{{ $k }}</option>
+                @endforeach
+            </select>
+
             <button type="submit"
                     style="padding:8px 20px; background:#0E6E66; color:white; border:none; border-radius:6px; font-size:14px; cursor:pointer; font-family:'IBM Plex Sans',sans-serif; font-weight:500">
                 Filter
             </button>
 
-            @if($search || $wilayah !== 'semua')
+            @if($search || $wilayah !== 'semua' || $kabupaten !== 'semua')
                 <a href="{{ route('laporan.rekapitulasi') }}"
                    style="padding:8px 16px; border:1px solid #DCE2E0; border-radius:6px; font-size:14px; color:#5B6470; font-family:Inter,sans-serif; text-decoration:none">
                     Reset
@@ -40,10 +48,11 @@
     </form>
 
     <p style="font-size:13px; color:#5B6470; margin-bottom:8px">
-        @if($search || $wilayah !== 'semua')
+        @if($search || $wilayah !== 'semua' || $kabupaten !== 'semua')
             Menampilkan {{ $paginated->total() }} dari {{ $totalSemua }} pelanggan
             @if($search) untuk "{{ $search }}"@endif
             @if($wilayah !== 'semua') · Wilayah: {{ $wilayah }}@endif
+            @if($kabupaten !== 'semua') · Kabupaten: {{ $kabupaten }}@endif
         @else
             {{ $totalSemua }} pelanggan
         @endif
@@ -90,12 +99,14 @@
                 <thead>
                     <tr class="border-b border-line">
                         <th style="width:4%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">No</th>
-                        <th style="width:22%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Pelanggan</th>
-                        <th style="width:12%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Wilayah</th>
-                        <th style="width:16%; padding:12px 16px; text-align:right; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Total Tagihan</th>
-                        <th style="width:16%; padding:12px 16px; text-align:right; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Total Terbayar</th>
-                        <th style="width:17%; padding:12px 16px; text-align:right; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Sisa Piutang</th>
-                        <th style="width:13%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Status</th>
+                        <th style="width:16%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Pelanggan</th>
+                        <th style="width:14%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Lembaga</th>
+                        <th style="width:10%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Kabupaten</th>
+                        <th style="width:9%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Sumber Dana</th>
+                        <th style="width:12%; padding:12px 16px; text-align:right; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Total Tagihan</th>
+                        <th style="width:12%; padding:12px 16px; text-align:right; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Total Terbayar</th>
+                        <th style="width:13%; padding:12px 16px; text-align:right; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Sisa Piutang</th>
+                        <th style="width:10%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Status</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -127,7 +138,32 @@
                                     <span style="font-weight:500; color:#1B2027">{{ $r->pelanggan->nama_pelanggan }}</span>
                                 @endif
                             </td>
-                            <td style="padding:12px 16px; font-size:14px; white-space:nowrap">{{ $r->pelanggan->wilayah ?: '-' }}</td>
+                            <td style="padding:12px 16px; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:0"
+                                title="{{ $r->pelanggan->nama_lembaga ?: '-' }}">
+                                <div style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis">
+                                    {{ $r->pelanggan->nama_lembaga ?: '-' }}
+                                </div>
+                                @if($r->pelanggan->status_lembaga)
+                                    <div style="font-size:10px; color:#8A929C">
+                                        {{ $r->pelanggan->status_lembaga }}
+                                    </div>
+                                @endif
+                            </td>
+                            <td style="padding:12px 16px; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:0"
+                                title="{{ $r->pelanggan->kabupaten ?: $r->pelanggan->wilayah }}">
+                                {{ $r->pelanggan->kabupaten ?: $r->pelanggan->wilayah }}
+                            </td>
+                            <td style="padding:12px 16px; white-space:nowrap">
+                                @php
+                                    $sumberDominan = $r->pelanggan->tagihan->where('approval_status', 'aktif')
+                                        ->groupBy('sumber_dana')
+                                        ->sortByDesc(fn ($g) => $g->count())
+                                        ->keys()->first();
+                                @endphp
+                                @if($sumberDominan)
+                                    <x-badge-sumber-dana :sumber="$sumberDominan" />
+                                @endif
+                            </td>
                             <td style="padding:12px 16px; font-size:14px; white-space:nowrap; text-align:right; font-family:'IBM Plex Mono',monospace">
                                 Rp {{ number_format($r->total_tagihan, 2, ',', '.') }}
                             </td>
@@ -157,8 +193,8 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" style="padding:32px; text-align:center; color:#5B6470; font-size:14px">
-                                @if($search || $wilayah !== 'semua')
+                            <td colspan="9" style="padding:32px; text-align:center; color:#5B6470; font-size:14px">
+                                @if($search || $wilayah !== 'semua' || $kabupaten !== 'semua')
                                     Tidak ada pelanggan yang cocok dengan filter ini.
                                     <a href="{{ route('laporan.rekapitulasi') }}" style="color:#0E6E66; text-decoration:none">Reset filter</a>
                                 @else
@@ -206,6 +242,26 @@
                             </span>
                         @endif
                     </div>
+                    @php
+                        $sumberDominan = $r->pelanggan->tagihan->where('approval_status', 'aktif')
+                            ->groupBy('sumber_dana')
+                            ->sortByDesc(fn ($g) => $g->count())
+                            ->keys()->first();
+                    @endphp
+                    @if($r->pelanggan->nama_lembaga || $r->pelanggan->kabupaten || $sumberDominan)
+                        <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:6px" class="text-xs text-ink-muted">
+                            <span>
+                                {{ $r->pelanggan->nama_lembaga ?: '-' }}
+                                @if($r->pelanggan->status_lembaga)
+                                    ({{ $r->pelanggan->status_lembaga }})
+                                @endif
+                                · {{ $r->pelanggan->kabupaten ?: $r->pelanggan->wilayah }}
+                            </span>
+                            @if($sumberDominan)
+                                <x-badge-sumber-dana :sumber="$sumberDominan" />
+                            @endif
+                        </div>
+                    @endif
                     <div class="flex items-center justify-between text-sm">
                         <span style="color:#5B6470">{{ $r->pelanggan->wilayah ?: '-' }}</span>
                         <span style="font-family:'IBM Plex Mono',monospace; font-weight:500; color:{{ $sisaColor }}">
@@ -222,7 +278,7 @@
                 </div>
             @empty
                 <div class="p-8 text-center" style="color:#5B6470; font-size:14px">
-                    @if($search || $wilayah !== 'semua')
+                    @if($search || $wilayah !== 'semua' || $kabupaten !== 'semua')
                         Tidak ada pelanggan yang cocok dengan filter ini.
                         <a href="{{ route('laporan.rekapitulasi') }}" style="color:#0E6E66; text-decoration:none">Reset filter</a>
                     @else

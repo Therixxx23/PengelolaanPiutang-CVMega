@@ -14,10 +14,13 @@ class RekapitulasiExport
 
     private string $wilayah;
 
-    public function __construct(string $search = '', string $wilayah = 'semua')
+    private string $kabupaten;
+
+    public function __construct(string $search = '', string $wilayah = 'semua', string $kabupaten = 'semua')
     {
         $this->search = $search;
         $this->wilayah = $wilayah;
+        $this->kabupaten = $kabupaten;
     }
 
     public function write(AbstractWriter $writer): void
@@ -25,7 +28,7 @@ class RekapitulasiExport
         $headerStyle = new Style(fontBold: true);
 
         $headers = [
-            'No', 'Nama Pelanggan', 'Wilayah',
+            'No', 'Nama Pelanggan', 'Lembaga', 'Kabupaten', 'Sumber Dana',
             'Total Tagihan', 'Total Terbayar', 'Sisa Piutang',
             'Status Terburuk', 'Tagihan Aktif',
         ];
@@ -35,6 +38,7 @@ class RekapitulasiExport
         $pelanggan = Pelanggan::with(['tagihan' => fn ($q) => $q->aktif(), 'tagihan.pembayaran'])
             ->when($this->search, fn ($q) => $q->where('nama_pelanggan', 'like', '%'.LikeQuery::escape($this->search).'%'))
             ->when($this->wilayah !== 'semua', fn ($q) => $q->where('wilayah', $this->wilayah))
+            ->when($this->kabupaten !== 'semua', fn ($q) => $q->where('kabupaten', $this->kabupaten))
             ->orderBy('nama_pelanggan')
             ->get();
 
@@ -74,10 +78,18 @@ class RekapitulasiExport
         $no = 0;
         foreach ($ringkasan as $r) {
             $no++;
+            $p = $r['pelanggan'];
+            $sumberDominan = $p->tagihan->where('approval_status', 'aktif')
+                ->groupBy('sumber_dana')
+                ->sortByDesc(fn ($g) => $g->count())
+                ->keys()->first();
+
             $writer->addRow(Row::fromValues([
                 $no,
                 $r['pelanggan']->nama_pelanggan,
-                $r['pelanggan']->wilayah ?: '',
+                $r['pelanggan']->nama_lembaga ?: '',
+                $r['pelanggan']->kabupaten ?: ($r['pelanggan']->wilayah ?: ''),
+                $sumberDominan ?: '',
                 (float) $r['total_tagihan'],
                 (float) $r['total_terbayar'],
                 (float) max(0, $r['sisa_piutang']),
@@ -90,6 +102,8 @@ class RekapitulasiExport
         $writer->addRow(Row::fromValuesWithStyle([
             '',
             'TOTAL',
+            '',
+            '',
             '',
             (float) $ringkasan->sum('total_tagihan'),
             (float) $ringkasan->sum('total_terbayar'),

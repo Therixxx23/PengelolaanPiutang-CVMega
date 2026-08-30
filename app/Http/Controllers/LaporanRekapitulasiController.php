@@ -19,11 +19,13 @@ class LaporanRekapitulasiController extends Controller
 
         $search = $request->get('search', '');
         $wilayah = $request->get('wilayah', 'semua');
+        $kabupaten = $request->get('kabupaten', 'semua');
         $totalSemua = Pelanggan::count();
 
         $semuaPelanggan = Pelanggan::with(['tagihan' => fn ($q) => $q->aktif(), 'tagihan.pembayaran'])
             ->when($search, fn ($q) => $q->where('nama_pelanggan', 'like', '%'.LikeQuery::escape($search).'%'))
             ->when($wilayah !== 'semua', fn ($q) => $q->where('wilayah', $wilayah))
+            ->when($kabupaten !== 'semua', fn ($q) => $q->where('kabupaten', $kabupaten))
             ->orderBy('nama_pelanggan')
             ->get();
 
@@ -72,13 +74,19 @@ class LaporanRekapitulasiController extends Controller
             $currentPage,
             ['path' => Paginator::resolveCurrentPath()],
         );
-        $paginated->appends(['search' => $search, 'wilayah' => $wilayah]);
+        $paginated->appends([
+            'search' => $search,
+            'wilayah' => $wilayah,
+            'kabupaten' => $kabupaten,
+        ]);
 
         $daftarWilayah = Pelanggan::distinct()->pluck('wilayah')->sort();
+        $daftarKabupaten = Pelanggan::whereNotNull('kabupaten')->distinct()->orderBy('kabupaten')->pluck('kabupaten');
 
         return view('laporan.rekapitulasi', compact(
             'paginated', 'totalPiutang', 'totalTertagih', 'totalSisa', 'totalPelanggan',
-            'totalSemua', 'chartLabels', 'chartData', 'search', 'wilayah', 'daftarWilayah',
+            'totalSemua', 'chartLabels', 'chartData', 'search', 'wilayah', 'kabupaten',
+            'daftarWilayah', 'daftarKabupaten',
         ));
     }
 
@@ -88,6 +96,7 @@ class LaporanRekapitulasiController extends Controller
 
         $search = $request->get('search', '');
         $wilayah = $request->get('wilayah', 'semua');
+        $kabupaten = $request->get('kabupaten', 'semua');
 
         $filename = 'Rekapitulasi-Piutang';
         if ($search) {
@@ -96,6 +105,9 @@ class LaporanRekapitulasiController extends Controller
         if ($wilayah !== 'semua') {
             $filename .= '-'.str_replace('/', '-', $wilayah);
         }
+        if ($kabupaten !== 'semua') {
+            $filename .= '-'.str_replace('/', '-', $kabupaten);
+        }
         $filename .= '-'.now()->format('Y-m-d').'.xlsx';
 
         $path = tempnam(sys_get_temp_dir(), 'piutang').'.xlsx';
@@ -103,7 +115,7 @@ class LaporanRekapitulasiController extends Controller
         $writer = new Writer;
         $writer->openToFile($path);
 
-        $export = new RekapitulasiExport($search, $wilayah);
+        $export = new RekapitulasiExport($search, $wilayah, $kabupaten);
         $export->write($writer);
 
         $writer->close();
