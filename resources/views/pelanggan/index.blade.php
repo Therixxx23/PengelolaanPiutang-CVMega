@@ -50,12 +50,28 @@
                 @endforeach
             </select>
 
+            <select name="kabupaten"
+                    style="width:160px; padding:8px 12px; border:1px solid #DCE2E0; border-radius:6px; font-family:Inter,sans-serif; font-size:14px; color:#1B2027; outline-color:#0E6E66">
+                <option value="semua" {{ $kabupaten === 'semua' ? 'selected' : '' }}>Semua Kabupaten</option>
+                @foreach($daftarKabupaten as $k)
+                    <option value="{{ $k }}" {{ $kabupaten === $k ? 'selected' : '' }}>{{ $k }}</option>
+                @endforeach
+            </select>
+
+            <select name="status_lembaga"
+                    style="width:160px; padding:8px 12px; border:1px solid #DCE2E0; border-radius:6px; font-family:Inter,sans-serif; font-size:14px; color:#1B2027; outline-color:#0E6E66">
+                <option value="semua" {{ $status_lembaga === 'semua' ? 'selected' : '' }}>Semua Status</option>
+                @foreach($daftarStatusLembaga as $s)
+                    <option value="{{ $s }}" {{ $status_lembaga === $s ? 'selected' : '' }}>{{ $s }}</option>
+                @endforeach
+            </select>
+
             <button type="submit"
                     style="padding:8px 20px; background:#0E6E66; color:white; border:none; border-radius:6px; font-size:14px; cursor:pointer; font-family:'IBM Plex Sans',sans-serif; font-weight:500">
                 Cari
             </button>
 
-            @if($search || $wilayah !== 'semua')
+            @if($search || $wilayah !== 'semua' || $kabupaten !== 'semua' || $status_lembaga !== 'semua')
                 <a href="{{ route('pelanggan.index') }}"
                    style="padding:8px 16px; border:1px solid #DCE2E0; border-radius:6px; font-size:14px; color:#5B6470; font-family:Inter,sans-serif; text-decoration:none">
                     Reset
@@ -65,10 +81,12 @@
     </form>
 
     <p style="font-size:13px; color:#5B6470; margin-bottom:8px">
-        @if($search || $wilayah !== 'semua')
+        @if($search || $wilayah !== 'semua' || $kabupaten !== 'semua' || $status_lembaga !== 'semua')
             Menampilkan {{ $pelanggan->total() }} dari {{ $totalSemua }} pelanggan
             @if($search) untuk "{{ $search }}"@endif
             @if($wilayah !== 'semua') · {{ $wilayah }}@endif
+            @if($kabupaten !== 'semua') · {{ $kabupaten }}@endif
+            @if($status_lembaga !== 'semua') · {{ $status_lembaga }}@endif
         @else
             {{ $totalSemua }} pelanggan
         @endif
@@ -130,12 +148,15 @@
             <table style="width:100%; table-layout:fixed">
                 <thead>
                     <tr class="border-b border-line">
-                        <th style="width:24%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Nama</th>
-                        <th style="width:14%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Wilayah</th>
-                        <th style="width:16%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Telepon</th>
-                        <th style="width:18%; padding:12px 16px; text-align:right; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Batas Kredit</th>
-                        <th style="width:12%; padding:12px 16px; text-align:right; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Aktif</th>
-                        <th style="width:16%; padding:12px 16px; text-align:right; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em"></th>
+                        <th style="width:16%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Nama</th>
+                        <th style="width:8%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Kode</th>
+                        <th style="width:18%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Lembaga</th>
+                        <th style="width:10%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Kabupaten</th>
+                        <th style="width:9%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Wilayah</th>
+                        <th style="width:11%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Telepon</th>
+                        <th style="width:12%; padding:12px 16px; text-align:right; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Batas Kredit</th>
+                        <th style="width:8%; padding:12px 16px; text-align:right; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Tagihan Aktif</th>
+                        <th style="width:8%; padding:12px 16px; text-align:right; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em"></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -147,6 +168,24 @@
                                    style="color:#0E6E66; text-decoration:none; font-weight:500">
                                     {{ $p->nama_pelanggan }}
                                 </a>
+                            </td>
+                            <td style="padding:12px 16px; font-size:12px; white-space:nowrap; font-family:'IBM Plex Mono',monospace; color:#1B2027">
+                                {{ $p->kode_pelanggan ?: '-' }}
+                            </td>
+                            <td style="padding:12px 16px; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:0"
+                                title="{{ $p->nama_lembaga ?: $p->nama_pelanggan }}">
+                                <div style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis">
+                                    {{ $p->nama_lembaga ?: $p->nama_pelanggan }}
+                                </div>
+                                @if($p->status_lembaga)
+                                    <div style="font-size:10px; color:#8A929C">
+                                        {{ $p->status_lembaga }}
+                                    </div>
+                                @endif
+                            </td>
+                            <td style="padding:12px 16px; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:0"
+                                title="{{ $p->kabupaten ?: $p->wilayah }}">
+                                {{ $p->kabupaten ?: $p->wilayah }}
                             </td>
                             <td style="padding:12px 16px; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:0"
                                 title="{{ $p->wilayah }}">
@@ -184,8 +223,8 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" style="padding:32px; text-align:center; color:#5B6470; font-size:14px">
-                                @if($search || $wilayah !== 'semua')
+                            <td colspan="9" style="padding:32px; text-align:center; color:#5B6470; font-size:14px">
+                                @if($search || $wilayah !== 'semua' || $kabupaten !== 'semua' || $status_lembaga !== 'semua')
                                     Tidak ada pelanggan yang cocok dengan pencarian ini.
                                     <a href="{{ route('pelanggan.index') }}" style="color:#0E6E66; text-decoration:none">Reset pencarian</a>
                                 @else
@@ -211,6 +250,18 @@
                         </a>
                         <span style="font-size:12px; color:#5B6470">{{ $p->wilayah ?: '-' }}</span>
                     </div>
+                    @if($p->kode_pelanggan || $p->nama_lembaga || $p->kabupaten)
+                        <div style="font-size:12px; color:#5B6470">
+                            <span style="font-family:'IBM Plex Mono',monospace">{{ $p->kode_pelanggan ?: '-' }}</span>
+                            @if($p->nama_lembaga)
+                                · {{ $p->nama_lembaga }}
+                            @endif
+                            @if($p->status_lembaga)
+                                (@{{ $p->status_lembaga }})
+                            @endif
+                            · {{ $p->kabupaten ?: $p->wilayah }}
+                        </div>
+                    @endif
                     <div class="flex items-center justify-between text-sm">
                         <span style="color:#5B6470; font-family:'IBM Plex Mono',monospace">{{ $p->no_telepon ?: '-' }}</span>
                         <span style="font-family:'IBM Plex Mono',monospace; font-size:14px">Aktif: {{ $p->tagihan_aktif }}</span>
@@ -240,7 +291,7 @@
                 </div>
             @empty
                 <div class="p-8 text-center" style="color:#5B6470; font-size:14px">
-                    @if($search || $wilayah !== 'semua')
+                    @if($search || $wilayah !== 'semua' || $kabupaten !== 'semua' || $status_lembaga !== 'semua')
                         Tidak ada pelanggan yang cocok dengan pencarian ini.
                         <a href="{{ route('pelanggan.index') }}" style="color:#0E6E66; text-decoration:none">Reset pencarian</a>
                     @else

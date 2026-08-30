@@ -17,6 +17,8 @@ class PelangganController extends Controller
 
         $search = request('search', '');
         $wilayah = request('wilayah', 'semua');
+        $kabupaten = request('kabupaten', 'semua');
+        $status_lembaga = request('status_lembaga', 'semua');
         $totalSemua = Pelanggan::count();
 
         $like = '%'.LikeQuery::escape($search).'%';
@@ -27,14 +29,26 @@ class PelangganController extends Controller
                 ->orWhere('wilayah', 'like', $like)
             )
             ->when($wilayah !== 'semua', fn ($q) => $q->where('wilayah', $wilayah))
+            ->when($kabupaten !== 'semua', fn ($q) => $q->where('kabupaten', $kabupaten))
+            ->when($status_lembaga !== 'semua', fn ($q) => $q->where('status_lembaga', $status_lembaga))
             ->orderBy('nama_pelanggan')
             ->paginate(10);
 
-        $pelanggan->appends(['search' => $search, 'wilayah' => $wilayah]);
+        $pelanggan->appends([
+            'search' => $search,
+            'wilayah' => $wilayah,
+            'kabupaten' => $kabupaten,
+            'status_lembaga' => $status_lembaga,
+        ]);
 
         $daftarWilayah = Pelanggan::distinct()->pluck('wilayah')->sort();
+        $daftarKabupaten = Pelanggan::whereNotNull('kabupaten')->distinct()->orderBy('kabupaten')->pluck('kabupaten');
+        $daftarStatusLembaga = ['NEGERI', 'SWASTA'];
 
-        return view('pelanggan.index', compact('pelanggan', 'search', 'wilayah', 'daftarWilayah', 'totalSemua'));
+        return view('pelanggan.index', compact(
+            'pelanggan', 'search', 'wilayah', 'kabupaten', 'status_lembaga',
+            'daftarWilayah', 'daftarKabupaten', 'daftarStatusLembaga', 'totalSemua'
+        ));
     }
 
     public function suggest(Request $request)
