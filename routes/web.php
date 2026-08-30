@@ -42,6 +42,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/', [ImportController::class, 'index'])->name('index');
         Route::post('preview', [ImportController::class, 'preview'])->name('preview');
         Route::post('store', [ImportController::class, 'store'])->name('store');
+        Route::post('cancel', [ImportController::class, 'cancel'])->name('cancel');
     });
 
     Route::resource('users', UserController::class)

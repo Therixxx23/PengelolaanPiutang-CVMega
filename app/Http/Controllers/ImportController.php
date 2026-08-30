@@ -78,4 +78,21 @@ class ImportController extends Controller
             ->route('import.index')
             ->with('error', $result['message']);
     }
+
+    public function cancel()
+    {
+        $this->authorize('import', Tagihan::class);
+
+        $path = session('import.file_path');
+
+        if ($path && Storage::disk('local')->exists($path)) {
+            Storage::disk('local')->delete($path);
+        }
+
+        session()->forget('import.file_path');
+
+        return redirect()
+            ->route('import.index')
+            ->with('info', 'Impor dibatalkan.');
+    }
 }

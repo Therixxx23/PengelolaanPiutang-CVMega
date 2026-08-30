@@ -15,38 +15,24 @@
                     {{ $summary['kolom_terdeteksi'] }} kolom dikenali.
                 </p>
 
-                <form action="{{ route('import.store') }}" method="POST" class="mt-4 flex items-center gap-3"
-                    x-data="{ open: false }">
-                    @csrf
-                    <button type="button" x-on:click="open = true"
-                        class="px-4 py-2 rounded text-sm font-semibold bg-ink text-white hover:bg-ink-muted transition">
-                        Konfirmasi &amp; Impor
-                    </button>
-                    <a href="{{ route('import.index') }}" class="text-sm text-ink-muted hover:text-ink transition">
-                        Batal
-                    </a>
-                    <div x-show="open" x-cloak x-transition
-                        class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
-                        x-on:click.self="open = false">
-                        <div class="bg-surface border border-line rounded-lg p-6 max-w-md w-full">
-                            <h3 class="font-display text-base font-semibold text-ink">Konfirmasi Impor</h3>
-                            <p class="text-sm text-ink-muted mt-1">
-                                Impor akan membuat tagihan dan pelanggan baru dari file yang sudah dipratinjau.
-                                Faktur yang sudah ada akan dilewati. Lanjutkan?
-                            </p>
-                            <div class="mt-4 flex items-center gap-3">
-                                <button type="submit"
-                                    class="px-4 py-2 rounded text-sm font-semibold bg-status-paid text-white hover:opacity-90 transition">
-                                    Ya, Impor
-                                </button>
-                                <button type="button" x-on:click="open = false"
-                                    class="text-sm text-ink-muted hover:text-ink transition">
-                                    Batal
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </form>
+                <div class="mt-4 flex items-center gap-3">
+                    <form action="{{ route('import.cancel') }}" method="POST" style="display:inline">
+                        @csrf
+                        <button type="submit"
+                            style="padding:10px 24px; border:1px solid #DCE2E0; border-radius:6px; background:white; color:#5B6470; font-size:14px; cursor:pointer">
+                            Batal
+                        </button>
+                    </form>
+
+                    <form action="{{ route('import.store') }}" method="POST" style="display:inline; margin-left:8px">
+                        @csrf
+                        <button type="submit"
+                            style="padding:10px 24px; background:#0E6E66; color:white; border:none; border-radius:6px; font-size:14px; cursor:pointer"
+                            onclick="return confirm('Yakin ingin mengimport data ini ke sistem? Proses tidak bisa dibatalkan setelah dikonfirmasi.')">
+                            &#10003; Konfirmasi &amp; Import
+                        </button>
+                    </form>
+                </div>
             </div>
 
             @if(count($header) > 0)

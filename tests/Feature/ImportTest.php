@@ -160,4 +160,43 @@ class ImportTest extends TestCase
             ->post(route('import.store'))
             ->assertForbidden();
     }
+
+    public function test_preview_shows_confirm_and_batal_buttons(): void
+    {
+        $admin = User::factory()->create(['role' => 'bagian_administrasi']);
+        $path = $this->buildXlsx($this->validRows());
+
+        $this->actingAs($admin)
+            ->post(route('import.preview'), ['file' => $this->xlsxUpload($path)])
+            ->assertOk()
+            ->assertSee('Konfirmasi &amp; Import', false)
+            ->assertSee('Batal', false);
+    }
+
+    public function test_cancel_clears_session_and_redirects(): void
+    {
+        $admin = User::factory()->create(['role' => 'bagian_administrasi']);
+        $path = $this->buildXlsx($this->validRows());
+
+        $this->actingAs($admin)
+            ->post(route('import.preview'), ['file' => $this->xlsxUpload($path)])
+            ->assertOk();
+
+        $this->assertTrue(session()->has('import.file_path'));
+
+        $this->actingAs($admin)
+            ->post(route('import.cancel'))
+            ->assertRedirect(route('import.index'));
+
+        $this->assertFalse(session()->has('import.file_path'));
+    }
+
+    public function test_sales_cannot_cancel(): void
+    {
+        $sales = User::factory()->sales()->create();
+
+        $this->actingAs($sales)
+            ->post(route('import.cancel'))
+            ->assertForbidden();
+    }
 }
