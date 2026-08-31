@@ -146,17 +146,28 @@
     <div class="bg-surface border border-line rounded overflow-hidden">
         <div class="hidden sm:block overflow-x-auto">
             <table style="width:100%; min-width:950px; table-layout:fixed">
+                <colgroup>
+                    <col style="width:16%">
+                    <col style="width:8%">
+                    <col style="width:18%">
+                    <col style="width:10%">
+                    <col style="width:9%">
+                    <col style="width:11%">
+                    <col style="width:12%">
+                    <col style="width:8%">
+                    <col style="width:8%">
+                </colgroup>
                 <thead>
                     <tr class="border-b border-line">
-                        <th style="width:16%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Nama</th>
-                        <th style="width:8%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Kode</th>
-                        <th style="width:18%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Lembaga</th>
-                        <th style="width:10%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Kabupaten</th>
-                        <th style="width:9%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Wilayah</th>
-                        <th style="width:11%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Telepon</th>
-                        <th style="width:12%; padding:12px 16px; text-align:right; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Batas Kredit</th>
-                        <th style="width:8%; padding:12px 16px; text-align:right; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Tagihan Aktif</th>
-                        <th style="width:8%; padding:12px 16px; text-align:right; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em"></th>
+                        <th style="padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Nama</th>
+                        <th style="padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Kode</th>
+                        <th style="padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Lembaga</th>
+                        <th style="padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Kabupaten</th>
+                        <th style="padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Wilayah</th>
+                        <th style="padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Telepon</th>
+                        <th style="padding:12px 16px; text-align:right; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Batas Kredit</th>
+                        <th style="padding:12px 16px; text-align:right; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Tagihan Aktif</th>
+                        <th style="padding:12px 16px; text-align:right; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em"></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -257,7 +268,7 @@
                                 · {{ $p->nama_lembaga }}
                             @endif
                             @if($p->status_lembaga)
-                                (@{{ $p->status_lembaga }})
+                                ({{ $p->status_lembaga }})
                             @endif
                             · {{ $p->kabupaten ?: $p->wilayah }}
                         </div>

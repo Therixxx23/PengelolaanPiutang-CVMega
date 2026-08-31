@@ -180,11 +180,11 @@
         <div class="hidden sm:block overflow-x-auto">
             <style>
                 .tabel-tagihan th {
-                    padding: 10px 8px;
+                    padding: 12px 16px;
                     font-size: 11px;
                     color: #5B6470;
                     font-weight: 600;
-                    letter-spacing: 0.04em;
+                    letter-spacing: 0.05em;
                     text-transform: uppercase;
                     border-bottom: 2px solid #DCE2E0;
                     background: #F6F7F6;
@@ -192,7 +192,7 @@
                     white-space: nowrap;
                 }
                 .tabel-tagihan td {
-                    padding: 8px 6px;
+                    padding: 12px 16px;
                     border-bottom: 1px solid #DCE2E0;
                     vertical-align: middle;
                     font-size: 13px;
@@ -202,19 +202,32 @@
                 }
             </style>
             <table style="width:100%; min-width:1100px; table-layout:fixed; border-collapse:collapse" class="tabel-tagihan">
+                <colgroup>
+                    <col style="width:13%">
+                    <col style="width:7%">
+                    <col style="width:15%">
+                    <col style="width:9%">
+                    <col style="width:9%">
+                    <col style="width:10%">
+                    <col style="width:6%">
+                    <col style="width:10%">
+                    <col style="width:10%">
+                    <col style="width:7%">
+                    <col style="width:4%">
+                </colgroup>
                 <thead>
                     <tr>
-                        <th style="width:13%">No. Invoice</th>
-                        <th style="width:7%">No. SJ</th>
-                        <th style="width:15%">Lembaga</th>
-                        <th style="width:9%">Tanggal</th>
-                        <th style="width:9%">Jatuh Tempo</th>
-                        <th style="width:10%">Sales</th>
-                        <th style="width:6%">Dana</th>
-                        <th style="width:10%; text-align:right">Total</th>
-                        <th style="width:10%">Status</th>
-                        <th style="width:7%">Penagihan</th>
-                        <th style="width:4%; text-align:right"></th>
+                        <th>No. Invoice</th>
+                        <th>No. SJ</th>
+                        <th>Lembaga</th>
+                        <th>Tanggal</th>
+                        <th>Jatuh Tempo</th>
+                        <th>Sales</th>
+                        <th>Dana</th>
+                        <th style="text-align:right">Total</th>
+                        <th>Status</th>
+                        <th>Penagihan</th>
+                        <th style="text-align:right"></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -262,24 +275,24 @@
                                 title="{{ $t->nama_sales ?: '-' }}">
                                 {{ $t->nama_sales ?: '-' }}
                             </td>
-                            <td style="white-space:nowrap; padding:8px 6px">
+                            <td style="white-space:nowrap; padding:12px 16px">
                                 <x-badge-sumber-dana :sumber="$t->sumber_dana" />
                             </td>
                             <td style="text-align:right; white-space:nowrap; font-size:13px">
                                 <span style="color:#5B6470; margin-right:2px">Rp</span>
                                 <span style="font-family:'IBM Plex Mono',monospace">{{ number_format($t->total_tagihan, 0, ',', '.') }}</span>
                             </td>
-                            <td style="white-space:nowrap; padding:8px 6px">
+                            <td style="white-space:nowrap; padding:12px 16px">
                                 <span style="font-size:11px; padding:3px 8px; border-radius:4px; white-space:nowrap; background:{{ $bg }}; color:{{ $color }}; border:1px solid {{ $color }}">
                                     {{ $label }}
                                 </span>
                             </td>
-                            <td style="white-space:nowrap; padding:8px 6px">
+                            <td style="white-space:nowrap; padding:12px 16px">
                                 @if($t->status_penagihan)
                                     <x-badge-penagihan :status="$t->status_penagihan" />
                                 @endif
                             </td>
-                            <td style="white-space:nowrap; padding:8px 6px; text-align:right">
+                            <td style="white-space:nowrap; padding:12px 16px; text-align:right">
                                 <div style="display:flex; gap:4px; align-items:center; justify-content:flex-end">
                                     @can('update', $t)
                                         <a href="{{ route('tagihan.edit', $t) }}"
