@@ -46,7 +46,7 @@ class PembayaranBuktiTest extends TestCase
 
     public function test_sales_can_upload_payment_proof_for_assigned_tagihan(): void
     {
-        Storage::fake('public');
+        Storage::fake('local');
 
         $sales = $this->sales();
         $tagihan = $this->assignedTagihanFor($sales);
@@ -62,7 +62,7 @@ class PembayaranBuktiTest extends TestCase
             'status' => 'pending',
         ]);
 
-        Storage::disk('public')->assertExists(
+        Storage::disk('local')->assertExists(
             PembayaranBukti::first()->file_path
         );
     }
@@ -327,6 +327,78 @@ class PembayaranBuktiTest extends TestCase
 
         $this->actingAs($this->keuangan())
             ->get(route('pembayaran-bukti.index'))
+            ->assertOk();
+    }
+
+    public function test_sales_can_download_own_proof(): void
+    {
+        Storage::fake('local');
+
+        $sales = $this->sales();
+        $tagihan = $this->assignedTagihanFor($sales);
+        $bukti = PembayaranBukti::factory()->create([
+            'tagihan_id' => $tagihan->id_tagihan,
+            'sales_id' => $sales->id,
+            'file_path' => 'bukti-bayar/bukti.pdf',
+        ]);
+        Storage::disk('local')->put('bukti-bayar/bukti.pdf', 'fake-content');
+
+        $this->actingAs($sales)
+            ->get(route('pembayaran-bukti.download', $bukti))
+            ->assertOk()
+            ->assertDownload();
+    }
+
+    public function test_sales_cannot_download_other_sales_proof(): void
+    {
+        Storage::fake('local');
+
+        $sales = $this->sales();
+        $other = $this->sales();
+        $tagihan = $this->assignedTagihanFor($other);
+        $bukti = PembayaranBukti::factory()->create([
+            'tagihan_id' => $tagihan->id_tagihan,
+            'sales_id' => $other->id,
+            'file_path' => 'bukti-bayar/bukti.pdf',
+        ]);
+        Storage::disk('local')->put('bukti-bayar/bukti.pdf', 'fake-content');
+
+        $this->actingAs($sales)
+            ->get(route('pembayaran-bukti.download', $bukti))
+            ->assertForbidden();
+    }
+
+    public function test_guest_cannot_download_proof(): void
+    {
+        Storage::fake('local');
+
+        $sales = $this->sales();
+        $tagihan = $this->assignedTagihanFor($sales);
+        $bukti = PembayaranBukti::factory()->create([
+            'tagihan_id' => $tagihan->id_tagihan,
+            'sales_id' => $sales->id,
+            'file_path' => 'bukti-bayar/bukti.pdf',
+        ]);
+
+        $this->get(route('pembayaran-bukti.download', $bukti))
+            ->assertRedirect(route('login'));
+    }
+
+    public function test_keuangan_can_download_proof(): void
+    {
+        Storage::fake('local');
+
+        $sales = $this->sales();
+        $tagihan = $this->assignedTagihanFor($sales);
+        $bukti = PembayaranBukti::factory()->create([
+            'tagihan_id' => $tagihan->id_tagihan,
+            'sales_id' => $sales->id,
+            'file_path' => 'bukti-bayar/bukti.pdf',
+        ]);
+        Storage::disk('local')->put('bukti-bayar/bukti.pdf', 'fake-content');
+
+        $this->actingAs($this->keuangan())
+            ->get(route('pembayaran-bukti.download', $bukti))
             ->assertOk();
     }
 }

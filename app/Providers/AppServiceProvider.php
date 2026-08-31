@@ -30,6 +30,10 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        if (app()->environment('production') && config('app.debug')) {
+            abort(500, 'APP_DEBUG harus false saat APP_ENV=production.');
+        }
+
         Gate::policy(Pelanggan::class, PelangganPolicy::class);
         Gate::policy(Tagihan::class, TagihanPolicy::class);
         Gate::policy(Pembayaran::class, PembayaranPolicy::class);

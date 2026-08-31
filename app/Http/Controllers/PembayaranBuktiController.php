@@ -7,6 +7,7 @@ use App\Models\PembayaranBukti;
 use App\Models\Tagihan;
 use App\Services\PembayaranBuktiService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 
 class PembayaranBuktiController extends Controller
@@ -104,5 +105,19 @@ class PembayaranBuktiController extends Controller
         }
 
         return back()->with('success', 'Bukti pembayaran ditolak.');
+    }
+
+    public function download(PembayaranBukti $bukti)
+    {
+        $this->authorize('view', $bukti);
+
+        if (! $bukti->file_path || ! Storage::disk('local')->exists($bukti->file_path)) {
+            abort(404, 'File bukti tidak ditemukan.');
+        }
+
+        $noInvoice = str_replace(['/', '\\'], '-', (string) $bukti->tagihan->no_invoice);
+        $namaFile = 'bukti-bayar-'.$bukti->id.'-'.$noInvoice.'.'.pathinfo($bukti->file_path, PATHINFO_EXTENSION);
+
+        return Storage::disk('local')->download($bukti->file_path, $namaFile);
     }
 }

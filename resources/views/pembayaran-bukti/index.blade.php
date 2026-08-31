@@ -84,7 +84,7 @@
                             </td>
                             <td class="table-cell text-sm">
                                 @if ($b->file_path)
-                                    <a href="{{ Storage::url($b->file_path) }}" target="_blank" class="text-action hover:underline">Lihat file</a>
+                                    <a href="{{ route('pembayaran-bukti.download', $b) }}" target="_blank" class="text-action hover:underline">Lihat file</a>
                                 @endif
                                 @if ($b->catatan_reject)
                                     <p class="text-xs text-status-critical mt-1 italic">{{ $b->catatan_reject }}</p>
@@ -168,7 +168,7 @@
                     @endif
                     <div class="flex items-center gap-2">
                         @if ($b->file_path)
-                            <a href="{{ Storage::url($b->file_path) }}" target="_blank" class="text-sm text-action hover:underline">Lihat file</a>
+                            <a href="{{ route('pembayaran-bukti.download', $b) }}" target="_blank" class="text-sm text-action hover:underline">Lihat file</a>
                         @endif
                         @can('approve', $b)
                             <form method="POST" action="{{ route('pembayaran-bukti.setujui', $b) }}" class="inline"

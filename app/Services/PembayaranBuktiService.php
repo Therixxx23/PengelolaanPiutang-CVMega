@@ -38,7 +38,7 @@ class PembayaranBuktiService
         }
 
         $file = $data['file'];
-        $path = $file->store('bukti-bayar', 'public');
+        $path = $file->store('bukti-bayar', 'local');
 
         $bukti = $tagihan->pembayaranBukti()->create([
             'sales_id' => $sales->id,

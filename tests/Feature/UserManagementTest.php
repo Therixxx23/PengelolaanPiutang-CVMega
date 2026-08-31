@@ -83,6 +83,23 @@ class UserManagementTest extends TestCase
         $response->assertSessionHasErrors('password');
     }
 
+    public function test_store_with_password_lacking_number_fails(): void
+    {
+        $pimpinan = User::factory()->pimpinan()->create();
+
+        $response = $this->actingAs($pimpinan)->post('/users', [
+            'name' => 'Budi Sales',
+            'email' => 'budi@example.com',
+            'password' => 'abcdefgh',
+            'password_confirmation' => 'abcdefgh',
+            'role' => 'sales',
+            'is_active' => 1,
+        ]);
+
+        $response->assertSessionHasErrors('password');
+        $this->assertDatabaseCount('users', 1);
+    }
+
     public function test_pimpinan_cannot_deactivate_self(): void
     {
         $pimpinan = User::factory()->pimpinan()->create();

@@ -288,6 +288,8 @@ class SecurityAuditTest extends TestCase
         $response->assertHeader('X-Content-Type-Options', 'nosniff');
         $response->assertHeader('X-XSS-Protection', '1; mode=block');
         $response->assertHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+        $response->assertHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), interest-cohort=()');
+        $response->assertHeaderMissing('Strict-Transport-Security');
     }
 
     public function test_login_rate_limit_429_pada_attempt_keenam(): void

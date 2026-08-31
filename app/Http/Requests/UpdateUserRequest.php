@@ -27,7 +27,7 @@ class UpdateUserRequest extends FormRequest
             ],
             'role' => ['required', 'in:bagian_administrasi,bagian_keuangan,pimpinan,sales'],
             'is_active' => ['nullable', 'boolean'],
-            'password' => ['nullable', 'string', 'min:8', 'confirmed'],
+            'password' => ['nullable', 'string', 'min:8', 'regex:/[A-Za-z]/', 'regex:/[0-9]/', 'confirmed'],
         ];
     }
 
@@ -42,6 +42,7 @@ class UpdateUserRequest extends FormRequest
             'role.required' => 'Role wajib dipilih.',
             'role.in' => 'Role tidak valid.',
             'password.min' => 'Password minimal 8 karakter.',
+            'password.regex' => 'Password harus mengandung huruf dan angka.',
             'password.confirmed' => 'Konfirmasi password tidak cocok.',
         ];
     }
