@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Tagihan;
 use App\Models\User;
+use App\Services\ImportSiplahService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use OpenSpout\Common\Entity\Row;
@@ -44,6 +45,29 @@ class ImportTest extends TestCase
             ['No Invoice', 'Nama Pelanggan', 'Tanggal Faktur', 'Total', 'Status'],
             ['INV/TEST/000001', 'SMA Test A', '01/07/2026', 1000000, 'Lunas'],
             ['INV/TEST/000002', 'SMA Test B', '02/07/2026', 2000000, 'Belum Lunas'],
+        ];
+    }
+
+    /**
+     * Meniru struktur export SIPLAH asli: baris judul di atas baris header,
+     * dan satu faktur (NOFAK) terdiri dari banyak baris item.
+     */
+    protected function siplahStyleRows(): array
+    {
+        $header = [
+            'NOSRTJLN', 'NOFAK', 'PERIODETGL', 'KODSAL', 'NAMSAL',
+            'NAMLAND', 'NAMLEM', 'STATUS', 'KODEBARANG', 'NAMABARANG',
+            'SATUAN', 'HARGA JUAL', 'BRUTOPEN (QTY)', 'NETTOPENJ (RP)', 'SUMB_DANA',
+        ];
+
+        return [
+            ['FAKTUR KEMBALI DENGAN DETAIL BARANG'],
+            $header,
+            // Faktur 1: 2 item
+            ['SJ/001', 'FKT/2026/07/0001', '31/07/2026', 'SL-1', 'Rusdi', 'SMA A', 'SMA Negeri A', 'NEGERI', 'BK-1', 'Buku MTK', 'PCS', 50000, 2, 100000, 'BOS'],
+            ['SJ/001', 'FKT/2026/07/0001', '31/07/2026', 'SL-1', 'Rusdi', 'SMA A', 'SMA Negeri A', 'NEGERI', 'BK-2', 'Buku BSI', 'PCS', 25000, 4, 100000, 'BOS'],
+            // Faktur 2: 1 item
+            ['SJ/002', 'FKT/2026/07/0002', '31/07/2026', 'SL-2', 'Dedi', 'SMP B', 'SMP Negeri B', 'NEGERI', 'BK-3', 'Alat Tulis', 'SET', 30000, 5, 150000, 'BOP'],
         ];
     }
 
@@ -198,5 +222,45 @@ class ImportTest extends TestCase
         $this->actingAs($sales)
             ->post(route('import.cancel'))
             ->assertForbidden();
+    }
+
+    public function test_siplah_style_preview_detects_header_and_groups_items(): void
+    {
+        $path = $this->buildXlsx($this->siplahStyleRows());
+
+        $preview = app(ImportSiplahService::class)->preview($path);
+
+        $this->assertTrue($preview['success']);
+        $this->assertSame(3, $preview['summary']['total_baris']);
+        $this->assertSame(2, $preview['ringkasan']['totalFaktur']);
+        $this->assertSame(2, $preview['ringkasan']['fakturBaru']);
+
+        $first = $preview['rows']->firstWhere('no_invoice', 'FKT/2026/07/0001');
+        $this->assertSame(2, $first['jumlah_item']);
+        $this->assertSame('SMA Negeri A', $first['nama_lembaga']);
+        $this->assertSame('BOS', $first['sumber_dana']);
+    }
+
+    public function test_siplah_style_store_creates_invoice_with_multiple_items(): void
+    {
+        $admin = User::factory()->create(['role' => 'bagian_administrasi']);
+        $path = $this->buildXlsx($this->siplahStyleRows());
+
+        $this->actingAs($admin)
+            ->post(route('import.preview'), ['file' => $this->xlsxUpload($path)])
+            ->assertOk();
+
+        $this->actingAs($admin)
+            ->post(route('import.store'))
+            ->assertRedirect(route('import.index'));
+
+        $this->assertDatabaseHas('tagihan', ['no_invoice' => 'FKT/2026/07/0001']);
+        $this->assertDatabaseHas('tagihan', ['no_invoice' => 'FKT/2026/07/0002']);
+
+        $tagihan = Tagihan::where('no_invoice', 'FKT/2026/07/0001')->firstOrFail();
+        $this->assertSame(2, $tagihan->items()->count());
+
+        $tagihan2 = Tagihan::where('no_invoice', 'FKT/2026/07/0002')->firstOrFail();
+        $this->assertSame(1, $tagihan2->items()->count());
     }
 }
