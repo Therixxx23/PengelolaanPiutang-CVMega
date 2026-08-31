@@ -24,7 +24,7 @@ class TagihanPolicy
 
     public function import(User $user): bool
     {
-        return $user->isAdministrasi() || $user->isPimpinan();
+        return $user->isAdministrasi();
     }
 
     public function update(User $user, Tagihan $tagihan): bool

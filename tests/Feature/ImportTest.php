@@ -77,10 +77,10 @@ class ImportTest extends TestCase
         $this->assertTrue($admin->can('import', Tagihan::class));
     }
 
-    public function test_pimpinan_can_import(): void
+    public function test_pimpinan_cannot_import(): void
     {
         $pimpinan = User::factory()->pimpinan()->create();
-        $this->assertTrue($pimpinan->can('import', Tagihan::class));
+        $this->assertFalse($pimpinan->can('import', Tagihan::class));
     }
 
     public function test_sales_cannot_import(): void

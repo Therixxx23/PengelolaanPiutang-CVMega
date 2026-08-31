@@ -43,7 +43,7 @@
             @endauth
 
             @auth
-                @if(Auth::user()->isAdministrasi() || Auth::user()->isPimpinan())
+                @if(Auth::user()->isAdministrasi())
                     <x-nav-link :href="route('import.index')" :active="request()->routeIs('import.*')">
                         Import SIPLAH
                     </x-nav-link>
