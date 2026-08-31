@@ -8,6 +8,7 @@ use App\Http\Controllers\LaporanRekapitulasiController;
 use App\Http\Controllers\LaporanUmurPiutangController;
 use App\Http\Controllers\LogAktivitasController;
 use App\Http\Controllers\PelangganController;
+use App\Http\Controllers\PembayaranBuktiController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RiwayatPembayaranController;
 use App\Http\Controllers\TagihanController;
@@ -86,6 +87,14 @@ Route::middleware('auth')->group(function () {
         Route::get('/', [ApprovalController::class, 'index'])->name('index');
         Route::post('{tagihan}/setujui', [ApprovalController::class, 'setujui'])->name('setujui');
         Route::post('{tagihan}/tolak', [ApprovalController::class, 'tolak'])->name('tolak');
+    });
+
+    Route::prefix('pembayaran-bukti')->name('pembayaran-bukti.')->group(function () {
+        Route::get('/', [PembayaranBuktiController::class, 'index'])->name('index');
+        Route::get('create', [PembayaranBuktiController::class, 'create'])->name('create');
+        Route::post('/', [PembayaranBuktiController::class, 'store'])->name('store');
+        Route::post('{bukti}/setujui', [PembayaranBuktiController::class, 'setujui'])->name('setujui');
+        Route::post('{bukti}/tolak', [PembayaranBuktiController::class, 'tolak'])->name('tolak');
     });
 
     Route::get('/log-aktivitas', [LogAktivitasController::class, 'index'])

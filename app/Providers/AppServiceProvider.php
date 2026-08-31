@@ -5,10 +5,12 @@ namespace App\Providers;
 use App\Models\LogAktivitas;
 use App\Models\Pelanggan;
 use App\Models\Pembayaran;
+use App\Models\PembayaranBukti;
 use App\Models\Tagihan;
 use App\Models\User;
 use App\Policies\LogAktivitasPolicy;
 use App\Policies\PelangganPolicy;
+use App\Policies\PembayaranBuktiPolicy;
 use App\Policies\PembayaranPolicy;
 use App\Policies\TagihanPolicy;
 use App\Policies\UserPolicy;
@@ -31,6 +33,7 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(Pelanggan::class, PelangganPolicy::class);
         Gate::policy(Tagihan::class, TagihanPolicy::class);
         Gate::policy(Pembayaran::class, PembayaranPolicy::class);
+        Gate::policy(PembayaranBukti::class, PembayaranBuktiPolicy::class);
         Gate::policy(LogAktivitas::class, LogAktivitasPolicy::class);
         Gate::policy(User::class, UserPolicy::class);
 

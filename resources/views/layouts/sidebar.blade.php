@@ -21,6 +21,12 @@
                 </x-nav-link>
             @endif
 
+            @if(Auth::user()->isSales() || Auth::user()->isKeuangan() || Auth::user()->isAdministrasi())
+                <x-nav-link :href="route('pembayaran-bukti.index')" :active="request()->routeIs('pembayaran-bukti.*')">
+                    {{ Auth::user()->isSales() ? 'Upload Bukti Bayar' : 'Validasi Bukti Bayar' }}
+                </x-nav-link>
+            @endif
+
             @if(Auth::user()->isPimpinan())
                 @php $menungguApproval = \App\Models\Tagihan::menungguApproval()->count(); @endphp
                 <x-nav-link :href="route('users.index')" :active="request()->routeIs('users.*')">
