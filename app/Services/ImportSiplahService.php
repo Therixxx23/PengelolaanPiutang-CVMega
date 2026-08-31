@@ -307,9 +307,8 @@ class ImportSiplahService
 
                 // --- Pelanggan ---
                 $kodePelanggan = $this->cleanText($data['kode_pelanggan'] ?? null);
-                $namaPelanggan = $this->cleanText($data['nama_pelanggan']
-                    ?? $data['nama_lembaga']
-                    ?? 'Pelanggan Tanpa Nama');
+                $namaPelanggan = $this->cleanText($data['nama_pelanggan'] ?? $data['nama_lembaga'] ?? null)
+                    ?: 'Pelanggan Tanpa Nama';
 
                 $pelanggan = $this->findOrCreatePelanggan($data, $kodePelanggan, $namaPelanggan);
                 if ($pelanggan['baru']) {
@@ -469,9 +468,8 @@ class ImportSiplahService
             }
 
             $kodePelanggan = $this->cleanText($data['kode_pelanggan'] ?? null);
-            $namaPelanggan = $this->cleanText($data['nama_pelanggan']
-                ?? $data['nama_lembaga']
-                ?? 'Pelanggan Tanpa Nama');
+            $namaPelanggan = $this->cleanText($data['nama_pelanggan'] ?? $data['nama_lembaga'] ?? null)
+                ?: 'Pelanggan Tanpa Nama';
             $isPelangganBaru = ! $this->hasMatchingPelanggan($data, $kodePelanggan, $namaPelanggan);
             if ($isPelangganBaru) {
                 $pelangganBaru++;
