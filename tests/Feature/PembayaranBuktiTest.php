@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\PembayaranBukti;
 use App\Models\Tagihan;
 use App\Models\User;
+use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -182,6 +183,10 @@ class PembayaranBuktiTest extends TestCase
             'validated_by' => $keuangan->id,
         ]);
         $this->assertDatabaseCount('pembayaran', 0);
+        $this->assertDatabaseHas('tagihan', [
+            'id_tagihan' => $tagihan->id_tagihan,
+            'status' => 'belum_lunas',
+        ]);
     }
 
     public function test_reject_requires_note(): void
@@ -400,5 +405,80 @@ class PembayaranBuktiTest extends TestCase
         $this->actingAs($this->keuangan())
             ->get(route('pembayaran-bukti.download', $bukti))
             ->assertOk();
+    }
+
+    public function test_sales_can_delete_own_pending_proof(): void
+    {
+        Storage::fake('local');
+
+        $sales = $this->sales();
+        $tagihan = $this->assignedTagihanFor($sales);
+        $bukti = PembayaranBukti::factory()->create([
+            'tagihan_id' => $tagihan->id_tagihan,
+            'sales_id' => $sales->id,
+            'status' => 'pending',
+            'file_path' => 'bukti-bayar/bukti.pdf',
+        ]);
+        Storage::disk('local')->put('bukti-bayar/bukti.pdf', 'fake-content');
+
+        $this->actingAs($sales)
+            ->delete(route('pembayaran-bukti.destroy', $bukti))
+            ->assertRedirect(route('pembayaran-bukti.index'));
+
+        $this->assertDatabaseMissing('pembayaran_bukti', ['id' => $bukti->id]);
+        Storage::disk('local')->assertMissing('bukti-bayar/bukti.pdf');
+    }
+
+    public function test_sales_cannot_delete_approved_proof(): void
+    {
+        Storage::fake('local');
+
+        $sales = $this->sales();
+        $tagihan = $this->assignedTagihanFor($sales);
+        $bukti = PembayaranBukti::factory()->approved()->create([
+            'tagihan_id' => $tagihan->id_tagihan,
+            'sales_id' => $sales->id,
+        ]);
+
+        $this->actingAs($sales)
+            ->delete(route('pembayaran-bukti.destroy', $bukti))
+            ->assertForbidden();
+
+        $this->assertDatabaseHas('pembayaran_bukti', ['id' => $bukti->id]);
+    }
+
+    public function test_sales_cannot_delete_other_sales_pending_proof(): void
+    {
+        Storage::fake('local');
+
+        $sales = $this->sales();
+        $other = $this->sales();
+        $tagihan = $this->assignedTagihanFor($other);
+        $bukti = PembayaranBukti::factory()->create([
+            'tagihan_id' => $tagihan->id_tagihan,
+            'sales_id' => $other->id,
+            'status' => 'pending',
+        ]);
+
+        $this->actingAs($sales)
+            ->delete(route('pembayaran-bukti.destroy', $bukti))
+            ->assertForbidden();
+
+        $this->assertDatabaseHas('pembayaran_bukti', ['id' => $bukti->id]);
+    }
+
+    public function test_approved_proof_cannot_be_edited_by_sales(): void
+    {
+        $sales = $this->sales();
+        $tagihan = $this->assignedTagihanFor($sales);
+        $bukti = PembayaranBukti::factory()->approved()->create([
+            'tagihan_id' => $tagihan->id_tagihan,
+            'sales_id' => $sales->id,
+        ]);
+
+        $this->assertFalse($this->app->make(Gate::class)
+            ->forUser($sales)->allows('update', $bukti));
+        $this->assertTrue($this->app->make(Gate::class)
+            ->forUser($sales)->denies('delete', $bukti));
     }
 }

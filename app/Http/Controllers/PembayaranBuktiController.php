@@ -120,4 +120,19 @@ class PembayaranBuktiController extends Controller
 
         return Storage::disk('local')->download($bukti->file_path, $namaFile);
     }
+
+    public function destroy(PembayaranBukti $bukti)
+    {
+        $this->authorize('delete', $bukti);
+
+        if ($bukti->file_path && Storage::disk('local')->exists($bukti->file_path)) {
+            Storage::disk('local')->delete($bukti->file_path);
+        }
+
+        $bukti->delete();
+
+        return redirect()
+            ->route('pembayaran-bukti.index')
+            ->with('success', 'Bukti pembayaran dihapus.');
+    }
 }

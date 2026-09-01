@@ -94,6 +94,7 @@ Route::middleware('auth')->group(function () {
         Route::get('create', [PembayaranBuktiController::class, 'create'])->name('create');
         Route::post('/', [PembayaranBuktiController::class, 'store'])->name('store');
         Route::get('{bukti}/download', [PembayaranBuktiController::class, 'download'])->name('download');
+        Route::delete('{bukti}', [PembayaranBuktiController::class, 'destroy'])->name('destroy');
         Route::post('{bukti}/setujui', [PembayaranBuktiController::class, 'setujui'])->name('setujui');
         Route::post('{bukti}/tolak', [PembayaranBuktiController::class, 'tolak'])->name('tolak');
     });

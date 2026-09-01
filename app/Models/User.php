@@ -78,6 +78,16 @@ class User extends Authenticatable
         return $this->hasMany(Tagihan::class, 'assigned_sales_id');
     }
 
+    public function buktiPembayaran(): HasMany
+    {
+        return $this->hasMany(PembayaranBukti::class, 'sales_id');
+    }
+
+    public function buktiPembayaranDivalidasi(): HasMany
+    {
+        return $this->hasMany(PembayaranBukti::class, 'validated_by');
+    }
+
     public function getRoleLabelAttribute(): string
     {
         return match ($this->role) {

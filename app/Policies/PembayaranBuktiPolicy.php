@@ -50,4 +50,27 @@ class PembayaranBuktiPolicy
     {
         return $user->isKeuangan() && $bukti->isPending();
     }
+
+    public function update(User $user, PembayaranBukti $bukti): bool
+    {
+        return $this->canEditOwnPending($user, $bukti);
+    }
+
+    public function delete(User $user, PembayaranBukti $bukti): bool
+    {
+        return $this->canEditOwnPending($user, $bukti);
+    }
+
+    private function canEditOwnPending(User $user, PembayaranBukti $bukti): bool
+    {
+        if (! $user->isSales()) {
+            return false;
+        }
+
+        if ($bukti->sales_id !== $user->id) {
+            return false;
+        }
+
+        return $bukti->isPending();
+    }
 }

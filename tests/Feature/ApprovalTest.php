@@ -27,8 +27,15 @@ class ApprovalTest extends TestCase
         return User::factory()->pimpinan()->create();
     }
 
-    private function payload(int $pelangganId, float $total, string $noInvoice = 'INV/2026/08/000001'): array
+    private function invoiceAwalBulan(): string
     {
+        return 'INV/'.now()->format('Y/m/').'000001';
+    }
+
+    private function payload(int $pelangganId, float $total, ?string $noInvoice = null): array
+    {
+        $noInvoice = $noInvoice ?? $this->invoiceAwalBulan();
+
         return [
             'id_pelanggan' => $pelangganId,
             'no_invoice' => $noInvoice,
@@ -48,7 +55,7 @@ class ApprovalTest extends TestCase
             ->assertSessionHas('success');
 
         $this->assertDatabaseHas('tagihan', [
-            'no_invoice' => 'INV/2026/08/000001',
+            'no_invoice' => $this->invoiceAwalBulan(),
             'approval_status' => 'aktif',
         ]);
     }
@@ -63,7 +70,7 @@ class ApprovalTest extends TestCase
             ->assertSessionHas('warning');
 
         $this->assertDatabaseHas('tagihan', [
-            'no_invoice' => 'INV/2026/08/000001',
+            'no_invoice' => $this->invoiceAwalBulan(),
             'approval_status' => 'menunggu_persetujuan',
         ]);
     }

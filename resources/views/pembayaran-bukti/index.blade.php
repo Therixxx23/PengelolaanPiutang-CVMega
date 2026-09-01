@@ -107,6 +107,14 @@
                                         Tolak
                                     </button>
                                 @endcan
+                                @can('delete', $b)
+                                    <form method="POST" action="{{ route('pembayaran-bukti.destroy', $b) }}" class="inline"
+                                          onsubmit="return confirm('Hapus bukti pembayaran ini?')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn-secondary !px-3 !py-1 !text-xs">Hapus</button>
+                                    </form>
+                                @endcan
                             </td>
                         </tr>
                         @can('reject', $b)
@@ -175,6 +183,14 @@
                                   onsubmit="return confirm('Setujui bukti ini?')">
                                 @csrf
                                 <button type="submit" class="btn-edit !px-3 !py-1 !text-xs">Setujui</button>
+                            </form>
+                        @endcan
+                        @can('delete', $b)
+                            <form method="POST" action="{{ route('pembayaran-bukti.destroy', $b) }}" class="inline"
+                                  onsubmit="return confirm('Hapus bukti pembayaran ini?')">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn-secondary !px-3 !py-1 !text-xs">Hapus</button>
                             </form>
                         @endcan
                     </div>
