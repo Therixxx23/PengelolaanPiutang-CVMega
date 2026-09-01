@@ -48,7 +48,21 @@ class StorePembayaranBuktiRequest extends FormRequest
                     }
                 },
             ],
-            'file' => ['required', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:5120'],
+            'file' => [
+                'required',
+                'file',
+                'mimes:jpg,jpeg,png,pdf',
+                'max:5120',
+                function ($attribute, $value, $fail) {
+                    $finfo = new \finfo(FILEINFO_MIME_TYPE);
+                    $mime = $finfo->file($value->getRealPath());
+                    $allowed = ['image/jpeg', 'image/png', 'application/pdf'];
+
+                    if (! in_array($mime, $allowed, true)) {
+                        $fail('File bukti harus berupa foto (JPG/PNG) atau PDF.');
+                    }
+                },
+            ],
             'nominal_dibayar' => ['required', 'numeric', 'min:1000', 'max:'.$maksimum],
             'tanggal_bayar' => ['required', 'date', 'before_or_equal:today'],
         ];

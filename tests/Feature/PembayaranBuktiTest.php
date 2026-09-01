@@ -39,10 +39,35 @@ class PembayaranBuktiTest extends TestCase
     {
         return [
             'tagihan_id' => $tagihan->id_tagihan,
-            'file' => UploadedFile::fake()->create('bukti.pdf', 100, 'application/pdf'),
+            'file' => UploadedFile::fake()->createWithContent(
+                'bukti.pdf',
+                "%PDF-1.4\n1 0 obj\n<<>>\nendobj\ntrailer\n<<>>\n%%EOF"
+            ),
             'nominal_dibayar' => $nominal,
             'tanggal_bayar' => now()->format('Y-m-d'),
         ];
+    }
+
+    public function test_upload_diminta_sales_dengan_file_extension_php_ditolak(): void
+    {
+        Storage::fake('local');
+
+        $sales = $this->sales();
+        $tagihan = $this->assignedTagihanFor($sales);
+
+        $payload = $this->uploadPayload($tagihan);
+        $payload['file'] = UploadedFile::fake()->createWithContent(
+            'bukti.jpg',
+            '<?php echo "nope"; ?>'
+        );
+
+        $this->actingAs($sales)
+            ->post(route('pembayaran-bukti.store'), $payload)
+            ->assertSessionHasErrors('file');
+
+        $this->assertDatabaseMissing('pembayaran_bukti', [
+            'tagihan_id' => $tagihan->id_tagihan,
+        ]);
     }
 
     public function test_sales_can_upload_payment_proof_for_assigned_tagihan(): void
@@ -66,6 +91,23 @@ class PembayaranBuktiTest extends TestCase
         Storage::disk('local')->assertExists(
             PembayaranBukti::first()->file_path
         );
+    }
+
+    public function test_upload_bukti_rate_limit_429_setelah_5_upload(): void
+    {
+        Storage::fake('local');
+
+        $sales = $this->sales();
+        $tagihan = $this->assignedTagihanFor($sales);
+
+        for ($i = 1; $i <= 5; $i++) {
+            $this->actingAs($sales)
+                ->post(route('pembayaran-bukti.store'), $this->uploadPayload($tagihan, 5000));
+        }
+
+        $this->actingAs($sales)
+            ->post(route('pembayaran-bukti.store'), $this->uploadPayload($tagihan, 5000))
+            ->assertStatus(429);
     }
 
     public function test_sales_cannot_upload_for_tagihan_not_their_responsibility(): void
@@ -348,10 +390,18 @@ class PembayaranBuktiTest extends TestCase
         ]);
         Storage::disk('local')->put('bukti-bayar/bukti.pdf', 'fake-content');
 
-        $this->actingAs($sales)
+        $response = $this->actingAs($sales)
             ->get(route('pembayaran-bukti.download', $bukti))
-            ->assertOk()
-            ->assertDownload();
+            ->assertOk();
+
+        $this->assertStringContainsString(
+            'inline',
+            (string) $response->headers->get('Content-Disposition')
+        );
+        $this->assertStringNotContainsString(
+            'bukti-bayar/bukti.pdf',
+            (string) $response->headers->get('Content-Disposition')
+        );
     }
 
     public function test_sales_cannot_download_other_sales_proof(): void

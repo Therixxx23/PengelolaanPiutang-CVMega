@@ -118,7 +118,14 @@ class PembayaranBuktiController extends Controller
         $noInvoice = str_replace(['/', '\\'], '-', (string) $bukti->tagihan->no_invoice);
         $namaFile = 'bukti-bayar-'.$bukti->id.'-'.$noInvoice.'.'.pathinfo($bukti->file_path, PATHINFO_EXTENSION);
 
-        return Storage::disk('local')->download($bukti->file_path, $namaFile);
+        return Storage::disk('local')->response($bukti->file_path, $namaFile, [
+            'Content-Type' => Storage::disk('local')->mimeType($bukti->file_path),
+            'Content-Disposition' => 'inline; filename="'.$namaFile.'"',
+            'Content-Security-Policy' => "default-src 'none'; frame-ancestors 'none'",
+            'X-Content-Type-Options' => 'nosniff',
+            'Cache-Control' => 'private, no-cache, no-store, must-revalidate',
+            'Pragma' => 'no-cache',
+        ]);
     }
 
     public function destroy(PembayaranBukti $bukti)
