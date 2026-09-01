@@ -323,7 +323,66 @@ class PembayaranBuktiTest extends TestCase
         ]);
     }
 
-    public function test_administrasi_cannot_approve_proof(): void
+    public function test_administrasi_can_approve_and_reject_pending_proof(): void
+    {
+        $admin = User::factory()->create(['role' => 'bagian_administrasi']);
+        $sales = $this->sales();
+        $tagihan = $this->assignedTagihanFor($sales);
+
+        $buktiApprove = PembayaranBukti::factory()->create([
+            'tagihan_id' => $tagihan->id_tagihan,
+            'sales_id' => $sales->id,
+            'status' => 'pending',
+            'nominal_dibayar' => 100000,
+        ]);
+
+        $this->actingAs($admin)
+            ->post(route('pembayaran-bukti.setujui', $buktiApprove))
+            ->assertRedirect();
+
+        $this->assertDatabaseHas('pembayaran_bukti', [
+            'id' => $buktiApprove->id,
+            'status' => 'approved',
+        ]);
+
+        $buktiReject = PembayaranBukti::factory()->create([
+            'tagihan_id' => $tagihan->id_tagihan,
+            'sales_id' => $sales->id,
+            'status' => 'pending',
+        ]);
+
+        $this->actingAs($admin)
+            ->post(route('pembayaran-bukti.tolak', $buktiReject), ['catatan_reject' => 'File tidak jelas.'])
+            ->assertRedirect();
+
+        $this->assertDatabaseHas('pembayaran_bukti', [
+            'id' => $buktiReject->id,
+            'status' => 'rejected',
+        ]);
+    }
+
+    public function test_pimpinan_cannot_approve_proof(): void
+    {
+        $pimpinan = User::factory()->create(['role' => 'pimpinan']);
+        $sales = $this->sales();
+        $tagihan = $this->assignedTagihanFor($sales);
+        $bukti = PembayaranBukti::factory()->create([
+            'tagihan_id' => $tagihan->id_tagihan,
+            'sales_id' => $sales->id,
+            'status' => 'pending',
+        ]);
+
+        $this->actingAs($pimpinan)
+            ->post(route('pembayaran-bukti.setujui', $bukti))
+            ->assertForbidden();
+
+        $this->assertDatabaseHas('pembayaran_bukti', [
+            'id' => $bukti->id,
+            'status' => 'pending',
+        ]);
+    }
+
+    public function test_administrasi_melihat_tombol_aksi_untuk_bukti_pending(): void
     {
         $admin = User::factory()->create(['role' => 'bagian_administrasi']);
         $sales = $this->sales();
@@ -334,14 +393,12 @@ class PembayaranBuktiTest extends TestCase
             'status' => 'pending',
         ]);
 
-        $this->actingAs($admin)
-            ->post(route('pembayaran-bukti.setujui', $bukti))
-            ->assertForbidden();
+        $response = $this->actingAs($admin)->get(route('pembayaran-bukti.index'));
 
-        $this->assertDatabaseHas('pembayaran_bukti', [
-            'id' => $bukti->id,
-            'status' => 'pending',
-        ]);
+        $response->assertOk();
+        $response->assertSee(route('pembayaran-bukti.setujui', $bukti), false);
+        $response->assertSee(route('pembayaran-bukti.tolak', $bukti), false);
+        $response->assertDontSee('&mdash;');
     }
 
     public function test_administrasi_melihat_status_readonly_untuk_bukti_approved(): void

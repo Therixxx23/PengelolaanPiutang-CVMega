@@ -69,7 +69,7 @@ class PembayaranBuktiController extends Controller
 
         return redirect()
             ->route('pembayaran-bukti.index')
-            ->with('success', 'Bukti pembayaran berhasil diunggah dan menunggu validasi Bagian Keuangan.');
+            ->with('success', 'Bukti pembayaran berhasil diunggah dan menunggu validasi.');
     }
 
     public function setujui(Request $request, PembayaranBukti $bukti)

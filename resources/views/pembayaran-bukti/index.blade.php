@@ -8,7 +8,7 @@
         </div>
     </x-slot>
 
-    @if(auth()->user()->isKeuangan())
+    @if(auth()->user()->isKeuangan() || auth()->user()->isAdministrasi())
         <div style="display:flex; gap:16px; margin-bottom:16px; flex-wrap:wrap">
             <div style="flex:1; border:1px solid #E5C99B; border-radius:8px; padding:16px; background:#FFFBF5">
                 <div style="font-size:11px; color:#C8862A; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; margin-bottom:4px">

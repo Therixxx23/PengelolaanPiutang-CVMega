@@ -38,17 +38,17 @@ class PembayaranBuktiPolicy
 
     public function validate(User $user): bool
     {
-        return $user->isKeuangan();
+        return $user->isKeuangan() || $user->isAdministrasi();
     }
 
     public function approve(User $user, PembayaranBukti $bukti): bool
     {
-        return $user->isKeuangan() && $bukti->isPending();
+        return ($user->isKeuangan() || $user->isAdministrasi()) && $bukti->isPending();
     }
 
     public function reject(User $user, PembayaranBukti $bukti): bool
     {
-        return $user->isKeuangan() && $bukti->isPending();
+        return ($user->isKeuangan() || $user->isAdministrasi()) && $bukti->isPending();
     }
 
     public function update(User $user, PembayaranBukti $bukti): bool
