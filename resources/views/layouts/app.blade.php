@@ -46,5 +46,33 @@
         </div>
 
         @stack('scripts')
+
+        <script>
+            (function() {
+                const TIMEOUT = 7200000;
+                let timer;
+
+                function resetTimer() {
+                    clearTimeout(timer);
+                    timer = setTimeout(function() {
+                        if (confirm(
+                            'Sesi Anda akan berakhir karena tidak aktif. Klik OK untuk tetap login.'
+                        )) {
+                            fetch('{{ route("refresh-session") }}', {
+                                method: 'POST',
+                                headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
+                            }).then(() => resetTimer());
+                        } else {
+                            window.location = '{{ route("logout") }}';
+                        }
+                    }, TIMEOUT - 300000);
+                }
+
+                ['mousemove', 'keypress', 'click', 'scroll', 'touchstart']
+                    .forEach(e => document.addEventListener(e, resetTimer));
+
+                resetTimer();
+            })();
+        </script>
     </body>
 </html>

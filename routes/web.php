@@ -92,15 +92,27 @@ Route::middleware('auth')->group(function () {
     Route::prefix('pembayaran-bukti')->name('pembayaran-bukti.')->group(function () {
         Route::get('/', [PembayaranBuktiController::class, 'index'])->name('index');
         Route::get('create', [PembayaranBuktiController::class, 'create'])->name('create');
-        Route::post('/', [PembayaranBuktiController::class, 'store'])->name('store');
+        Route::post('/', [PembayaranBuktiController::class, 'store'])
+            ->middleware('throttle:5,1')
+            ->name('store');
         Route::get('{bukti}/download', [PembayaranBuktiController::class, 'download'])->name('download');
         Route::delete('{bukti}', [PembayaranBuktiController::class, 'destroy'])->name('destroy');
-        Route::post('{bukti}/setujui', [PembayaranBuktiController::class, 'setujui'])->name('setujui');
-        Route::post('{bukti}/tolak', [PembayaranBuktiController::class, 'tolak'])->name('tolak');
+        Route::post('{bukti}/setujui', [PembayaranBuktiController::class, 'setujui'])
+            ->middleware('throttle:30,1')
+            ->name('setujui');
+        Route::post('{bukti}/tolak', [PembayaranBuktiController::class, 'tolak'])
+            ->middleware('throttle:30,1')
+            ->name('tolak');
     });
 
     Route::get('/log-aktivitas', [LogAktivitasController::class, 'index'])
         ->name('log-aktivitas');
+
+    Route::post('refresh-session', function () {
+        request()->session()->regenerate();
+
+        return response()->json(['ok' => true]);
+    })->name('refresh-session');
 });
 
 require __DIR__.'/auth.php';

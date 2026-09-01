@@ -36,8 +36,8 @@ class UserManagementTest extends TestCase
         $response = $this->actingAs($pimpinan)->post('/users', [
             'name' => 'Budi Sales',
             'email' => 'budi@example.com',
-            'password' => 'password123',
-            'password_confirmation' => 'password123',
+            'password' => 'Password123',
+            'password_confirmation' => 'Password123',
             'role' => 'sales',
             'is_active' => 1,
         ]);
@@ -58,8 +58,8 @@ class UserManagementTest extends TestCase
         $response = $this->actingAs($pimpinan)->post('/users', [
             'name' => 'Duplikat',
             'email' => $existing->email,
-            'password' => 'password123',
-            'password_confirmation' => 'password123',
+            'password' => 'Password123',
+            'password_confirmation' => 'Password123',
             'role' => 'sales',
             'is_active' => 1,
         ]);
@@ -92,6 +92,23 @@ class UserManagementTest extends TestCase
             'email' => 'budi@example.com',
             'password' => 'abcdefgh',
             'password_confirmation' => 'abcdefgh',
+            'role' => 'sales',
+            'is_active' => 1,
+        ]);
+
+        $response->assertSessionHasErrors('password');
+        $this->assertDatabaseCount('users', 1);
+    }
+
+    public function test_store_with_password_lacking_uppercase_fails(): void
+    {
+        $pimpinan = User::factory()->pimpinan()->create();
+
+        $response = $this->actingAs($pimpinan)->post('/users', [
+            'name' => 'Budi Sales',
+            'email' => 'budi@example.com',
+            'password' => 'abc12345',
+            'password_confirmation' => 'abc12345',
             'role' => 'sales',
             'is_active' => 1,
         ]);

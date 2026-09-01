@@ -32,7 +32,7 @@
             <div>
                 <label for="password" class="block text-sm font-medium text-ink mb-1">Password</label>
                 <input type="password" id="password" name="password" class="input-field">
-                <p class="mt-1 text-xs text-ink-muted">Kosongkan jika tidak ingin mengganti password</p>
+                <p class="mt-1 text-xs text-ink-muted">Kosongkan jika tidak ingin mengganti password. Min. 8 karakter, harus ada huruf besar dan angka</p>
                 @error('password') <p class="mt-1 text-sm text-status-critical">{{ $message }}</p> @enderror
             </div>
 
