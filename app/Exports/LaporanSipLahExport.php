@@ -2,6 +2,7 @@
 
 namespace App\Exports;
 
+use App\Support\SpreadsheetSafeString;
 use OpenSpout\Common\Entity\Row;
 use OpenSpout\Common\Entity\Style\Style;
 use OpenSpout\Writer\AbstractWriter;
@@ -27,14 +28,14 @@ class LaporanSipLahExport
 
         foreach ($this->tagihan as $t) {
             $writer->addRow(Row::fromValues([
-                $t->no_invoice,
-                $t->no_sj ?: '',
+                SpreadsheetSafeString::make($t->no_invoice),
+                SpreadsheetSafeString::make($t->no_sj ?: ''),
                 $t->tanggal_tagihan?->format('Y-m-d'),
-                $t->pelanggan?->nama_pelanggan,
-                $t->pelanggan?->nama_lembaga ?: $t->pelanggan?->nama_pelanggan,
-                $t->pelanggan?->kabupaten ?: '',
-                $t->nama_sales ?: '',
-                $t->sumber_dana ?: '',
+                SpreadsheetSafeString::make($t->pelanggan?->nama_pelanggan),
+                SpreadsheetSafeString::make($t->pelanggan?->nama_lembaga ?: $t->pelanggan?->nama_pelanggan),
+                SpreadsheetSafeString::make($t->pelanggan?->kabupaten ?: ''),
+                SpreadsheetSafeString::make($t->nama_sales ?: ''),
+                SpreadsheetSafeString::make($t->sumber_dana ?: ''),
                 $t->items->count(),
                 $t->items->sum('qty_netto'),
                 (float) $t->total_tagihan,
@@ -54,14 +55,14 @@ class LaporanSipLahExport
         foreach ($this->tagihan as $t) {
             foreach ($t->items as $item) {
                 $writer->addRow(Row::fromValues([
-                    $t->no_invoice,
-                    $item->kode_barang ?: '',
-                    $item->nama_barang,
-                    $item->kelas ?: '',
-                    $item->nama_supplier ?: '',
+                    SpreadsheetSafeString::make($t->no_invoice),
+                    SpreadsheetSafeString::make($item->kode_barang ?: ''),
+                    SpreadsheetSafeString::make($item->nama_barang),
+                    SpreadsheetSafeString::make($item->kelas ?: ''),
+                    SpreadsheetSafeString::make($item->nama_supplier ?: ''),
                     (int) $item->qty_netto,
                     (float) $item->harga_jual,
-                    is_numeric($item->persen_diskon) ? (float) $item->persen_diskon : $item->persen_diskon,
+                    is_numeric($item->persen_diskon) ? (float) $item->persen_diskon : SpreadsheetSafeString::make($item->persen_diskon),
                     (float) $item->netto_penj,
                 ]));
             }

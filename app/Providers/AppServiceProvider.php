@@ -19,6 +19,7 @@ use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -32,6 +33,10 @@ class AppServiceProvider extends ServiceProvider
     {
         if (app()->environment('production') && config('app.debug')) {
             abort(500, 'APP_DEBUG harus false saat APP_ENV=production.');
+        }
+
+        if (app()->environment('production')) {
+            URL::forceScheme('https');
         }
 
         Gate::policy(Pelanggan::class, PelangganPolicy::class);

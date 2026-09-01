@@ -4,6 +4,7 @@ namespace App\Exports;
 
 use App\Models\Pelanggan;
 use App\Support\LikeQuery;
+use App\Support\SpreadsheetSafeString;
 use OpenSpout\Common\Entity\Row;
 use OpenSpout\Common\Entity\Style\Style;
 use OpenSpout\Writer\AbstractWriter;
@@ -86,10 +87,10 @@ class RekapitulasiExport
 
             $writer->addRow(Row::fromValues([
                 $no,
-                $r['pelanggan']->nama_pelanggan,
-                $r['pelanggan']->nama_lembaga ?: '',
-                $r['pelanggan']->kabupaten ?: ($r['pelanggan']->wilayah ?: ''),
-                $sumberDominan ?: '',
+                SpreadsheetSafeString::make($r['pelanggan']->nama_pelanggan),
+                SpreadsheetSafeString::make($r['pelanggan']->nama_lembaga ?: ''),
+                SpreadsheetSafeString::make($r['pelanggan']->kabupaten ?: ($r['pelanggan']->wilayah ?: '')),
+                SpreadsheetSafeString::make($sumberDominan ?: ''),
                 (float) $r['total_tagihan'],
                 (float) $r['total_terbayar'],
                 (float) max(0, $r['sisa_piutang']),

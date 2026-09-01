@@ -4,6 +4,7 @@ namespace App\Exports;
 
 use App\Models\Tagihan;
 use App\Services\TagihanFilterService;
+use App\Support\SpreadsheetSafeString;
 use OpenSpout\Common\Entity\Row;
 use OpenSpout\Common\Entity\Style\Style;
 use OpenSpout\Writer\AbstractWriter;
@@ -58,16 +59,16 @@ class TagihanBelumLunasExport
             $sisa = $t->total_tagihan - $totalDibayar;
 
             $writer->addRow(Row::fromValues([
-                $t->no_invoice,
-                $t->pelanggan->nama_pelanggan,
-                $t->pelanggan->wilayah ?: '',
+                SpreadsheetSafeString::make($t->no_invoice),
+                SpreadsheetSafeString::make($t->pelanggan->nama_pelanggan),
+                SpreadsheetSafeString::make($t->pelanggan->wilayah ?: ''),
                 $t->tanggal_tagihan->format('Y-m-d'),
                 $t->tanggal_jatuh_tempo->format('Y-m-d'),
                 (float) $t->total_tagihan,
                 (float) $totalDibayar,
                 (float) max(0, $sisa),
                 $t->days_overdue,
-                $bucketLabels[$t->aging_bucket] ?? $t->aging_bucket,
+                $bucketLabels[$t->aging_bucket] ?? SpreadsheetSafeString::make($t->aging_bucket),
                 $t->is_overdue ? 'Jatuh Tempo' : 'Belum Lunas',
             ]));
         }
