@@ -3,6 +3,8 @@
 .env
 .env.backup
 .env.production
+SECURITY.md
+/scripts/backup.sh
 .phpactor.json
 .phpunit.result.cache
 /.fleet
