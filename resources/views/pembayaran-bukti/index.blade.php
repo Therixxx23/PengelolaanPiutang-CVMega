@@ -115,6 +115,24 @@
                                         <button type="submit" class="btn-secondary !px-3 !py-1 !text-xs">Hapus</button>
                                     </form>
                                 @endcan
+
+                                @cannot('approve', $b)
+                                    @if ($b->status === 'approved' || $b->status === 'rejected')
+                                        <span class="inline-flex items-center gap-1 text-xs text-ink-muted">
+                                            @if ($b->status === 'approved')
+                                                <span class="text-[10px] px-2 py-0.5 rounded font-medium"
+                                                      style="background:#3E7C5820; color:#3E7C58; border:1px solid #3E7C58">Disetujui</span>
+                                            @else
+                                                <span class="text-[10px] px-2 py-0.5 rounded font-medium"
+                                                      style="background:#B33A2E20; color:#B33A2E; border:1px solid #B33A2E">Ditolak</span>
+                                            @endif
+                                            <span class="whitespace-nowrap">oleh {{ $b->validator?->name ?? '-' }}
+                                                · {{ $b->validated_at?->format('d/m/Y') ?? '-' }}</span>
+                                        </span>
+                                    @else
+                                        <span class="text-xs text-ink-muted">&mdash;</span>
+                                    @endif
+                                @endcannot
                             </td>
                         </tr>
                         @can('reject', $b)

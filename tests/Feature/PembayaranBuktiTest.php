@@ -231,6 +231,28 @@ class PembayaranBuktiTest extends TestCase
         ]);
     }
 
+    public function test_approved_proof_cannot_be_approve_ulang_via_backend(): void
+    {
+        $sales = $this->sales();
+        $keuangan = $this->keuangan();
+        $tagihan = $this->assignedTagihanFor($sales, 100000);
+        $bukti = PembayaranBukti::factory()->approved()->create([
+            'tagihan_id' => $tagihan->id_tagihan,
+            'sales_id' => $sales->id,
+            'nominal_dibayar' => 100000,
+        ]);
+
+        $this->actingAs($keuangan)
+            ->post(route('pembayaran-bukti.setujui', $bukti))
+            ->assertForbidden();
+
+        $this->assertDatabaseCount('pembayaran', 0);
+        $this->assertDatabaseHas('pembayaran_bukti', [
+            'id' => $bukti->id,
+            'status' => 'approved',
+        ]);
+    }
+
     public function test_reject_requires_note(): void
     {
         $sales = $this->sales();
@@ -320,6 +342,27 @@ class PembayaranBuktiTest extends TestCase
             'id' => $bukti->id,
             'status' => 'pending',
         ]);
+    }
+
+    public function test_administrasi_melihat_status_readonly_untuk_bukti_approved(): void
+    {
+        $admin = User::factory()->create(['role' => 'bagian_administrasi']);
+        $keuangan = $this->keuangan();
+        $sales = $this->sales();
+        $tagihan = $this->assignedTagihanFor($sales);
+        $bukti = PembayaranBukti::factory()->approved()->create([
+            'tagihan_id' => $tagihan->id_tagihan,
+            'sales_id' => $sales->id,
+            'validated_by' => $keuangan->id,
+            'validated_at' => now(),
+        ]);
+
+        $response = $this->actingAs($admin)->get(route('pembayaran-bukti.index'));
+
+        $response->assertOk();
+        $response->assertDontSee(route('pembayaran-bukti.setujui', $bukti));
+        $response->assertDontSee(route('pembayaran-bukti.tolak', $bukti));
+        $response->assertSee($keuangan->name, false);
     }
 
     public function test_keuangan_cannot_upload_proof(): void
