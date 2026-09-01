@@ -365,6 +365,65 @@ class PembayaranBuktiTest extends TestCase
         $response->assertSee($keuangan->name, false);
     }
 
+    public function test_keuangan_melihat_tombol_aksi_untuk_bukti_pending(): void
+    {
+        $keuangan = $this->keuangan();
+        $sales = $this->sales();
+        $tagihan = $this->assignedTagihanFor($sales);
+        $bukti = PembayaranBukti::factory()->create([
+            'tagihan_id' => $tagihan->id_tagihan,
+            'sales_id' => $sales->id,
+            'status' => 'pending',
+        ]);
+
+        $response = $this->actingAs($keuangan)->get(route('pembayaran-bukti.index'));
+
+        $response->assertOk();
+        $response->assertSee('Setujui', false);
+        $response->assertSee('Tolak', false);
+        $response->assertSee(route('pembayaran-bukti.setujui', $bukti), false);
+        $response->assertSee(route('pembayaran-bukti.tolak', $bukti), false);
+    }
+
+    public function test_keuangan_tidak_melihat_tombol_aksi_untuk_bukti_approved(): void
+    {
+        $keuangan = $this->keuangan();
+        $sales = $this->sales();
+        $tagihan = $this->assignedTagihanFor($sales);
+        $bukti = PembayaranBukti::factory()->approved()->create([
+            'tagihan_id' => $tagihan->id_tagihan,
+            'sales_id' => $sales->id,
+            'validated_by' => $keuangan->id,
+            'validated_at' => now(),
+        ]);
+
+        $response = $this->actingAs($keuangan)->get(route('pembayaran-bukti.index'));
+
+        $response->assertOk();
+        $response->assertDontSee(route('pembayaran-bukti.setujui', $bukti), false);
+        $response->assertDontSee(route('pembayaran-bukti.tolak', $bukti), false);
+    }
+
+    public function test_keuangan_tidak_melihat_tombol_aksi_untuk_bukti_rejected(): void
+    {
+        $keuangan = $this->keuangan();
+        $sales = $this->sales();
+        $tagihan = $this->assignedTagihanFor($sales);
+        $bukti = PembayaranBukti::factory()->rejected()->create([
+            'tagihan_id' => $tagihan->id_tagihan,
+            'sales_id' => $sales->id,
+            'validated_by' => $keuangan->id,
+            'validated_at' => now(),
+            'catatan_reject' => 'File tidak terbaca.',
+        ]);
+
+        $response = $this->actingAs($keuangan)->get(route('pembayaran-bukti.index'));
+
+        $response->assertOk();
+        $response->assertDontSee(route('pembayaran-bukti.setujui', $bukti), false);
+        $response->assertDontSee(route('pembayaran-bukti.tolak', $bukti), false);
+    }
+
     public function test_keuangan_cannot_upload_proof(): void
     {
         $keuangan = $this->keuangan();
