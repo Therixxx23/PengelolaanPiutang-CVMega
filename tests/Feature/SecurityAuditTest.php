@@ -2,10 +2,13 @@
 
 namespace Tests\Feature;
 
+use App\Http\Middleware\SecurityHeaders;
 use App\Models\Pelanggan;
 use App\Models\Tagihan;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Tests\TestCase;
 
 class SecurityAuditTest extends TestCase
@@ -316,5 +319,58 @@ class SecurityAuditTest extends TestCase
         }
 
         $this->actingAs($admin)->get(route('pelanggan.suggest'))->assertStatus(429);
+    }
+
+    public function test_force_https_301_di_production(): void
+    {
+        config(['app.env' => 'production']);
+
+        $admin = $this->admin();
+
+        $response = $this->actingAs($admin)->get(route('dashboard'));
+
+        $response->assertStatus(301);
+        $this->assertStringStartsWith('https://', (string) $response->headers->get('Location'));
+    }
+
+    public function test_production_menambah_header_hsts_dan_csp(): void
+    {
+        config(['app.env' => 'production']);
+
+        $middleware = app(SecurityHeaders::class);
+        $request = Request::create('https://example.test/dashboard', 'GET');
+
+        $response = $middleware->handle($request, fn () => new Response('<html></html>'));
+
+        $this->assertSame(
+            'max-age=31536000; includeSubDomains',
+            $response->headers->get('Strict-Transport-Security')
+        );
+        $this->assertSame(
+            'strict-origin-when-cross-origin',
+            $response->headers->get('Referrer-Policy')
+        );
+        $this->assertNull($response->headers->get('X-Powered-By'));
+
+        $csp = (string) $response->headers->get('Content-Security-Policy');
+        $this->assertStringContainsString("default-src 'self'", $csp);
+        $this->assertStringContainsString('frame-ancestors', $csp);
+    }
+
+    public function test_refresh_session_membutuhkan_auth(): void
+    {
+        $this->post(route('refresh-session'))->assertRedirect(route('login'));
+
+        $admin = $this->admin();
+        $this->actingAs($admin)->post(route('refresh-session'))->assertOk();
+    }
+
+    public function test_file_bukti_tidak_bisa_diakses_via_url_storage_publik(): void
+    {
+        $admin = $this->admin();
+
+        $this->get('/storage/bukti-bayar/apa-saja.pdf')->assertNotFound();
+
+        $this->actingAs($admin)->get('/storage/bukti-bayar/apa-saja.pdf')->assertNotFound();
     }
 }
