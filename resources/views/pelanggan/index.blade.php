@@ -147,15 +147,15 @@
         <div class="hidden sm:block overflow-x-auto">
             <table style="width:100%; min-width:950px; table-layout:fixed">
                 <colgroup>
-                    <col style="width:16%">
-                    <col style="width:8%">
-                    <col style="width:18%">
-                    <col style="width:10%">
-                    <col style="width:9%">
-                    <col style="width:11%">
-                    <col style="width:12%">
-                    <col style="width:8%">
-                    <col style="width:8%">
+                    <col style="width:18%"> <!-- NAMA -->
+                    <col style="width:11%"> <!-- KODE — lebih lebar -->
+                    <col style="width:18%"> <!-- LEMBAGA -->
+                    <col style="width:10%"> <!-- KABUPATEN -->
+                    <col style="width:9%">  <!-- WILAYAH -->
+                    <col style="width:12%"> <!-- TELEPON -->
+                    <col style="width:11%"> <!-- BATAS KREDIT -->
+                    <col style="width:7%">  <!-- TAGIHAN AKTIF -->
+                    <col style="width:4%">  <!-- AKSI — cukup 2 tombol kecil -->
                 </colgroup>
                 <thead>
                     <tr class="border-b border-line">
@@ -180,27 +180,33 @@
                                     {{ $p->nama_pelanggan }}
                                 </a>
                             </td>
-                            <td style="padding:12px 16px; font-size:12px; white-space:nowrap; font-family:'IBM Plex Mono',monospace; color:#1B2027">
-                                {{ $p->kode_pelanggan ?: '-' }}
+                            <td style="padding:12px 16px; font-family:'IBM Plex Mono',monospace; font-size:11px; color:#5B6470; white-space:nowrap">
+                                {{ $p->kode_pelanggan ?? '—' }}
                             </td>
-                            <td style="padding:12px 16px; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:0"
-                                title="{{ $p->nama_lembaga ?: $p->nama_pelanggan }}">
-                                <div style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis">
-                                    {{ $p->nama_lembaga ?: $p->nama_pelanggan }}
-                                </div>
-                                @if($p->status_lembaga)
-                                    <div style="font-size:10px; color:#8A929C">
+                            <td style="padding:12px 16px; max-width:0" title="{{ $p->nama_lembaga }}">
+                                @if($p->nama_lembaga && $p->nama_lembaga !== $p->nama_pelanggan)
+                                    <span style="display:block; font-size:13px; color:#1B2027; overflow:hidden; text-overflow:ellipsis; white-space:nowrap">
+                                        {{ $p->nama_lembaga }}
+                                    </span>
+                                    @if($p->status_lembaga)
+                                    <span style="display:inline-block; margin-top:3px; font-size:10px; padding:1px 6px; border-radius:3px; white-space:nowrap; background:{{ $p->status_lembaga === 'NEGERI' ? '#EBF5FB' : '#FEF9E7' }}; color:{{ $p->status_lembaga === 'NEGERI' ? '#1A5276' : '#7D6608' }}; border:1px solid {{ $p->status_lembaga === 'NEGERI' ? '#1A5276' : '#7D6608' }}">
                                         {{ $p->status_lembaga }}
-                                    </div>
+                                    </span>
+                                    @endif
+                                @else
+                                    <span style="color:#DCE2E0; font-size:12px">—</span>
                                 @endif
                             </td>
-                            <td style="padding:12px 16px; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:0"
-                                title="{{ $p->kabupaten ?: $p->wilayah }}">
-                                {{ $p->kabupaten ?: $p->wilayah }}
+                            @php
+                                $tampilWilayah = ($p->wilayah && $p->wilayah !== $p->kabupaten)
+                                    ? $p->wilayah : null;
+                            @endphp
+                            <td style="padding:12px 16px; font-size:13px; color:#5B6470; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:0"
+                                title="{{ $p->kabupaten }}">
+                                {{ $p->kabupaten ?? '—' }}
                             </td>
-                            <td style="padding:12px 16px; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:0"
-                                title="{{ $p->wilayah }}">
-                                {{ $p->wilayah ?: '-' }}
+                            <td style="padding:12px 16px; font-size:12px; color:#5B6470">
+                                {{ $tampilWilayah ?? '—' }}
                             </td>
                             <td style="padding:12px 16px; font-size:14px; font-family:'IBM Plex Mono',monospace">
                                 {{ $p->no_telepon ?: '-' }}
@@ -211,22 +217,23 @@
                             <td style="padding:12px 16px; font-size:14px; text-align:right; font-family:'IBM Plex Mono',monospace">
                                 {{ $p->tagihan_aktif }}
                             </td>
-                            <td style="padding:12px 16px; text-align:right; white-space:nowrap">
-                                <div style="display:flex; align-items:center; justify-content:flex-end; gap:6px">
+                            <td style="padding:8px 4px; white-space:nowrap">
+                                <div style="display:flex; gap:3px; justify-content:flex-end">
                                     @can('update', $p)
                                         <a href="{{ route('pelanggan.edit', $p) }}"
-                                           style="padding:2px 8px; border:1px solid #0E6E66; color:#0E6E66; background:white; border-radius:4px; font-size:11px; text-decoration:none; font-family:Inter,sans-serif; font-weight:500">
+                                           style="font-size:11px; padding:3px 8px; border:1px solid #0E6E66; color:#0E6E66; border-radius:4px; text-decoration:none; white-space:nowrap">
                                             Edit
                                         </a>
                                     @endcan
                                     @can('delete', $p)
-                                        <form action="{{ route('pelanggan.destroy', $p) }}" method="POST" onsubmit="return confirm('Hapus pelanggan ini?')">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit"
-                                                    style="padding:2px 8px; border:1px solid #B33A2E; color:#B33A2E; background:white; border-radius:4px; font-size:11px; cursor:pointer; font-family:Inter,sans-serif; font-weight:500">
-                                                Hapus
-                                            </button>
+                                        <button form="del-p-{{ $p->id_pelanggan }}"
+                                                onclick="return confirm('Hapus pelanggan ini?')"
+                                                style="font-size:11px; padding:3px 8px; border:1px solid #B33A2E; color:#B33A2E; background:white; border-radius:4px; cursor:pointer; white-space:nowrap">
+                                            Hapus
+                                        </button>
+                                        <form id="del-p-{{ $p->id_pelanggan }}" method="POST"
+                                              action="{{ route('pelanggan.destroy', $p) }}" style="display:none">
+                                            @csrf @method('DELETE')
                                         </form>
                                     @endcan
                                 </div>
