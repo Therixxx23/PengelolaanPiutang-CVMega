@@ -48,36 +48,67 @@
         </div>
     </form>
 
-    <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:16px">
-        <div style="border:1px solid #DCE2E0; border-radius:8px; padding:16px">
-            <div style="font-size:11px; color:#5B6470; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; margin-bottom:4px">Total Faktur</div>
-            <div style="font-family:'IBM Plex Mono',monospace; font-size:20px; color:#1B2027; font-weight:600">{{ number_format($summary['total_faktur'], 0, ',', '.') }}</div>
-        </div>
-        <div style="border:1px solid #DCE2E0; border-radius:8px; padding:16px">
-            <div style="font-size:11px; color:#5B6470; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; margin-bottom:4px">Total Nilai</div>
-            <div style="font-family:'IBM Plex Mono',monospace; font-size:20px; color:#0E6E66; font-weight:600">Rp {{ number_format($summary['total_nilai'], 0, ',', '.') }}</div>
-        </div>
-        <div style="border:1px solid #DCE2E0; border-radius:8px; padding:16px">
-            <div style="font-size:11px; color:#5B6470; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; margin-bottom:4px">Total Item</div>
-            <div style="font-family:'IBM Plex Mono',monospace; font-size:20px; color:#1B2027; font-weight:600">{{ number_format($summary['total_item'], 0, ',', '.') }}</div>
-        </div>
-        <div style="border:1px solid #DCE2E0; border-radius:8px; padding:16px">
-            <div style="font-size:11px; color:#5B6470; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; margin-bottom:4px">Total Qty</div>
-            <div style="font-family:'IBM Plex Mono',monospace; font-size:20px; color:#1B2027; font-weight:600">{{ number_format($summary['total_qty'], 0, ',', '.') }} buku</div>
-        </div>
-        <div style="border:1px solid #DCE2E0; border-radius:8px; padding:16px">
-            <div style="font-size:11px; color:#5B6470; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; margin-bottom:4px">Sudah Lunas</div>
-            <div style="font-family:'IBM Plex Mono',monospace; font-size:20px; color:#3E7C58; font-weight:600">{{ number_format($summary['sudah_lunas'], 0, ',', '.') }} faktur</div>
-        </div>
-        <div style="border:1px solid #DCE2E0; border-radius:8px; padding:16px">
-            <div style="font-size:11px; color:#5B6470; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; margin-bottom:4px">Belum Lunas</div>
-            <div style="font-family:'IBM Plex Mono',monospace; font-size:20px; color:#B33A2E; font-weight:600">{{ number_format($summary['belum_lunas'], 0, ',', '.') }} faktur</div>
-        </div>
+    <div style="display:flex; gap:12px; margin-bottom:16px; align-items:stretch; flex-wrap:wrap">
+
+      <!-- Card Total Faktur -->
+      <div style="flex:1 1 200px; border:1px solid #DCE2E0; border-radius:8px; padding:16px 20px">
+        <p style="font-size:11px; font-weight:600; color:#5B6470; letter-spacing:0.05em; text-transform:uppercase; margin:0 0 6px">Total Faktur</p>
+        <p style="font-size:22px; font-weight:700; color:#1B2027; font-family:'IBM Plex Mono',monospace; margin:0">
+          {{ number_format($summary['total_faktur'],0,',','.') }}
+          <span style="font-size:14px; font-weight:400; color:#5B6470">faktur</span>
+        </p>
+      </div>
+
+      <!-- Card Total Nilai -->
+      <div style="flex:1 1 200px; border:1px solid #DCE2E0; border-radius:8px; padding:16px 20px">
+        <p style="font-size:11px; font-weight:600; color:#5B6470; letter-spacing:0.05em; text-transform:uppercase; margin:0 0 6px">Total Nilai</p>
+        <p style="font-size:22px; font-weight:700; color:#1B2027; font-family:'IBM Plex Mono',monospace; margin:0">
+          Rp {{ number_format((float) $summary['total_nilai'],0,',','.') }}
+          <span style="font-size:14px; font-weight:400; color:#5B6470">rupiah</span>
+        </p>
+      </div>
+
+      <!-- Card Total Item -->
+      <div style="flex:1 1 200px; border:1px solid #DCE2E0; border-radius:8px; padding:16px 20px">
+        <p style="font-size:11px; font-weight:600; color:#5B6470; letter-spacing:0.05em; text-transform:uppercase; margin:0 0 6px">Total Item</p>
+        <p style="font-size:22px; font-weight:700; color:#1B2027; font-family:'IBM Plex Mono',monospace; margin:0">
+          {{ number_format($summary['total_item'],0,',','.') }}
+          <span style="font-size:14px; font-weight:400; color:#5B6470">item</span>
+        </p>
+      </div>
+
+      <!-- Card Total QTY -->
+      <div style="flex:1 1 200px; border:1px solid #DCE2E0; border-radius:8px; padding:16px 20px">
+        <p style="font-size:11px; font-weight:600; color:#5B6470; letter-spacing:0.05em; text-transform:uppercase; margin:0 0 6px">Total Qty</p>
+        <p style="font-size:22px; font-weight:700; color:#1B2027; font-family:'IBM Plex Mono',monospace; margin:0">
+          {{ number_format($summary['total_qty'],0,',','.') }}
+          <span style="font-size:14px; font-weight:400; color:#5B6470">buku</span>
+        </p>
+      </div>
+
+      <!-- Card Sudah Lunas -->
+      <div style="flex:1 1 200px; border:1px solid #3E7C58; border-radius:8px; padding:16px 20px; background:#F0FAF5">
+        <p style="font-size:11px; font-weight:600; color:#3E7C58; letter-spacing:0.05em; text-transform:uppercase; margin:0 0 6px">Sudah Lunas</p>
+        <p style="font-size:22px; font-weight:700; color:#3E7C58; font-family:'IBM Plex Mono',monospace; margin:0">
+          {{ number_format($summary['sudah_lunas'],0,',','.') }}
+          <span style="font-size:14px; font-weight:400">faktur</span>
+        </p>
+      </div>
+
+      <!-- Card Belum Lunas -->
+      <div style="flex:1 1 200px; border:1px solid #B33A2E; border-radius:8px; padding:16px 20px; background:#FFF5F5">
+        <p style="font-size:11px; font-weight:600; color:#B33A2E; letter-spacing:0.05em; text-transform:uppercase; margin:0 0 6px">Belum Lunas</p>
+        <p style="font-size:22px; font-weight:700; color:#B33A2E; font-family:'IBM Plex Mono',monospace; margin:0">
+          {{ number_format($summary['belum_lunas'],0,',','.') }}
+          <span style="font-size:14px; font-weight:400">faktur</span>
+        </p>
+      </div>
+
     </div>
 
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px">
         <div style="border:1px solid #DCE2E0; border-radius:8px; padding:16px">
-            <div style="font-size:11px; color:#5B6470; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; margin-bottom:12px">Per Sumber Dana</div>
+            <p style="font-size:11px; font-weight:600; color:#5B6470; letter-spacing:0.05em; text-transform:uppercase; margin:0 0 12px">Per Sumber Dana</p>
             @forelse ($perSumberDana as $dana => $brk)
                 @php
                     $color = $loop->first ? '#B8612A' : '#6B7CA3';
@@ -93,7 +124,7 @@
         </div>
 
         <div style="border:1px solid #DCE2E0; border-radius:8px; padding:16px">
-            <div style="font-size:11px; color:#5B6470; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; margin-bottom:12px">Performa Sales</div>
+            <p style="font-size:11px; font-weight:600; color:#5B6470; letter-spacing:0.05em; text-transform:uppercase; margin:0 0 12px">Performa Sales</p>
             @forelse ($perSales->take(10) as $nama => $brk)
                 <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid #EEF0EF">
                     <span style="font-weight:500; color:#1B2027; font-size:14px">{{ $loop->iteration }}. {{ $nama ?: '-' }}</span>
@@ -107,47 +138,72 @@
     </div>
 
     <div class="bg-surface border border-line rounded overflow-hidden">
-        <div class="hidden sm:block overflow-x-auto">
-            <table style="width:100%; table-layout:fixed">
+        <div class="hidden sm:block" style="overflow-x:auto; width:100%">
+            <table style="width:100%; min-width:1100px; table-layout:fixed">
+                <colgroup>
+                    <col style="width:3%">   <!-- Toggle -->
+                    <col style="width:12%">  <!-- No. Faktur -->
+                    <col style="width:10%">  <!-- No. SJ -->
+                    <col style="width:8%">   <!-- Tanggal -->
+                    <col style="width:14%">  <!-- Lembaga -->
+                    <col style="width:8%">   <!-- Kabupaten -->
+                    <col style="width:10%">  <!-- Sales -->
+                    <col style="width:5%">   <!-- Dana -->
+                    <col style="width:5%">   <!-- Item -->
+                    <col style="width:10%">  <!-- Total -->
+                    <col style="width:8%">   <!-- Status -->
+                    <col style="width:7%">   <!-- V/A -->
+                </colgroup>
                 <thead>
                     <tr class="border-b border-line">
-                        <th style="width:16%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">No. Faktur</th>
-                        <th style="width:10%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">No. SJ</th>
-                        <th style="width:10%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Tanggal</th>
-                        <th style="width:16%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Pelanggan</th>
-                        <th style="width:9%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Kabupaten</th>
-                        <th style="width:11%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Sales</th>
-                        <th style="width:8%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Dana</th>
-                        <th style="width:6%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Item</th>
-                        <th style="width:9%; padding:12px 16px; text-align:right; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Total</th>
-                        <th style="width:8%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Status</th>
+                        <th style="padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em"></th>
+                        <th style="padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">No. Faktur</th>
+                        <th style="padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">No. SJ</th>
+                        <th style="padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Tanggal</th>
+                        <th style="padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Lembaga</th>
+                        <th style="padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Kabupaten</th>
+                        <th style="padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Sales</th>
+                        <th style="padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Dana</th>
+                        <th style="padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Item</th>
+                        <th style="padding:12px 16px; text-align:right; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Total</th>
+                        <th style="padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Status</th>
+                        <th style="padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em"><span title="Validasi / Sinkron">V/A</span></th>
                     </tr>
                 </thead>
                     @forelse ($tagihan as $t)
                         <tbody x-data="{ open: false }">
-                            <tr x-on:click="open = !open" style="cursor:pointer; border-left:3px solid {{ $t->status === 'lunas' ? '#3E7C58' : '#B33A2E' }}" class="border-b border-line hover:bg-paper transition">
-                                <td style="padding:12px 16px; font-family:'IBM Plex Mono',monospace; font-size:13px; white-space:nowrap">
-                                    <span x-text="open ? '\u25BC' : '\u25B6'" style="font-size:10px; color:#5B6470; margin-right:6px"></span>
-                                    {{ $t->no_invoice }}
-                                </td>
+                            <tr x-on:click="open = !open" style="cursor:pointer; border-left:3px solid {{ $t->status === 'lunas' ? '#3E7C58' : ($t->tanggal_jatuh_tempo->isPast() ? '#B33A2E' : '#6B7CA3') }}" class="border-b border-line hover:bg-paper transition">
+                                <td style="padding:12px 16px"><span x-text="open ? '\u25BC' : '\u25B6'" style="font-size:10px; color:#5B6470"></span></td>
+                                <td style="padding:12px 16px; font-family:'IBM Plex Mono',monospace; font-size:13px; white-space:nowrap">{{ $t->no_invoice }}</td>
                                 <td style="padding:12px 16px; font-size:13px; font-family:'IBM Plex Mono',monospace">{{ $t->no_sj ?: '-' }}</td>
                                 <td style="padding:12px 16px; font-size:13px">{{ $t->tanggal_tagihan?->format('d/m/Y') }}</td>
-                                <td style="padding:12px 16px; font-size:13px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:0" title="{{ $t->pelanggan?->nama_pelanggan }}">
+                                <td style="padding:12px 16px; font-size:13px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:0" title="{{ $t->pelanggan?->nama_lembaga ?: $t->pelanggan?->nama_pelanggan }}">
                                     {{ $t->pelanggan?->nama_lembaga ?: $t->pelanggan?->nama_pelanggan }}
                                 </td>
                                 <td style="padding:12px 16px; font-size:13px; white-space:nowrap">{{ $t->pelanggan?->kabupaten ?: '-' }}</td>
                                 <td style="padding:12px 16px; font-size:13px; white-space:nowrap">{{ $t->nama_sales ?: '-' }}</td>
-                                <td style="padding:12px 16px; font-size:13px; white-space:nowrap">{{ $t->sumber_dana ?: '-' }}</td>
-                                <td style="padding:12px 16px; font-size:13px">{{ $t->items->count() }}</td>
+                                <td style="padding:12px 16px; font-size:13px; white-space:nowrap">
+                                    @if($t->sumber_dana)
+                                        <x-badge-sumber-dana :sumber="$t->sumber_dana" />
+                                    @else
+                                        <span style="color:#DCE2E0; font-size:12px">—</span>
+                                    @endif
+                                </td>
+                                <td style="padding:12px 16px; font-size:13px; white-space:nowrap">{{ $t->items->count() }}</td>
                                 <td style="padding:12px 16px; text-align:right; font-family:'IBM Plex Mono',monospace; font-size:13px; white-space:nowrap">Rp {{ number_format($t->total_tagihan, 0, ',', '.') }}</td>
                                 <td style="padding:12px 16px; white-space:nowrap">
-                                    <span style="font-size:11px; padding:2px 8px; border-radius:4px; background:{{ $t->status === 'lunas' ? '#3E7C58' : '#B33A2E' }}20; color:{{ $t->status === 'lunas' ? '#3E7C58' : '#B33A2E' }}">
-                                        {{ $t->status === 'lunas' ? 'Lunas' : 'Belum Lunas' }}
-                                    </span>
+                                    @if($t->status === 'lunas')
+                                        <span style="font-size:11px; padding:2px 8px; border-radius:4px; background:#3E7C5820; color:#3E7C58">Lunas</span>
+                                    @elseif($t->tanggal_jatuh_tempo->isPast())
+                                        <span style="font-size:11px; padding:2px 8px; border-radius:4px; background:#B33A2E20; color:#B33A2E">Jatuh Tempo</span>
+                                    @else
+                                        <span style="font-size:11px; padding:2px 8px; border-radius:4px; background:#C8862A20; color:#C8862A">Belum Lunas</span>
+                                    @endif
                                 </td>
+                                <td style="padding:12px 16px; font-size:12px; color:#5B6470; white-space:nowrap">—</td>
                             </tr>
                             <tr x-show="open" x-transition class="border-b border-line">
-                                <td colspan="10" style="padding:0; background:#F9FAFB">
+                                <td colspan="12" style="padding:0; background:#F9FAFB">
                                     <table style="width:100%; font-size:12px">
                                         <thead style="background:#EEF2F7">
                                             <tr>
@@ -187,7 +243,7 @@
                     @empty
                         <tbody>
                             <tr>
-                                <td colspan="10" style="padding:32px; text-align:center; color:#5B6470; font-size:14px">Tidak ada data import SIPLAH yang cocok dengan filter ini.</td>
+                                <td colspan="12" style="padding:32px; text-align:center; color:#5B6470; font-size:14px">Tidak ada data import SIPLAH yang cocok dengan filter ini.</td>
                             </tr>
                         </tbody>
                     @endforelse
