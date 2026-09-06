@@ -174,15 +174,15 @@
                         <tbody x-data="{ open: false }">
                             <tr x-on:click="open = !open" style="cursor:pointer; border-left:3px solid {{ $t->status === 'lunas' ? '#3E7C58' : ($t->tanggal_jatuh_tempo->isPast() ? '#B33A2E' : '#6B7CA3') }}" class="border-b border-line hover:bg-paper transition">
                                 <td style="padding:12px 16px"><span x-text="open ? '\u25BC' : '\u25B6'" style="font-size:10px; color:#5B6470"></span></td>
-                                <td style="padding:12px 16px; font-family:'IBM Plex Mono',monospace; font-size:13px; white-space:nowrap">{{ $t->no_invoice }}</td>
-                                <td style="padding:12px 16px; font-size:13px; font-family:'IBM Plex Mono',monospace">{{ $t->no_sj ?: '-' }}</td>
+                                <td style="padding:12px 16px; font-family:'IBM Plex Mono',monospace; font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:0" title="{{ $t->no_invoice }}">{{ $t->no_invoice }}</td>
+                                <td style="padding:12px 16px; font-size:13px; font-family:'IBM Plex Mono',monospace; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:0" title="{{ $t->no_sj ?: '-' }}">{{ $t->no_sj ?: '-' }}</td>
                                 <td style="padding:12px 16px; font-size:13px">{{ $t->tanggal_tagihan?->format('d/m/Y') }}</td>
                                 <td style="padding:12px 16px; font-size:13px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:0" title="{{ $t->pelanggan?->nama_lembaga ?: $t->pelanggan?->nama_pelanggan }}">
                                     {{ $t->pelanggan?->nama_lembaga ?: $t->pelanggan?->nama_pelanggan }}
                                 </td>
-                                <td style="padding:12px 16px; font-size:13px; white-space:nowrap">{{ $t->pelanggan?->kabupaten ?: '-' }}</td>
-                                <td style="padding:12px 16px; font-size:13px; white-space:nowrap">{{ $t->nama_sales ?: '-' }}</td>
-                                <td style="padding:12px 16px; font-size:13px; white-space:nowrap">
+                                <td style="padding:12px 16px; font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:0" title="{{ $t->pelanggan?->kabupaten ?: '-' }}">{{ $t->pelanggan?->kabupaten ?: '-' }}</td>
+                                <td style="padding:12px 16px; font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:0" title="{{ $t->nama_sales ?: '-' }}">{{ $t->nama_sales ?: '-' }}</td>
+                                <td style="padding:12px 16px; font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:0">
                                     @if($t->sumber_dana)
                                         <x-badge-sumber-dana :sumber="$t->sumber_dana" />
                                     @else
@@ -220,10 +220,10 @@
                                         <tbody>
                                             @foreach($t->items as $item)
                                                 <tr style="border-bottom:1px solid #EEF2F7">
-                                                    <td style="padding:6px 12px; font-family:'IBM Plex Mono',monospace; font-size:11px">{{ $item->kode_barang ?: '-' }}</td>
-                                                    <td>{{ $item->nama_barang }}</td>
+                                                    <td style="padding:6px 12px; font-family:'IBM Plex Mono',monospace; font-size:11px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:0" title="{{ $item->kode_barang ?: '-' }}">{{ $item->kode_barang ?: '-' }}</td>
+                                                    <td style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:0" title="{{ $item->nama_barang }}">{{ $item->nama_barang }}</td>
                                                     <td>{{ $item->kelas ?: '-' }}</td>
-                                                    <td>{{ $item->nama_supplier ?: '-' }}</td>
+                                                    <td style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:0" title="{{ $item->nama_supplier ?: '-' }}">{{ $item->nama_supplier ?: '-' }}</td>
                                                     <td style="text-align:right; font-family:'IBM Plex Mono',monospace">{{ $item->qty_netto }}</td>
                                                     <td style="text-align:right; font-family:'IBM Plex Mono',monospace">Rp {{ number_format((float) $item->harga_jual, 0, ',', '.') }}</td>
                                                     <td style="text-align:right; font-family:'IBM Plex Mono',monospace">{{ $item->persen_diskon ?: 0 }}%</td>
