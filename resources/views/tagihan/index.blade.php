@@ -208,12 +208,12 @@
                     <col style="width:14%"> <!-- Lembaga -->
                     <col style="width:8%">  <!-- Tanggal -->
                     <col style="width:8%">  <!-- Jatuh Tempo -->
-                    <col style="width:9%">  <!-- Sales -->
+                    <col style="width:8%">  <!-- Sales -->
                     <col style="width:5%">  <!-- Dana -->
                     <col style="width:9%">  <!-- Total -->
                     <col style="width:9%">  <!-- Status -->
                     <col style="width:8%">  <!-- Penagihan -->
-                    <col style="width:11%"> <!-- Aksi — lebih lebar -->
+                    <col style="width:12%"> <!-- Aksi — cukup untuk Edit + Hapus tanpa tumpang tindih -->
                 </colgroup>
                 <thead>
                     <tr>
@@ -300,18 +300,18 @@
                                     <span style="color:#DCE2E0; font-size:12px">—</span>
                                 @endif
                             </td>
-                            <td style="padding:8px 6px; white-space:nowrap; overflow:hidden">
-                                <div style="display:flex; gap:3px; flex-wrap:nowrap; align-items:center; justify-content:flex-end">
+                            <td style="padding:8px 6px; white-space:nowrap">
+                                <div style="display:flex; gap:4px; flex-wrap:nowrap; align-items:center; justify-content:flex-end">
                                     @can('update', $t)
                                         <a href="{{ route('tagihan.edit', $t) }}"
-                                           style="font-size:11px; padding:3px 8px; border:1px solid #0E6E66; color:#0E6E66; border-radius:4px; text-decoration:none; white-space:nowrap; flex-shrink:0">
+                                           style="font-size:11px; padding:3px 8px; min-width:36px; text-align:center; box-sizing:border-box; border:1px solid #0E6E66; color:#0E6E66; background:white; border-radius:4px; text-decoration:none; white-space:nowrap; flex:0 0 auto">
                                             Edit
                                         </a>
                                     @endcan
                                     @can('delete', $t)
                                         <button onclick="confirm('Hapus tagihan ini?') || event.preventDefault()"
                                                 form="del-t-{{ $t->id_tagihan }}"
-                                                style="font-size:11px; padding:3px 8px; border:1px solid #B33A2E; color:#B33A2E; background:white; border-radius:4px; cursor:pointer; white-space:nowrap; flex-shrink:0">
+                                                style="font-size:11px; padding:3px 8px; min-width:42px; text-align:center; box-sizing:border-box; border:1px solid #B33A2E; color:#B33A2E; background:white; border-radius:4px; cursor:pointer; white-space:nowrap; flex:0 0 auto">
                                             Hapus
                                         </button>
                                         <form id="del-t-{{ $t->id_tagihan }}" method="POST"
