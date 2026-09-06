@@ -95,18 +95,29 @@
 
     <div class="bg-surface border border-line rounded overflow-hidden">
         <div class="hidden sm:block overflow-x-auto">
-            <table style="width:100%; min-width:1100px; table-layout:fixed">
+            <table style="width:100%; min-width:1250px; table-layout:fixed; border-collapse:collapse">
+                <colgroup>
+                    <col style="width:4%">   <!-- No -->
+                    <col style="width:13%">  <!-- Pelanggan -->
+                    <col style="width:12%">  <!-- Lembaga -->
+                    <col style="width:9%">   <!-- Kabupaten -->
+                    <col style="width:9%">   <!-- Sumber Dana -->
+                    <col style="width:15%">  <!-- Total Tagihan -->
+                    <col style="width:15%">  <!-- Total Terbayar -->
+                    <col style="width:15%">  <!-- Sisa Piutang -->
+                    <col style="width:8%">   <!-- Status -->
+                </colgroup>
                 <thead>
                     <tr class="border-b border-line">
-                        <th style="width:4%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">No</th>
-                        <th style="width:16%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Pelanggan</th>
-                        <th style="width:14%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Lembaga</th>
-                        <th style="width:10%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Kabupaten</th>
-                        <th style="width:9%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Sumber Dana</th>
-                        <th style="width:12%; padding:12px 16px; text-align:right; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Total Tagihan</th>
-                        <th style="width:12%; padding:12px 16px; text-align:right; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Total Terbayar</th>
-                        <th style="width:13%; padding:12px 16px; text-align:right; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Sisa Piutang</th>
-                        <th style="width:10%; padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Status</th>
+                        <th style="padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">No</th>
+                        <th style="padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Pelanggan</th>
+                        <th style="padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Lembaga</th>
+                        <th style="padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Kabupaten</th>
+                        <th style="padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Sumber Dana</th>
+                        <th style="padding:12px 16px; text-align:right; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Total Tagihan</th>
+                        <th style="padding:12px 16px; text-align:right; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Total Terbayar</th>
+                        <th style="padding:12px 16px; text-align:right; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Sisa Piutang</th>
+                        <th style="padding:12px 16px; text-align:left; font-size:11px; font-weight:500; color:#5B6470; text-transform:uppercase; letter-spacing:0.05em">Status</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -164,13 +175,13 @@
                                     <x-badge-sumber-dana :sumber="$sumberDominan" />
                                 @endif
                             </td>
-                            <td style="padding:12px 16px; font-size:14px; white-space:nowrap; text-align:right; font-family:'IBM Plex Mono',monospace">
+                            <td style="padding:12px 16px; font-size:14px; white-space:nowrap; text-align:right; font-family:'IBM Plex Mono',monospace; overflow:hidden; text-overflow:ellipsis; max-width:0">
                                 Rp {{ number_format($r->total_tagihan, 2, ',', '.') }}
                             </td>
-                            <td style="padding:12px 16px; font-size:14px; white-space:nowrap; text-align:right; font-family:'IBM Plex Mono',monospace">
+                            <td style="padding:12px 16px; font-size:14px; white-space:nowrap; text-align:right; font-family:'IBM Plex Mono',monospace; overflow:hidden; text-overflow:ellipsis; max-width:0">
                                 Rp {{ number_format($r->total_terbayar, 2, ',', '.') }}
                             </td>
-                            <td style="padding:12px 16px; text-align:right; white-space:nowrap">
+                            <td style="padding:12px 16px; text-align:right; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:0">
                                 <div style="font-family:'IBM Plex Mono',monospace; font-size:14px; color:{{ $sisaColor }}">
                                     Rp {{ number_format($r->sisa_piutang, 2, ',', '.') }}
                                 </div>
