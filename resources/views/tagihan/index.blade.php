@@ -177,7 +177,7 @@
     </p>
 
     <div class="bg-surface border border-line rounded overflow-hidden">
-        <div class="hidden sm:block overflow-x-auto">
+        <div class="hidden sm:block" style="overflow-x:auto; width:100%">
             <style>
                 .tabel-tagihan th {
                     padding: 12px 16px;
@@ -201,19 +201,19 @@
                     background: #FAFAFA;
                 }
             </style>
-            <table style="width:100%; min-width:1100px; table-layout:fixed; border-collapse:collapse" class="tabel-tagihan">
+            <table style="width:100%; min-width:1200px; table-layout:fixed; border-collapse:collapse" class="tabel-tagihan">
                 <colgroup>
-                    <col style="width:13%">
-                    <col style="width:7%">
-                    <col style="width:15%">
-                    <col style="width:9%">
-                    <col style="width:9%">
-                    <col style="width:10%">
-                    <col style="width:6%">
-                    <col style="width:10%">
-                    <col style="width:10%">
-                    <col style="width:7%">
-                    <col style="width:4%">
+                    <col style="width:12%"> <!-- No. Invoice -->
+                    <col style="width:7%">  <!-- No. SJ -->
+                    <col style="width:14%"> <!-- Lembaga -->
+                    <col style="width:8%">  <!-- Tanggal -->
+                    <col style="width:8%">  <!-- Jatuh Tempo -->
+                    <col style="width:9%">  <!-- Sales -->
+                    <col style="width:5%">  <!-- Dana -->
+                    <col style="width:9%">  <!-- Total -->
+                    <col style="width:9%">  <!-- Status -->
+                    <col style="width:8%">  <!-- Penagihan -->
+                    <col style="width:11%"> <!-- Aksi — lebih lebar -->
                 </colgroup>
                 <thead>
                     <tr>
@@ -233,15 +233,17 @@
                 <tbody>
                     @forelse ($tagihan as $t)
                         @php
-                            $rail = match(true) {
-                                $t->status === 'lunas' => 'paid',
-                                $t->is_overdue => match($t->aging_bucket) {
-                                    '0-30' => 'watch30',
-                                    '31-60' => 'watch60',
-                                    default => 'critical',
-                                },
-                                default => 'lancar',
-                            };
+                            if ($t->status === 'lunas') {
+                                $railColor = '#3E7C58';
+                            } elseif (! $t->tanggal_jatuh_tempo->isPast()) {
+                                $railColor = '#6B7CA3';
+                            } elseif ($t->days_overdue <= 30) {
+                                $railColor = '#C8862A';
+                            } elseif ($t->days_overdue <= 60) {
+                                $railColor = '#B8612A';
+                            } else {
+                                $railColor = '#B33A2E';
+                            }
 
                             [$label, $color] = match(true) {
                                 $t->status === 'lunas'             => ['Lunas', '#3E7C58'],
@@ -250,7 +252,7 @@
                             };
                             $bg = $color . '20';
                         @endphp
-                        <tr class="aging-rail-{{ $rail }}">
+                        <tr style="border-left:3px solid {{ $railColor }}">
                             <td style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:0"
                                 title="{{ $t->no_invoice }}">
                                 <a href="{{ route('tagihan.show', $t) }}"
@@ -275,8 +277,12 @@
                                 title="{{ $t->nama_sales ?: '-' }}">
                                 {{ $t->nama_sales ?: '-' }}
                             </td>
-                            <td style="white-space:nowrap; padding:12px 16px">
-                                <x-badge-sumber-dana :sumber="$t->sumber_dana" />
+                            <td style="padding:8px 6px; white-space:nowrap">
+                                @if($t->sumber_dana)
+                                    <x-badge-sumber-dana :sumber="$t->sumber_dana" />
+                                @else
+                                    <span style="color:#DCE2E0; font-size:12px">—</span>
+                                @endif
                             </td>
                             <td style="text-align:right; white-space:nowrap; font-size:13px">
                                 <span style="color:#5B6470; margin-right:2px">Rp</span>
@@ -287,29 +293,30 @@
                                     {{ $label }}
                                 </span>
                             </td>
-                            <td style="white-space:nowrap; padding:12px 16px">
-                                @if($t->status_penagihan)
+                            <td style="padding:8px 6px; white-space:nowrap">
+                                @if($t->status_penagihan && $t->status_penagihan !== 'belum_ditagih')
                                     <x-badge-penagihan :status="$t->status_penagihan" />
+                                @else
+                                    <span style="color:#DCE2E0; font-size:12px">—</span>
                                 @endif
                             </td>
-                            <td style="white-space:nowrap; padding:12px 16px; text-align:right">
-                                <div style="display:flex; gap:4px; align-items:center; justify-content:flex-end">
+                            <td style="padding:8px 6px; white-space:nowrap; overflow:hidden">
+                                <div style="display:flex; gap:3px; flex-wrap:nowrap; align-items:center; justify-content:flex-end">
                                     @can('update', $t)
                                         <a href="{{ route('tagihan.edit', $t) }}"
-                                           style="font-size:12px; padding:4px 10px; border:1px solid #0E6E66; color:#0E6E66; background:white; border-radius:4px; text-decoration:none; white-space:nowrap">
+                                           style="font-size:11px; padding:3px 8px; border:1px solid #0E6E66; color:#0E6E66; border-radius:4px; text-decoration:none; white-space:nowrap; flex-shrink:0">
                                             Edit
                                         </a>
                                     @endcan
                                     @can('delete', $t)
                                         <button onclick="confirm('Hapus tagihan ini?') || event.preventDefault()"
-                                                form="form-hapus-{{ $t->id_tagihan }}"
-                                                style="font-size:12px; padding:4px 10px; border:1px solid #B33A2E; color:#B33A2E; background:white; border-radius:4px; cursor:pointer; white-space:nowrap">
+                                                form="del-t-{{ $t->id_tagihan }}"
+                                                style="font-size:11px; padding:3px 8px; border:1px solid #B33A2E; color:#B33A2E; background:white; border-radius:4px; cursor:pointer; white-space:nowrap; flex-shrink:0">
                                             Hapus
                                         </button>
-                                        <form id="form-hapus-{{ $t->id_tagihan }}" method="POST"
+                                        <form id="del-t-{{ $t->id_tagihan }}" method="POST"
                                               action="{{ route('tagihan.destroy', $t) }}" style="display:none">
-                                            @csrf
-                                            @method('DELETE')
+                                            @csrf @method('DELETE')
                                         </form>
                                     @endcan
                                 </div>
